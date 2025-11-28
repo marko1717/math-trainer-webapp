@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Трансформації графіків | НМТ Математика</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <span class="level-badge" id="levelBadge">Рівень 1</span>
+            </div>
+            <div class="header-center">
+                <h1>Трансформації</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter" id="streakCounter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streakNumber">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="start-content">
+                    <div class="start-icon">📈</div>
+                    <h2>Трансформації графіків</h2>
+                    <p class="start-description">
+                        Навчись визначати зсуви та відображення функцій
+                    </p>
+                    <div class="transform-preview">
+                        <div class="transform-item">f(x) → f(x - a) зсув вправо</div>
+                        <div class="transform-item">f(x) → f(x + a) зсув вліво</div>
+                        <div class="transform-item">f(x) → f(x) + b зсув вгору</div>
+                        <div class="transform-item">f(x) → f(x) - b зсув вниз</div>
+                        <div class="transform-item">f(x) → -f(x) відображення</div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="startBtn">
+                        Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="screen" id="quizScreen">
+                <div class="question-container">
+                    <div class="difficulty-indicator" id="difficultyIndicator">
+                        <span class="difficulty-dot active"></span>
+                        <span class="difficulty-dot"></span>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-number" id="questionNumber">Питання 1</div>
+                        <div class="question-text" id="questionText">
+                            Яка трансформація застосована до графіка?
+                        </div>
+                    </div>
+
+                    <!-- Graph Display -->
+                    <div class="graph-container">
+                        <div class="graph-wrapper">
+                            <canvas id="graphCanvas" width="300" height="300"></canvas>
+                            <div class="equation-display" id="equationDisplay">
+                                <div class="equation-original" id="originalEquation">f(x) = x²</div>
+                                <div class="equation-transformed" id="transformedEquation">g(x) = ?</div>
+                            </div>
+                        </div>
+                        <div class="graph-legend">
+                            <div class="legend-item">
+                                <span class="legend-color original"></span>
+                                <span>f(x) - оригінал</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color transformed"></span>
+                                <span>g(x) - трансформація</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="answers-container" id="answersContainer">
+                        <!-- Answers will be inserted here -->
+                    </div>
+
+                    <div class="feedback-container" id="feedbackContainer">
+                        <div class="feedback-icon" id="feedbackIcon"></div>
+                        <div class="feedback-text" id="feedbackText"></div>
+                        <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
+                    Далі →
+                </button>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-content">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultCorrect">0</div>
+                            <div class="stat-label">Правильних</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultAccuracy">0%</div>
+                            <div class="stat-label">Точність</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultLevel">1</div>
+                            <div class="stat-label">Рівень</div>
+                        </div>
+                    </div>
+
+                    <div class="ai-feedback" id="aiFeedback">
+                        <div class="ai-icon">🤖</div>
+                        <div class="ai-text" id="aiText">
+                            Аналізую твої результати...
+                        </div>
+                    </div>
+
+                    <div class="weak-topics" id="weakTopics" style="display: none;">
+                        <h3>Рекомендую попрактикувати:</h3>
+                        <div class="weak-list" id="weakList"></div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-large" id="restartBtn">
+                            Продовжити тренування
+                        </button>
+                        <button class="btn btn-secondary" id="reviewBtn">
+                            Переглянути правила
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rules Reference Screen -->
+            <div class="screen" id="rulesScreen">
+                <div class="rules-content">
+                    <h2>Правила трансформацій</h2>
+
+                    <div class="rule-category">
+                        <h3>Горизонтальні зсуви</h3>
+                        <div class="rule-card">
+                            <div class="rule-main">f(x - a) → зсув вправо на a</div>
+                            <div class="rule-example">Приклад: (x-2)² - парабола зсунута вправо на 2</div>
+                        </div>
+                        <div class="rule-card">
+                            <div class="rule-main">f(x + a) → зсув вліво на a</div>
+                            <div class="rule-example">Приклад: (x+3)² - парабола зсунута вліво на 3</div>
+                        </div>
+                    </div>
+
+                    <div class="rule-category">
+                        <h3>Вертикальні зсуви</h3>
+                        <div class="rule-card">
+                            <div class="rule-main">f(x) + b → зсув вгору на b</div>
+                            <div class="rule-example">Приклад: x² + 2 - парабола зсунута вгору на 2</div>
+                        </div>
+                        <div class="rule-card">
+                            <div class="rule-main">f(x) - b → зсув вниз на b</div>
+                            <div class="rule-example">Приклад: x² - 3 - парабола зсунута вниз на 3</div>
+                        </div>
+                    </div>
+
+                    <div class="rule-category">
+                        <h3>Відображення</h3>
+                        <div class="rule-card">
+                            <div class="rule-main">-f(x) → відображення відносно осі X</div>
+                            <div class="rule-example">Приклад: -x² - парабола перевернута вниз</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="backToQuizBtn">
+                        ← Повернутись
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

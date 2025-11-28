@@ -13,6 +13,26 @@ if (tg) {
 // === GPT API Configuration ===
 const API_BASE = 'https://marko17.pythonanywhere.com';
 
+// === LaTeX Rendering ===
+function renderMath(element) {
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(element, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });
+    }
+}
+
+function setTextWithMath(element, text) {
+    element.innerHTML = text;
+    renderMath(element);
+}
+
 // === GPT API Functions ===
 async function getGPTExplanation(question, correct, userAnswer, formulaType) {
     try {
@@ -630,7 +650,7 @@ class GameController {
             );
 
             if (gptExplanation) {
-                this.feedbackExplanation.textContent = '🤖 ' + gptExplanation;
+                setTextWithMath(this.feedbackExplanation, '🤖 ' + gptExplanation);
             } else {
                 this.feedbackExplanation.textContent = this.currentQuestion.explanation;
             }
@@ -689,7 +709,7 @@ class GameController {
         );
 
         if (gptFeedback) {
-            aiTextEl.textContent = gptFeedback;
+            setTextWithMath(aiTextEl, gptFeedback);
         } else {
             aiTextEl.textContent = message;
         }

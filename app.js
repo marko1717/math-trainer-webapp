@@ -91,6 +91,7 @@ async function getGPTHint(question, formulaType) {
 }
 
 // === Formula Database ===
+// 5 основних формул для НМТ (без кубів суми/різниці)
 const FORMULAS = {
     squareSum: {
         name: 'Квадрат суми',
@@ -107,25 +108,15 @@ const FORMULAS = {
         formula: 'a² - b² = (a - b)(a + b)',
         difficulty: 1
     },
-    cubeSum: {
-        name: 'Куб суми',
-        formula: '(a + b)³ = a³ + 3a²b + 3ab² + b³',
-        difficulty: 2
-    },
-    cubeDiff: {
-        name: 'Куб різниці',
-        formula: '(a - b)³ = a³ - 3a²b + 3ab² - b³',
-        difficulty: 2
-    },
     sumCubes: {
         name: 'Сума кубів',
         formula: 'a³ + b³ = (a + b)(a² - ab + b²)',
-        difficulty: 3
+        difficulty: 2
     },
     diffCubes: {
         name: 'Різниця кубів',
         formula: 'a³ - b³ = (a - b)(a² + ab + b²)',
-        difficulty: 3
+        difficulty: 2
     }
 };
 
@@ -193,48 +184,7 @@ const questionGenerators = {
         };
     },
 
-    // Level 2: Cubes
-    cubeSum: (difficulty) => {
-        const vars = ['x', 'y', 'a'];
-        const v = vars[Math.floor(Math.random() * vars.length)];
-        const n = difficulty <= 2 ? 1 : [1, 2][Math.floor(Math.random() * 2)];
-        const n3 = n * n * n;
-
-        return {
-            question: `Розкрийте дужки: (${v} + ${n})³`,
-            correct: `${v}³ + ${3*n}${v}² + ${3*n*n}${v} + ${n3}`,
-            formula: 'cubeSum',
-            explanation: `(${v} + ${n})³ = ${v}³ + 3·${v}²·${n} + 3·${v}·${n}² + ${n}³`,
-            wrongAnswers: [
-                `${v}³ + ${n3}`,
-                `${v}³ + ${3*n}${v}² + ${n3}`,
-                `${v}³ - ${3*n}${v}² + ${3*n*n}${v} - ${n3}`,
-                `${v}³ + ${n}${v}² + ${n*n}${v} + ${n3}`
-            ]
-        };
-    },
-
-    cubeDiff: (difficulty) => {
-        const vars = ['x', 'y', 'a'];
-        const v = vars[Math.floor(Math.random() * vars.length)];
-        const n = difficulty <= 2 ? 1 : [1, 2][Math.floor(Math.random() * 2)];
-        const n3 = n * n * n;
-
-        return {
-            question: `Розкрийте дужки: (${v} - ${n})³`,
-            correct: `${v}³ - ${3*n}${v}² + ${3*n*n}${v} - ${n3}`,
-            formula: 'cubeDiff',
-            explanation: `(${v} - ${n})³ = ${v}³ - 3·${v}²·${n} + 3·${v}·${n}² - ${n}³`,
-            wrongAnswers: [
-                `${v}³ - ${n3}`,
-                `${v}³ + ${3*n}${v}² - ${3*n*n}${v} + ${n3}`,
-                `${v}³ - ${3*n}${v}² - ${3*n*n}${v} - ${n3}`,
-                `${v}³ - ${n}${v}² + ${n*n}${v} - ${n3}`
-            ]
-        };
-    },
-
-    // Level 3: Sum/Diff of cubes
+    // Level 2: Sum/Diff of cubes
     sumCubes: (difficulty) => {
         const vars = ['x', 'y', 'a'];
         const v = vars[Math.floor(Math.random() * vars.length)];
@@ -337,13 +287,8 @@ class AdaptiveAI {
             types.push('squareSum', 'squareDiff', 'diffSquares');
         }
 
-        // Level 2: Cubes
+        // Level 2: Sum/Diff of cubes
         if (this.level >= 2) {
-            types.push('cubeSum', 'cubeDiff');
-        }
-
-        // Level 3: Sum/Diff of cubes
-        if (this.level >= 3) {
             types.push('sumCubes', 'diffCubes');
         }
 
@@ -403,7 +348,7 @@ class AdaptiveAI {
     adjustLevel() {
         // Level up: 5+ streak or high accuracy
         if (this.streak >= 5) {
-            this.level = Math.min(3, this.level + 1);
+            this.level = Math.min(2, this.level + 1);
             return;
         }
 
@@ -412,7 +357,7 @@ class AdaptiveAI {
         if (recent.length >= 5) {
             const recentAccuracy = recent.filter(q => q.isCorrect).length / recent.length;
 
-            if (recentAccuracy >= 0.8 && this.level < 3) {
+            if (recentAccuracy >= 0.8 && this.level < 2) {
                 this.level++;
             } else if (recentAccuracy < 0.4 && this.level > 1) {
                 this.level--;
@@ -447,9 +392,9 @@ class AdaptiveAI {
             message += `Вражаюча серія з ${this.streak} правильних відповідей підряд! `;
         }
 
-        if (this.level === 3) {
-            message += 'Ти на максимальному рівні складності — справжній профі!';
-        } else if (this.level === 2) {
+        if (this.level === 2) {
+            message += 'Ти на максимальному рівні — справжній профі!';
+        } else {
             message += 'Ще трохи — і перейдеш на найвищий рівень!';
         }
 

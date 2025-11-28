@@ -10,6 +10,66 @@ if (tg) {
     }
 }
 
+// === GPT API Configuration ===
+const API_BASE = 'https://marko17.pythonanywhere.com';
+
+// === GPT API Functions ===
+async function getGPTExplanation(question, correct, userAnswer, formulaType) {
+    try {
+        const response = await fetch(`${API_BASE}/api/explain`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                question,
+                correct,
+                userAnswer,
+                formulaType
+            })
+        });
+        const data = await response.json();
+        return data.success ? data.explanation : null;
+    } catch (e) {
+        console.error('GPT explain error:', e);
+        return null;
+    }
+}
+
+async function getGPTFeedback(correct, total, level, weakAreas, streak) {
+    try {
+        const response = await fetch(`${API_BASE}/api/feedback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                correct,
+                total,
+                level,
+                weakAreas,
+                streak
+            })
+        });
+        const data = await response.json();
+        return data.success ? data.feedback : null;
+    } catch (e) {
+        console.error('GPT feedback error:', e);
+        return null;
+    }
+}
+
+async function getGPTHint(question, formulaType) {
+    try {
+        const response = await fetch(`${API_BASE}/api/hint`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, formulaType })
+        });
+        const data = await response.json();
+        return data.success ? data.hint : null;
+    } catch (e) {
+        console.error('GPT hint error:', e);
+        return null;
+    }
+}
+
 // === Formula Database ===
 const FORMULAS = {
     squareSum: {
@@ -529,8 +589,9 @@ class GameController {
         this.ai.processAnswer(this.currentQuestion.formula, isCorrect, responseTime);
         if (isCorrect) this.correctInSession++;
 
-        // Show feedback
-        this.showFeedback(isCorrect);
+        // Show feedback with user's answer
+        const userAnswerText = btn.querySelector('.answer-text')?.textContent || '';
+        this.showFeedback(isCorrect, userAnswerText);
 
         // Update UI
         this.updateUI();
@@ -547,19 +608,34 @@ class GameController {
         }
     }
 
-    showFeedback(isCorrect) {
+    async showFeedback(isCorrect, userAnswer = '') {
         this.feedbackContainer.classList.add('show');
         this.feedbackContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
 
         if (isCorrect) {
             this.feedbackIcon.textContent = '✅';
             this.feedbackText.textContent = this.getPositiveFeedback();
+            this.feedbackExplanation.textContent = this.currentQuestion.explanation;
         } else {
             this.feedbackIcon.textContent = '❌';
             this.feedbackText.textContent = 'Неправильно';
+            this.feedbackExplanation.textContent = '🤖 Завантажую пояснення від ШІ...';
+
+            // Get GPT explanation for wrong answer
+            const gptExplanation = await getGPTExplanation(
+                this.currentQuestion.question,
+                this.currentQuestion.correct,
+                userAnswer,
+                FORMULAS[this.currentQuestion.formula]?.name || ''
+            );
+
+            if (gptExplanation) {
+                this.feedbackExplanation.textContent = '🤖 ' + gptExplanation;
+            } else {
+                this.feedbackExplanation.textContent = this.currentQuestion.explanation;
+            }
         }
 
-        this.feedbackExplanation.textContent = this.currentQuestion.explanation;
         this.nextBtn.style.display = 'block';
     }
 
@@ -568,7 +644,7 @@ class GameController {
         return messages[Math.floor(Math.random() * messages.length)];
     }
 
-    showResults() {
+    async showResults() {
         this.showScreen(this.resultsScreen);
 
         const accuracy = Math.round((this.correctInSession / this.questionsPerSession) * 100);
@@ -596,9 +672,27 @@ class GameController {
             resultsTitle.textContent = 'Потрібна практика';
         }
 
-        // AI feedback
+        // Get weak areas
         const { message, weakAreas } = this.ai.getFeedback();
-        document.getElementById('aiText').textContent = message;
+
+        // Show loading state for AI feedback
+        const aiTextEl = document.getElementById('aiText');
+        aiTextEl.textContent = '🤖 Аналізую результати...';
+
+        // Get GPT personalized feedback
+        const gptFeedback = await getGPTFeedback(
+            this.correctInSession,
+            this.questionsPerSession,
+            this.ai.level,
+            weakAreas,
+            this.ai.streak
+        );
+
+        if (gptFeedback) {
+            aiTextEl.textContent = gptFeedback;
+        } else {
+            aiTextEl.textContent = message;
+        }
 
         // Show weak areas if any
         const weakTopicsDiv = document.getElementById('weakTopics');

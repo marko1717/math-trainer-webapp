@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Парні та непарні функції</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <h1>📊 Парність функцій</h1>
+            <p class="subtitle">Вивчи парні та непарні функції</p>
+
+            <div class="theory-preview">
+                <h3>📖 Означення</h3>
+                <div class="definition">
+                    <p><strong>Парна функція:</strong></p>
+                    <p class="formula" id="evenDef"></p>
+                    <p class="hint-text">Графік симетричний відносно осі OY</p>
+                </div>
+                <div class="definition">
+                    <p><strong>Непарна функція:</strong></p>
+                    <p class="formula" id="oddDef"></p>
+                    <p class="hint-text">Графік симетричний відносно початку координат</p>
+                </div>
+            </div>
+
+            <div class="level-select">
+                <h3>Обери рівень:</h3>
+                <button class="btn btn-level" data-level="1">
+                    <span class="level-icon">🌱</span>
+                    <span class="level-text">Легкий</span>
+                    <span class="level-desc">Типові функції</span>
+                </button>
+                <button class="btn btn-level" data-level="2">
+                    <span class="level-icon">🌿</span>
+                    <span class="level-text">Середній</span>
+                    <span class="level-desc">Формули та графіки</span>
+                </button>
+                <button class="btn btn-level" data-level="3">
+                    <span class="level-icon">🌳</span>
+                    <span class="level-text">Складний</span>
+                    <span class="level-desc">Композиції та суми</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="header">
+                <div class="stats">
+                    <span class="stat">✅ <span id="correct">0</span></span>
+                    <span class="stat">❌ <span id="wrong">0</span></span>
+                    <span class="stat">🔥 <span id="streak">0</span></span>
+                </div>
+                <div class="level-indicator">Рівень <span id="currentLevel">1</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Graph Container -->
+            <div class="graph-container" id="graphContainer" style="display: none;">
+                <canvas id="graphCanvas" width="300" height="250"></canvas>
+            </div>
+
+            <div class="question-area">
+                <p class="question-type" id="questionType"></p>
+                <div class="question" id="question"></div>
+            </div>
+
+            <div class="answers" id="answers"></div>
+
+            <button class="btn btn-hint" id="hintBtn">💡 Підказка</button>
+            <div class="hint-container" id="hintContainer" style="display: none;">
+                <div class="hint-text" id="hintText"></div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <h2 id="resultTitle">🎉 Чудово!</h2>
+            <div class="result-stats">
+                <div class="result-stat">
+                    <span class="result-value" id="finalCorrect">0</span>
+                    <span class="result-label">Правильно</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-value" id="finalWrong">0</span>
+                    <span class="result-label">Помилок</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-value" id="finalAccuracy">0%</span>
+                    <span class="result-label">Точність</span>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button class="btn btn-primary" id="restartBtn">🔄 Ще раз</button>
+                <button class="btn btn-secondary" id="menuBtn">📚 Меню</button>
+            </div>
+        </div>
+
+        <!-- Theory Reference -->
+        <div id="theoryScreen" class="screen">
+            <h2>📖 Довідник</h2>
+            <div class="theory-content">
+                <h3>Парні функції (симетрія ↔️)</h3>
+                <ul class="function-list" id="evenList"></ul>
+
+                <h3>Непарні функції (симетрія ↩️)</h3>
+                <ul class="function-list" id="oddList"></ul>
+
+                <h3>Ні парні, ні непарні</h3>
+                <ul class="function-list" id="neitherList"></ul>
+
+                <h3>Властивості</h3>
+                <div class="properties" id="propertiesList"></div>
+            </div>
+            <button class="btn btn-primary" id="backFromTheory">⬅️ Назад</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

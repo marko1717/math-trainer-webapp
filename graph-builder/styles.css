@@ -1,0 +1,452 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #252542;
+    --text-primary: #f0f0f0;
+    --text-secondary: #a0a0b0;
+    --accent: #7c3aed;
+    --accent-light: #a78bfa;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --grid-color: #2a2a4a;
+    --axis-color: #4a4a7a;
+    --point-color: #f59e0b;
+    --line-color: #7c3aed;
+    --correct-color: #10b981;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 15px;
+    min-height: 100vh;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Start Screen */
+#startScreen h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+}
+
+/* Topic Select */
+.topic-select h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.btn-topic {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    color: var(--text-primary);
+}
+
+.btn-topic:hover, .btn-topic:active {
+    border-color: var(--accent);
+    transform: translateX(5px);
+    background: rgba(124, 58, 237, 0.1);
+}
+
+.topic-icon {
+    font-size: 1.8rem;
+    width: 45px;
+    text-align: center;
+}
+
+.topic-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.topic-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.topic-formula {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-family: 'Courier New', monospace;
+}
+
+/* Game Screen */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.stats {
+    display: flex;
+    gap: 12px;
+}
+
+.stat {
+    font-size: 1rem;
+    background: var(--bg-card);
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+.btn-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: var(--error);
+    color: white;
+}
+
+.progress-bar {
+    height: 5px;
+    background: var(--bg-secondary);
+    border-radius: 3px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* Task Area */
+.task-area {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.task-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.function-display {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent-light);
+}
+
+/* Graph Area */
+.graph-area {
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+#graphCanvas {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 10px;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.graph-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.btn-control {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 2px solid var(--bg-secondary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-control:hover {
+    border-color: var(--accent);
+}
+
+.btn-control.active {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Hint Section */
+.hint-section {
+    margin-bottom: 15px;
+}
+
+.btn-hint {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 2px dashed var(--accent);
+    border-radius: 12px;
+    color: var(--accent-light);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-hint:hover {
+    background: rgba(124, 58, 237, 0.1);
+}
+
+.btn-hint:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hint-box {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(167, 139, 250, 0.1));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Check Button */
+.btn-check {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-check:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(124, 58, 237, 0.4);
+}
+
+.btn-check:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Feedback */
+.feedback {
+    text-align: center;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: none;
+    margin-top: 15px;
+}
+
+.feedback.show {
+    display: block;
+    animation: slideUp 0.3s ease;
+}
+
+.feedback.correct {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.feedback.wrong {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Result Screen */
+#resultScreen {
+    text-align: center;
+    padding-top: 40px;
+}
+
+#resultScreen h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 35px;
+}
+
+.result-stat {
+    background: var(--bg-card);
+    padding: 20px 22px;
+    border-radius: 16px;
+    min-width: 85px;
+}
+
+.result-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-light);
+    margin-bottom: 5px;
+}
+
+.result-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn {
+    padding: 16px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-light);
+}
+
+.btn-secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 2px solid var(--bg-secondary);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+}
+
+/* Responsive */
+@media (max-width: 380px) {
+    .container {
+        padding: 10px;
+    }
+
+    #graphCanvas {
+        max-width: 280px;
+    }
+
+    .result-stats {
+        gap: 12px;
+    }
+
+    .result-stat {
+        padding: 15px;
+        min-width: 75px;
+    }
+}
+
+/* Light theme */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #e9ecef;
+        --bg-card: #ffffff;
+        --text-primary: #212529;
+        --text-secondary: #6c757d;
+        --grid-color: #dee2e6;
+        --axis-color: #495057;
+    }
+
+    .btn-topic,
+    .graph-area,
+    .task-area {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    #startScreen h1 {
+        -webkit-text-fill-color: var(--accent);
+    }
+}

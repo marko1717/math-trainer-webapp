@@ -1,0 +1,116 @@
+/* Percent trainer specific styles */
+
+.theory-box {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+}
+
+.theory-box h3 {
+    color: var(--accent-light);
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.formula-row {
+    background: rgba(124, 58, 237, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.formula-row:last-child {
+    margin-bottom: 0;
+}
+
+.formula {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.question-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 25px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.question-type {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.question-text {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.method-hint {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.answer-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.answer-input {
+    flex: 1;
+    padding: 16px;
+    font-size: 1.2rem;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.answer-input:focus {
+    border-color: var(--accent);
+}
+
+.answer-input.correct {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.answer-input.wrong {
+    border-color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.btn-submit {
+    padding: 16px 24px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-submit:hover {
+    background: var(--accent-light);
+}
+
+.btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

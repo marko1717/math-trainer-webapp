@@ -1,0 +1,356 @@
+/* Shared styles for all trainers */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #252542;
+    --text-primary: #f0f0f0;
+    --text-secondary: #a0a0b0;
+    --accent: #7c3aed;
+    --accent-light: #a78bfa;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --border-color: #3a3a5a;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 15px;
+    min-height: 100vh;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Headers */
+h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+}
+
+/* Level Select */
+.level-select h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.btn-level {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    color: var(--text-primary);
+}
+
+.btn-level:hover, .btn-level:active {
+    border-color: var(--accent);
+    transform: translateX(5px);
+}
+
+.level-icon {
+    font-size: 1.8rem;
+}
+
+.level-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.level-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.level-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.stats {
+    display: flex;
+    gap: 10px;
+}
+
+.stat {
+    font-size: 0.95rem;
+    background: var(--bg-card);
+    padding: 6px 10px;
+    border-radius: 20px;
+}
+
+.level-badge {
+    background: var(--accent);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Progress Bar */
+.progress-bar {
+    height: 5px;
+    background: var(--bg-secondary);
+    border-radius: 3px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* Buttons */
+.btn {
+    padding: 14px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-light);
+}
+
+.btn-secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+}
+
+/* Hint System */
+.btn-hint {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 2px dashed var(--accent);
+    border-radius: 12px;
+    color: var(--accent-light);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 15px;
+}
+
+.btn-hint:hover {
+    background: rgba(124, 58, 237, 0.1);
+}
+
+.btn-hint:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hint-container {
+    display: none;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(167, 139, 250, 0.1));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.hint-container.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.hint-loading {
+    text-align: center;
+    color: var(--accent-light);
+}
+
+.hint-loading.hidden {
+    display: none;
+}
+
+.hint-text {
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* Feedback */
+.feedback {
+    text-align: center;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: none;
+}
+
+.feedback.show {
+    display: block;
+    animation: slideUp 0.3s ease;
+}
+
+.feedback.correct {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.feedback.wrong {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Result Screen */
+#resultScreen {
+    text-align: center;
+    padding-top: 40px;
+}
+
+#resultScreen h2 {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+}
+
+.result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.result-stat {
+    background: var(--bg-card);
+    padding: 18px 20px;
+    border-radius: 16px;
+    min-width: 85px;
+}
+
+.result-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-light);
+    margin-bottom: 5px;
+}
+
+.result-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Light theme */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #e9ecef;
+        --bg-card: #ffffff;
+        --text-primary: #212529;
+        --text-secondary: #6c757d;
+        --border-color: #dee2e6;
+    }
+
+    h1 {
+        -webkit-text-fill-color: var(--accent);
+    }
+}
+
+/* Responsive */
+@media (max-width: 380px) {
+    .container {
+        padding: 10px;
+    }
+
+    .result-stats {
+        gap: 10px;
+    }
+
+    .result-stat {
+        padding: 15px;
+        min-width: 75px;
+    }
+
+    .stats {
+        gap: 6px;
+    }
+
+    .stat {
+        padding: 5px 8px;
+        font-size: 0.85rem;
+    }
+}

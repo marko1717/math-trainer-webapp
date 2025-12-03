@@ -3,6 +3,97 @@
 
 const AI_API_URL = 'https://marko17.pythonanywhere.com/api/hint';
 
+// Convert LaTeX to readable Unicode text
+function latexToUnicode(text) {
+    if (!text) return text;
+
+    // Subscripts
+    const subscripts = {
+        '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄',
+        '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉',
+        'n': 'ₙ', 'm': 'ₘ', 'k': 'ₖ', 'i': 'ᵢ', 'j': 'ⱼ',
+        'a': 'ₐ', 'e': 'ₑ', 'o': 'ₒ', 'x': 'ₓ', 'h': 'ₕ',
+        '+': '₊', '-': '₋', '(': '₍', ')': '₎'
+    };
+
+    // Superscripts
+    const superscripts = {
+        '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+        '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+        'n': 'ⁿ', 'm': 'ᵐ', 'k': 'ᵏ', 'i': 'ⁱ', 'j': 'ʲ',
+        'x': 'ˣ', 'y': 'ʸ', 'a': 'ᵃ', 'b': 'ᵇ', 'c': 'ᶜ',
+        '+': '⁺', '-': '⁻', '(': '⁽', ')': '⁾'
+    };
+
+    // Greek letters
+    const greek = {
+        'alpha': 'α', 'beta': 'β', 'gamma': 'γ', 'delta': 'δ',
+        'epsilon': 'ε', 'pi': 'π', 'sigma': 'σ', 'theta': 'θ',
+        'lambda': 'λ', 'mu': 'μ', 'phi': 'φ', 'omega': 'ω'
+    };
+
+    let result = text;
+
+    // Remove \( \) and $ $ delimiters
+    result = result.replace(/\\\(|\\\)|\$\$/g, '');
+    result = result.replace(/\$/g, '');
+
+    // Handle fractions: \frac{a}{b} -> a/b
+    result = result.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)');
+
+    // Handle sqrt: \sqrt{x} -> √x
+    result = result.replace(/\\sqrt\{([^}]+)\}/g, '√($1)');
+    result = result.replace(/\\sqrt\s*(\w)/g, '√$1');
+
+    // Handle subscripts: a_{n} -> aₙ, a_n -> aₙ
+    result = result.replace(/([a-zA-Z])_\{([^}]+)\}/g, (match, base, sub) => {
+        const subConverted = sub.split('').map(c => subscripts[c] || c).join('');
+        return base + subConverted;
+    });
+    result = result.replace(/([a-zA-Z])_([a-zA-Z0-9])/g, (match, base, sub) => {
+        return base + (subscripts[sub] || sub);
+    });
+
+    // Handle superscripts: a^{n} -> aⁿ, a^n -> aⁿ
+    result = result.replace(/([a-zA-Z0-9])\\?\^\{([^}]+)\}/g, (match, base, sup) => {
+        const supConverted = sup.split('').map(c => superscripts[c] || c).join('');
+        return base + supConverted;
+    });
+    result = result.replace(/([a-zA-Z0-9])\^([a-zA-Z0-9])/g, (match, base, sup) => {
+        return base + (superscripts[sup] || sup);
+    });
+
+    // Greek letters
+    for (const [latex, unicode] of Object.entries(greek)) {
+        result = result.replace(new RegExp('\\\\' + latex, 'g'), unicode);
+    }
+
+    // Common symbols
+    result = result.replace(/\\times/g, '×');
+    result = result.replace(/\\cdot/g, '·');
+    result = result.replace(/\\div/g, '÷');
+    result = result.replace(/\\pm/g, '±');
+    result = result.replace(/\\mp/g, '∓');
+    result = result.replace(/\\leq/g, '≤');
+    result = result.replace(/\\geq/g, '≥');
+    result = result.replace(/\\neq/g, '≠');
+    result = result.replace(/\\approx/g, '≈');
+    result = result.replace(/\\infty/g, '∞');
+    result = result.replace(/\\sum/g, 'Σ');
+    result = result.replace(/\\prod/g, 'Π');
+    result = result.replace(/\\rightarrow/g, '→');
+    result = result.replace(/\\leftarrow/g, '←');
+    result = result.replace(/\\Rightarrow/g, '⇒');
+    result = result.replace(/\\in/g, '∈');
+
+    // Clean up remaining backslashes and braces
+    result = result.replace(/\\[a-zA-Z]+/g, ''); // Remove unknown commands
+    result = result.replace(/[{}]/g, ''); // Remove remaining braces
+    result = result.replace(/\s+/g, ' '); // Normalize spaces
+
+    return result.trim();
+}
+
 // Cache for hints (in-memory + localStorage)
 const hintCache = new Map();
 const CACHE_KEY = 'ai_hints_cache';
@@ -80,7 +171,8 @@ async function getAIHint(topic, questionText, level, context = {}) {
 
         if (response.ok) {
             const data = await response.json();
-            const hint = data.hint;
+            // Convert LaTeX to Unicode for readable display
+            const hint = latexToUnicode(data.hint);
 
             // Cache the result
             hintCache.set(cacheKey, hint);
@@ -135,6 +227,18 @@ function getFallbackHint(topic, context) {
 • cos α = прилеглий / гіпотенуза
 • tg α = протилежний / прилеглий`,
 
+        arithmetic_progression: `Арифметична прогресія:
+• Різниця: d = aₙ₊₁ − aₙ
+• n-й член: aₙ = a₁ + (n−1)·d
+• Сума: Sₙ = (a₁ + aₙ)·n/2
+• Середнє: aₙ = (aₙ₋₁ + aₙ₊₁)/2`,
+
+        geometric_progression: `Геометрична прогресія:
+• Знаменник: q = bₙ₊₁/bₙ
+• n-й член: bₙ = b₁·qⁿ⁻¹
+• Сума: Sₙ = b₁·(qⁿ−1)/(q−1)
+• Середнє геом.: bₙ = √(bₙ₋₁·bₙ₊₁)`,
+
         default: 'Уважно прочитай умову та згадай відповідну формулу. Спробуй підставити відомі значення.'
     };
 
@@ -166,5 +270,6 @@ loadCache();
 window.AIHints = {
     getHint: getAIHint,
     showInUI: showHintInUI,
-    getFallback: getFallbackHint
+    getFallback: getFallbackHint,
+    latexToUnicode: latexToUnicode
 };

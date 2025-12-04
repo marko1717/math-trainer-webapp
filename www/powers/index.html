@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Степені</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <a href="../index.html" class="back-link">← На головну</a>
+            <h1>⚡ Степені</h1>
+            <p class="subtitle">Властивості степенів для чисел і виразів</p>
+
+            <div class="theory-box">
+                <h3>📖 Основні правила</h3>
+                <div class="rules-grid">
+                    <div class="rule">aⁿ × aᵐ = aⁿ⁺ᵐ</div>
+                    <div class="rule">aⁿ ÷ aᵐ = aⁿ⁻ᵐ</div>
+                    <div class="rule">(aⁿ)ᵐ = aⁿᵐ</div>
+                    <div class="rule">(ab)ⁿ = aⁿbⁿ</div>
+                    <div class="rule">a⁰ = 1</div>
+                    <div class="rule">a⁻ⁿ = 1/aⁿ</div>
+                </div>
+            </div>
+
+            <div class="level-select">
+                <h3>Обери рівень:</h3>
+                <button class="btn btn-level" data-level="1">
+                    <span class="level-icon">🌱</span>
+                    <div class="level-info">
+                        <span class="level-name">Легкий</span>
+                        <span class="level-desc">Числові степені, прості правила</span>
+                    </div>
+                </button>
+                <button class="btn btn-level" data-level="2">
+                    <span class="level-icon">🌿</span>
+                    <div class="level-info">
+                        <span class="level-name">Середній</span>
+                        <span class="level-desc">Від'ємні показники, вирази</span>
+                    </div>
+                </button>
+                <button class="btn btn-level" data-level="3">
+                    <span class="level-icon">🌳</span>
+                    <div class="level-info">
+                        <span class="level-name">Складний</span>
+                        <span class="level-desc">Дробові показники, складні вирази</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="header">
+                <div class="stats">
+                    <span class="stat">✅ <span id="correct">0</span></span>
+                    <span class="stat">❌ <span id="wrong">0</span></span>
+                    <span class="stat">🔥 <span id="streak">0</span></span>
+                </div>
+                <div class="level-badge">Рівень <span id="currentLevel">1</span></div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-type" id="questionType"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="rule-hint" id="ruleHint"></div>
+            </div>
+
+            <div class="answers" id="answers"></div>
+
+            <button class="btn btn-hint" id="hintBtn">💡 Підказка від ШІ</button>
+            <div class="hint-container" id="hintContainer">
+                <div class="hint-loading" id="hintLoading">Думаю...</div>
+                <div class="hint-text" id="hintText"></div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <h2 id="resultTitle">🎉 Результат</h2>
+            <div class="result-stats">
+                <div class="result-stat">
+                    <span class="result-value" id="finalCorrect">0</span>
+                    <span class="result-label">Правильно</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-value" id="finalWrong">0</span>
+                    <span class="result-label">Помилок</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-value" id="finalAccuracy">0%</span>
+                    <span class="result-label">Точність</span>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button class="btn btn-primary" id="nextLevelBtn">⬆️ Наступний рівень</button>
+                <button class="btn btn-secondary" id="restartBtn">🔄 Ще раз</button>
+                <button class="btn btn-secondary" id="menuBtn">📚 Меню</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/ai-hints.js"></script>
+    <script src="../shared/progress.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

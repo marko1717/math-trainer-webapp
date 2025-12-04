@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Геометрична прогресія</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="../index.html" class="back-link">← Меню</a>
+            <h1>📊 Геометрична прогресія</h1>
+            <div class="stats">
+                <span class="score">✅ <span id="correct">0</span></span>
+                <span class="streak">🔥 <span id="streak">0</span></span>
+            </div>
+        </div>
+
+        <!-- Theory Section -->
+        <div id="theory-section" class="section">
+            <h2>📚 Теорія</h2>
+
+            <div class="theory-card">
+                <h3>Що таке геометрична прогресія?</h3>
+                <p>Послідовність чисел, де <strong>кожен член отримується множенням попереднього на одне й те саме число</strong> (знаменник).</p>
+                <div class="example">
+                    Приклад: 2, 6, 18, 54, ... (q = 3)
+                </div>
+            </div>
+
+            <div class="theory-card">
+                <h3>Знаменник прогресії (q)</h3>
+                <div class="formula">
+                    q = b<sub>n+1</sub> / b<sub>n</sub>
+                </div>
+                <p>Відношення будь-якого члена до попереднього.</p>
+                <div class="example">
+                    Якщо b₁ = 2, b₂ = 6, то q = 6 / 2 = 3
+                </div>
+                <div class="warning">
+                    ⚠️ q ≠ 0, і всі члени ≠ 0
+                </div>
+            </div>
+
+            <div class="theory-card">
+                <h3>Формула n-го члена</h3>
+                <div class="formula">
+                    b<sub>n</sub> = b<sub>1</sub> · q<sup>n−1</sup>
+                </div>
+                <p>Знаходимо будь-який член, знаючи перший і знаменник.</p>
+                <div class="example">
+                    b₁ = 2, q = 3 → b₄ = 2 · 3³ = 2 · 27 = 54
+                </div>
+            </div>
+
+            <div class="theory-card">
+                <h3>Сума n перших членів</h3>
+                <div class="formula">
+                    S<sub>n</sub> = b<sub>1</sub> · (q<sup>n</sup> − 1) / (q − 1)
+                </div>
+                <p>Якщо q ≠ 1</p>
+                <div class="example">
+                    S₄ для 2, 6, 18, 54: S₄ = 2·(3⁴−1)/(3−1) = 2·80/2 = 80
+                </div>
+            </div>
+
+            <div class="theory-card">
+                <h3>Середнє геометричне</h3>
+                <div class="formula">
+                    b<sub>n</sub> = √(b<sub>n-1</sub> · b<sub>n+1</sub>)
+                </div>
+                <p>Кожен член — середнє геометричне сусідніх (якщо всі додатні).</p>
+                <div class="example">
+                    В прогресії 4, 12, 36: 12 = √(4 · 36) = √144
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startPractice()">🎯 Почати практику</button>
+        </div>
+
+        <!-- Topic Selection -->
+        <div id="topic-section" class="section hidden">
+            <h2>🎯 Оберіть тему</h2>
+
+            <div class="topic-grid">
+                <button class="topic-btn" onclick="selectTopic('ratio')">
+                    <span class="topic-icon">✖️</span>
+                    <span class="topic-name">Знаменник q</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('nth_term')">
+                    <span class="topic-icon">🔢</span>
+                    <span class="topic-name">n-й член</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('sum')">
+                    <span class="topic-icon">➕</span>
+                    <span class="topic-name">Сума S<sub>n</sub></span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('mean')">
+                    <span class="topic-icon">√</span>
+                    <span class="topic-name">Середнє геом.</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('missing')">
+                    <span class="topic-icon">❓</span>
+                    <span class="topic-name">Пропущений член</span>
+                </button>
+                <button class="topic-btn" onclick="selectTopic('mixed')">
+                    <span class="topic-icon">🎲</span>
+                    <span class="topic-name">Мікс</span>
+                </button>
+            </div>
+
+            <button class="btn btn-secondary" onclick="showTheory()">📚 До теорії</button>
+        </div>
+
+        <!-- Practice Section -->
+        <div id="practice-section" class="section hidden">
+            <div class="level-indicator">
+                <span id="topic-name">Тема</span>
+                <span id="level-badge" class="level-badge">Рівень 1</span>
+            </div>
+
+            <div class="question-card">
+                <div id="question-text" class="question-text"></div>
+                <div id="sequence-display" class="sequence-display hidden"></div>
+            </div>
+
+            <div class="answer-section">
+                <input type="text" id="answer-input" class="answer-input" placeholder="Введіть відповідь" inputmode="text">
+                <button class="btn btn-primary" onclick="checkAnswer()">Перевірити</button>
+            </div>
+
+            <div id="feedback" class="feedback hidden"></div>
+
+            <div class="hint-section">
+                <button class="btn btn-hint" onclick="showHint()">💡 Підказка</button>
+                <button class="btn btn-hint" onclick="showFormula()">📐 Формула</button>
+                <button class="btn btn-ai" onclick="getAIHelp()">🤖 Пояснення ШІ</button>
+            </div>
+
+            <div id="hint-box" class="hint-box hidden"></div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="showTopics()">← Теми</button>
+                <button class="btn btn-secondary" onclick="nextQuestion()">Далі →</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="section hidden">
+            <h2>🏆 Результати</h2>
+            <div class="results-card">
+                <div class="result-item">
+                    <span>Правильних:</span>
+                    <span id="final-correct">0</span>
+                </div>
+                <div class="result-item">
+                    <span>Найкраща серія:</span>
+                    <span id="final-streak">0</span>
+                </div>
+                <div class="result-item">
+                    <span>Рівень:</span>
+                    <span id="final-level">1</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="showTopics()">🔄 Спробувати ще</button>
+            <button class="btn btn-secondary" onclick="showTheory()">📚 До теорії</button>
+        </div>
+    </div>
+
+    <script src="../shared/ai-hints.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

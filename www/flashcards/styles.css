@@ -1,0 +1,609 @@
+/* ===================================
+   MATH QUEST - FLASHCARDS
+   8-BIT RETRO THEME
+   =================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --primary: #7C9D85;
+    --primary-dark: #5a7a63;
+    --primary-light: #9ab8a2;
+    --accent: #EF8748;
+    --accent-dark: #DB9063;
+    --accent-light: #f5a06a;
+    --bg: #1a1a2e;
+    --bg-dark: #12121f;
+    --bg-light: #252542;
+    --card-bg: #252542;
+    --text: #F5F0EC;
+    --text-muted: #a09a96;
+    --text-dark: #1a1a2e;
+    --border: #3a3a5a;
+    --success: #7C9D85;
+    --error: #e74c3c;
+    --warning: #EF8748;
+    --pixel: 4px;
+    --pixel-sm: 2px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Press Start 2P', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+    image-rendering: pixelated;
+    -webkit-font-smoothing: none;
+}
+
+/* Scanline effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.container {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 15px;
+    min-height: 100vh;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+    animation: screenIn 0.3s ease;
+}
+
+@keyframes screenIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* === Back Link === */
+.back-link {
+    font-family: 'Press Start 2P', monospace;
+    display: inline-block;
+    font-size: 0.4rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    transition: all 0.1s ease;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+    background: rgba(239, 135, 72, 0.15);
+    border: 2px solid var(--accent);
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.back-link:hover, .back-link:active {
+    background: rgba(239, 135, 72, 0.3);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--bg-dark);
+}
+
+/* === Start Screen === */
+#startScreen h1 {
+    text-align: center;
+    font-size: 0.7rem;
+    margin-bottom: 8px;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    font-size: 0.4rem;
+}
+
+.sets-container h3 {
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    font-size: 0.4rem;
+}
+
+.sets-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.set-card {
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    text-align: center;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.set-card:hover, .set-card:active {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.set-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    filter: drop-shadow(2px 2px 0 var(--bg-dark));
+}
+
+.set-name {
+    font-size: 0.4rem;
+    margin-bottom: 4px;
+    color: var(--text);
+}
+
+.set-count {
+    font-size: 0.35rem;
+    color: var(--text-muted);
+}
+
+.nmt-indicator {
+    display: inline-block;
+    background: var(--success);
+    color: var(--text-dark);
+    font-size: 0.3rem;
+    padding: 2px 6px;
+    border: 2px solid var(--primary-dark);
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* === Filter Toggle === */
+.filter-toggle {
+    margin-top: 20px;
+    padding: 15px;
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.toggle-label input {
+    display: none;
+}
+
+.toggle-slider {
+    width: 48px;
+    height: 26px;
+    background: var(--border);
+    border: 2px solid var(--bg-dark);
+    position: relative;
+    transition: all 0.2s;
+}
+
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: var(--text);
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+}
+
+.toggle-label input:checked + .toggle-slider {
+    background: var(--success);
+}
+
+.toggle-label input:checked + .toggle-slider::after {
+    transform: translateX(22px);
+}
+
+.toggle-text {
+    font-size: 0.4rem;
+    color: var(--text);
+}
+
+/* === Cards Screen === */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.btn-back {
+    font-family: 'Press Start 2P', monospace;
+    width: 40px;
+    height: 40px;
+    border: var(--pixel) solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.btn-back:hover {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.set-title {
+    font-size: 0.5rem;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.card-counter {
+    background: var(--card-bg);
+    padding: 6px 12px;
+    border: 2px solid var(--border);
+    font-size: 0.4rem;
+    color: var(--text-muted);
+}
+
+.progress-bar {
+    height: 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transition: width 0.3s ease;
+    width: 0%;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
+}
+
+/* === Flashcard with 3D flip === */
+.flashcard-container {
+    perspective: 1000px;
+    margin-bottom: 25px;
+}
+
+.flashcard {
+    width: 100%;
+    height: 280px;
+    cursor: pointer;
+    position: relative;
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: var(--pixel) solid var(--border);
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.flashcard-front {
+    background: var(--card-bg);
+}
+
+.flashcard-back {
+    background: var(--bg-light);
+    border-color: var(--accent);
+    transform: rotateY(180deg);
+}
+
+.card-content {
+    font-size: 0.55rem;
+    text-align: center;
+    line-height: 1.8;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.tap-hint {
+    position: absolute;
+    bottom: 15px;
+    font-size: 0.35rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.nmt-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--success);
+    color: var(--text-dark);
+    font-size: 0.3rem;
+    padding: 4px 10px;
+    border: 2px solid var(--primary-dark);
+}
+
+.nmt-badge.hidden {
+    display: none;
+}
+
+/* === Card Navigation === */
+.card-nav {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.btn-nav {
+    font-family: 'Press Start 2P', monospace;
+    flex: 1;
+    max-width: 85px;
+    padding: 12px 8px;
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.btn-nav:hover {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.btn-nav:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.btn-nav .nav-icon {
+    font-size: 1rem;
+}
+
+.btn-nav .nav-text {
+    font-size: 0.3rem;
+    color: var(--text-muted);
+}
+
+.btn-nav.btn-know {
+    border-color: var(--success);
+    background: rgba(124, 157, 133, 0.15);
+}
+
+.btn-nav.btn-know:hover {
+    background: rgba(124, 157, 133, 0.25);
+}
+
+.btn-nav.btn-learn {
+    border-color: var(--warning);
+    background: rgba(239, 135, 72, 0.15);
+}
+
+.btn-nav.btn-learn:hover {
+    background: rgba(239, 135, 72, 0.25);
+}
+
+/* === Swipe hint === */
+.swipe-hint {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.35rem;
+    opacity: 0.6;
+}
+
+/* === Results Screen === */
+#resultsScreen {
+    padding-top: 30px;
+}
+
+#resultsScreen h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.results-stats {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.result-stat {
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    padding: 16px;
+    text-align: center;
+    min-width: 80px;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.result-stat.known {
+    border-color: var(--success);
+}
+
+.result-stat.learning {
+    border-color: var(--warning);
+}
+
+.result-stat.remaining {
+    border-color: var(--border);
+}
+
+.stat-value {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.result-stat.known .stat-value {
+    color: var(--success);
+}
+
+.result-stat.learning .stat-value {
+    color: var(--warning);
+}
+
+.result-stat.remaining .stat-value {
+    color: var(--text-muted);
+}
+
+.stat-label {
+    font-size: 0.35rem;
+    color: var(--text-muted);
+}
+
+.results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* === Buttons === */
+.btn {
+    font-family: 'Press Start 2P', monospace;
+    padding: 14px 20px;
+    border: var(--pixel) solid var(--border);
+    font-size: 0.45rem;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--text-dark);
+    border-color: var(--accent-dark);
+}
+
+.btn-primary:hover {
+    background: var(--accent-light);
+}
+
+.btn-secondary {
+    background: var(--card-bg);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+}
+
+/* === Responsive === */
+@media (max-width: 380px) {
+    .sets-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .flashcard {
+        height: 250px;
+    }
+
+    .card-content {
+        font-size: 0.5rem;
+    }
+
+    .btn-nav {
+        padding: 10px 6px;
+    }
+}
+
+/* === Card flip animation === */
+@keyframes cardPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.flashcard:active .flashcard-inner {
+    animation: cardPulse 0.2s ease;
+}
+
+/* === Swipe animation === */
+@keyframes swipeLeft {
+    0% { transform: translateX(0) rotate(0); opacity: 1; }
+    100% { transform: translateX(-100%) rotate(-10deg); opacity: 0; }
+}
+
+@keyframes swipeRight {
+    0% { transform: translateX(0) rotate(0); opacity: 1; }
+    100% { transform: translateX(100%) rotate(10deg); opacity: 0; }
+}
+
+.flashcard.swipe-left {
+    animation: swipeLeft 0.3s ease forwards;
+}
+
+.flashcard.swipe-right {
+    animation: swipeRight 0.3s ease forwards;
+}

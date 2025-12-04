@@ -1,0 +1,485 @@
+/* ===================================
+   MATH QUEST - ARITHMETIC PROGRESSION
+   8-BIT RETRO THEME
+   =================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --primary: #7C9D85;
+    --primary-dark: #5a7a63;
+    --primary-light: #9ab8a2;
+    --accent: #EF8748;
+    --accent-dark: #DB9063;
+    --accent-light: #f5a06a;
+    --bg: #1a1a2e;
+    --bg-dark: #12121f;
+    --bg-light: #252542;
+    --card-bg: #252542;
+    --text: #F5F0EC;
+    --text-muted: #a09a96;
+    --text-dark: #1a1a2e;
+    --border: #3a3a5a;
+    --success: #7C9D85;
+    --error: #e74c3c;
+    --warning: #EF8748;
+    --pixel: 4px;
+    --pixel-sm: 2px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Press Start 2P', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 12px;
+    line-height: 1.6;
+    image-rendering: pixelated;
+    -webkit-font-smoothing: none;
+}
+
+/* Scanline effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Back Link */
+.back-link {
+    display: inline-block;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    background: rgba(239, 135, 72, 0.15);
+    border: 2px solid var(--accent);
+    transition: all 0.1s ease;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--bg-dark);
+    position: relative;
+    z-index: 10;
+}
+
+.back-link:hover, .back-link:active {
+    background: rgba(239, 135, 72, 0.3);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--bg-dark);
+}
+
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.header h1 {
+    font-size: 0.6rem;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.stats {
+    display: flex;
+    gap: 12px;
+    font-size: 0.5rem;
+}
+
+.stats span {
+    background: var(--bg-dark);
+    padding: 6px 10px;
+    border: 2px solid var(--border);
+}
+
+.section {
+    animation: screenIn 0.3s ease;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@keyframes screenIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Theory Cards */
+.theory-card {
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.theory-card h3 {
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-size: 0.5rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.theory-card p {
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 8px;
+    font-size: 0.4rem;
+}
+
+.formula {
+    background: var(--bg-dark);
+    border: 2px solid var(--primary);
+    padding: 12px 16px;
+    font-size: 0.55rem;
+    text-align: center;
+    margin: 10px 0;
+    color: var(--primary);
+}
+
+.example {
+    background: rgba(124, 157, 133, 0.15);
+    border-left: 3px solid var(--success);
+    padding: 10px 12px;
+    margin-top: 10px;
+    font-size: 0.4rem;
+    color: var(--success);
+}
+
+/* Topic Grid */
+.topic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.topic-btn {
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+    font-family: 'Press Start 2P', monospace;
+}
+
+.topic-btn:hover, .topic-btn:active {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.topic-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(2px 2px 0 var(--bg-dark));
+}
+
+.topic-name {
+    color: var(--text);
+    font-size: 0.45rem;
+}
+
+/* Question Card */
+.question-card {
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    padding: 24px;
+    margin: 16px 0;
+    min-height: 120px;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.question-text {
+    font-size: 0.55rem;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.sequence-display {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    text-align: center;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+}
+
+.level-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+#topic-name {
+    color: var(--text-muted);
+    font-size: 0.4rem;
+}
+
+.level-badge {
+    background: var(--accent);
+    color: var(--text-dark);
+    padding: 6px 12px;
+    border: 2px solid var(--accent-dark);
+    font-size: 0.4rem;
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+/* Answer Section */
+.answer-section {
+    display: flex;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.answer-input {
+    flex: 1;
+    padding: 14px 16px;
+    font-size: 0.55rem;
+    font-family: 'Press Start 2P', monospace;
+    border: var(--pixel) solid var(--border);
+    background: var(--bg-dark);
+    color: var(--text);
+    text-align: center;
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+.answer-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent), inset 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+/* Buttons */
+.btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    padding: 14px 20px;
+    border: var(--pixel) solid var(--border);
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+    text-transform: uppercase;
+}
+
+.btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+    border-color: var(--accent);
+}
+
+.btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--text-dark);
+    border-color: var(--accent-dark);
+    width: 100%;
+    margin-top: 12px;
+}
+
+.btn-primary:hover {
+    background: var(--accent-light);
+}
+
+.btn-secondary {
+    background: var(--primary);
+    color: var(--text-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-light);
+}
+
+.btn-hint {
+    font-size: 0.4rem;
+    padding: 10px 14px;
+    background: transparent;
+    border: 2px dashed var(--warning);
+    color: var(--warning);
+}
+
+.btn-hint:hover {
+    background: rgba(239, 135, 72, 0.1);
+}
+
+.btn-ai {
+    font-size: 0.4rem;
+    padding: 10px 14px;
+    background: transparent;
+    border: 2px dashed var(--primary);
+    color: var(--primary);
+}
+
+.btn-ai:hover {
+    background: rgba(124, 157, 133, 0.1);
+}
+
+.hint-section {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+/* Feedback */
+.feedback {
+    padding: 16px;
+    margin: 16px 0;
+    text-align: center;
+    font-size: 0.5rem;
+    border: var(--pixel) solid;
+    animation: screenIn 0.3s ease;
+}
+
+.feedback.correct {
+    background: rgba(124, 157, 133, 0.2);
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.feedback.incorrect {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: var(--error);
+    color: var(--error);
+}
+
+/* Hint Box */
+.hint-box {
+    background: linear-gradient(135deg, rgba(239, 135, 72, 0.1), rgba(219, 144, 99, 0.05));
+    border: 2px dashed var(--warning);
+    padding: 16px;
+    margin: 16px 0;
+    line-height: 1.8;
+    font-size: 0.4rem;
+}
+
+.hint-box.ai-hint {
+    background: linear-gradient(135deg, rgba(124, 157, 133, 0.1), rgba(124, 157, 133, 0.05));
+    border-color: var(--primary);
+}
+
+.hint-box h4 {
+    color: var(--warning);
+    margin-bottom: 8px;
+    font-size: 0.45rem;
+}
+
+.hint-box.ai-hint h4 {
+    color: var(--primary);
+}
+
+/* Navigation */
+.nav-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.nav-buttons .btn {
+    flex: 1;
+}
+
+/* Results */
+.results-card {
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    padding: 24px;
+    margin: 20px 0;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 2px solid var(--border);
+    font-size: 0.5rem;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+/* Section titles */
+.section h2 {
+    color: var(--accent);
+    margin-bottom: 16px;
+    text-align: center;
+    font-size: 0.6rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+/* Loading */
+.loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 3px solid var(--primary);
+    border-top-color: transparent;
+    animation: spin 1s steps(8) infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 360px) {
+    .topic-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hint-section {
+        flex-direction: column;
+    }
+
+    .hint-section .btn {
+        width: 100%;
+    }
+}

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Math Quest - НМТ</title>
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <!-- 8-bit pixel font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7C9D85;
+            --primary-dark: #5a7a63;
+            --accent: #EF8748;
+            --accent-dark: #DB9063;
+            --bg: #1a1a2e;
+            --bg-dark: #12121f;
+            --card-bg: #252542;
+            --text: #F5F0EC;
+            --text-muted: #a09a96;
+            --border: #3a3a5a;
+            --success: #7C9D85;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+            --pixel-border: 4px;
+        }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: calc(16px + var(--safe-top)) 12px calc(16px + var(--safe-bottom));
+            image-rendering: pixelated;
+        }
+
+        /* Scanline effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 2px,
+                rgba(0, 0, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Pixel border mixin */
+        .pixel-box {
+            background: var(--card-bg);
+            border: var(--pixel-border) solid var(--border);
+            box-shadow:
+                var(--pixel-border) var(--pixel-border) 0 var(--bg-dark),
+                inset -2px -2px 0 rgba(0,0,0,0.3),
+                inset 2px 2px 0 rgba(255,255,255,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px 16px;
+        }
+
+        .header h1 {
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+            text-shadow: 3px 3px 0 var(--bg-dark);
+            line-height: 1.4;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* Pixel character */
+        .pixel-mascot {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 12px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Stats bar - like game HUD */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 2px 2px 0 var(--bg-dark);
+        }
+
+        .stat-label {
+            font-size: 0.4rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* HP/XP bars */
+        .xp-bar {
+            height: 12px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            margin: 12px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 35%;
+            transition: width 0.5s ease;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.3);
+        }
+
+        .xp-text {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.4rem;
+            color: var(--text);
+            text-shadow: 1px 1px 0 var(--bg-dark);
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 20px 0 12px 4px;
+            text-shadow: 2px 2px 0 var(--bg-dark);
+        }
+
+        .trainer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .trainer-card {
+            padding: 16px 12px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.1s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .trainer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.2) 100%);
+            pointer-events: none;
+        }
+
+        .trainer-card:hover, .trainer-card:active {
+            transform: translate(-2px, -2px);
+            box-shadow:
+                6px 6px 0 var(--bg-dark),
+                inset -2px -2px 0 rgba(0,0,0,0.3),
+                inset 2px 2px 0 rgba(255,255,255,0.1);
+            border-color: var(--accent);
+        }
+
+        .trainer-card:active {
+            transform: translate(2px, 2px);
+            box-shadow:
+                2px 2px 0 var(--bg-dark),
+                inset -2px -2px 0 rgba(0,0,0,0.3),
+                inset 2px 2px 0 rgba(255,255,255,0.1);
+        }
+
+        .trainer-icon {
+            font-size: 2rem;
+            filter: drop-shadow(2px 2px 0 var(--bg-dark));
+        }
+
+        .trainer-name {
+            color: var(--text);
+            font-size: 0.5rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .trainer-desc {
+            color: var(--text-muted);
+            font-size: 0.35rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .trainer-card.wide {
+            grid-column: span 2;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 14px 16px;
+        }
+
+        .trainer-card.wide .trainer-icon {
+            font-size: 1.8rem;
+        }
+
+        .trainer-card.wide .trainer-info {
+            text-align: left;
+            margin-left: 12px;
+        }
+
+        /* Level badge */
+        .level-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--accent);
+            color: var(--bg-dark);
+            font-size: 0.4rem;
+            padding: 4px 6px;
+            border: 2px solid var(--bg-dark);
+            box-shadow: 2px 2px 0 var(--bg-dark);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            padding: 16px;
+            color: var(--text-muted);
+            font-size: 0.4rem;
+            line-height: 1.8;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Blinking cursor effect */
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Start button */
+        .start-hint {
+            text-align: center;
+            margin: 16px 0;
+            padding: 12px;
+            font-size: 0.45rem;
+            color: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @media (max-width: 360px) {
+            .trainer-grid {
+                grid-template-columns: 1fr;
+            }
+            .trainer-card.wide {
+                grid-column: span 1;
+            }
+            .header h1 {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Pixel art decorations */
+        .pixel-star {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            box-shadow:
+                8px 0 0 var(--accent),
+                16px 0 0 var(--accent),
+                0 8px 0 var(--accent),
+                8px 8px 0 var(--primary),
+                16px 8px 0 var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header pixel-box">
+            <span class="pixel-mascot">🎮</span>
+            <h1>MATH QUEST</h1>
+            <p>Підготовка до НМТ</p>
+            <div class="xp-bar">
+                <div class="xp-fill" id="xp-fill"></div>
+                <span class="xp-text">LVL <span id="level">1</span></span>
+            </div>
+        </div>
+
+        <div class="stats-bar pixel-box">
+            <div class="stat-item">
+                <div class="stat-value" id="total-solved">0</div>
+                <div class="stat-label">SCORE</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="best-streak">0</div>
+                <div class="stat-label">COMBO</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="trainers-used">0</div>
+                <div class="stat-label">QUESTS</div>
+            </div>
+        </div>
+
+        <div class="start-hint">
+            ▶ SELECT QUEST <span class="blink">_</span>
+        </div>
+
+        <div class="section-title">⚔ ALGEBRA</div>
+        <div class="trainer-grid">
+            <a href="fsm/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">📐</span>
+                <span class="trainer-name">ФСМ</span>
+                <span class="trainer-desc">Формули скороченого множення</span>
+            </a>
+            <a href="quadratic/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">📊</span>
+                <span class="trainer-name">Квадратні</span>
+                <span class="trainer-desc">Дискримінант, корені</span>
+            </a>
+            <a href="powers/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">⚡</span>
+                <span class="trainer-name">Степені</span>
+                <span class="trainer-desc">Властивості степенів</span>
+            </a>
+            <a href="percent/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">💰</span>
+                <span class="trainer-name">Відсотки</span>
+                <span class="trainer-desc">Пропорції, формули</span>
+            </a>
+        </div>
+
+        <div class="section-title">📈 PROGRESSIONS</div>
+        <div class="trainer-grid">
+            <a href="arithmetic/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">➕</span>
+                <span class="trainer-name">Арифметична</span>
+                <span class="trainer-desc">d, aₙ, Sₙ</span>
+            </a>
+            <a href="geometric/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">✖</span>
+                <span class="trainer-name">Геометрична</span>
+                <span class="trainer-desc">q, bₙ, Sₙ</span>
+            </a>
+        </div>
+
+        <div class="section-title">📉 FUNCTIONS</div>
+        <div class="trainer-grid">
+            <a href="graphs/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">📈</span>
+                <span class="trainer-name">Графіки</span>
+                <span class="trainer-desc">Трансформації</span>
+            </a>
+            <a href="parity/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">⚖</span>
+                <span class="trainer-name">Парність</span>
+                <span class="trainer-desc">Парні/непарні</span>
+            </a>
+            <a href="graph-builder/index.html" class="trainer-card pixel-box wide">
+                <span class="trainer-icon">✏</span>
+                <div class="trainer-info">
+                    <span class="trainer-name">Побудова графіків</span>
+                    <span class="trainer-desc">Інтерактивне малювання</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="section-title">🔺 GEOMETRY</div>
+        <div class="trainer-grid">
+            <a href="triangle/index.html" class="trainer-card pixel-box wide">
+                <span class="trainer-icon">📐</span>
+                <div class="trainer-info">
+                    <span class="trainer-name">Прямокутний △</span>
+                    <span class="trainer-desc">Піфагор, тригонометрія</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="section-title">🎴 ITEMS</div>
+        <div class="trainer-grid">
+            <a href="flashcards/index.html" class="trainer-card pixel-box wide">
+                <span class="trainer-icon">🃏</span>
+                <div class="trainer-info">
+                    <span class="trainer-name">Флеш-картки</span>
+                    <span class="trainer-desc">Формули та теореми</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>MATH QUEST v1.0</p>
+            <p>© 2024 PRESS START</p>
+        </div>
+    </div>
+
+    <script>
+        // Load stats from localStorage
+        function loadStats() {
+            try {
+                const stats = JSON.parse(localStorage.getItem('math_trainer_global_stats') || '{}');
+                const solved = stats.totalSolved || 0;
+                document.getElementById('total-solved').textContent = solved;
+                document.getElementById('best-streak').textContent = stats.bestStreak || 0;
+                document.getElementById('trainers-used').textContent = stats.trainersUsed || 0;
+
+                // Calculate level based on solved problems
+                const level = Math.floor(solved / 10) + 1;
+                document.getElementById('level').textContent = level;
+
+                // XP bar progress (problems to next level)
+                const xpProgress = (solved % 10) * 10;
+                document.getElementById('xp-fill').style.width = xpProgress + '%';
+            } catch (e) {
+                console.log('Could not load stats');
+            }
+        }
+
+        // Update stats (called from trainers)
+        window.updateGlobalStats = function(solved, streak) {
+            try {
+                const stats = JSON.parse(localStorage.getItem('math_trainer_global_stats') || '{}');
+                stats.totalSolved = (stats.totalSolved || 0) + solved;
+                if (streak > (stats.bestStreak || 0)) {
+                    stats.bestStreak = streak;
+                }
+                localStorage.setItem('math_trainer_global_stats', JSON.stringify(stats));
+            } catch (e) {}
+        };
+
+        loadStats();
+
+        // Add retro sound effect on card hover (optional)
+        document.querySelectorAll('.trainer-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Could add 8-bit sound here
+            });
+        });
+    </script>
+</body>
+</html>

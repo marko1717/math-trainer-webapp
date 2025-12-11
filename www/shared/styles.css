@@ -54,6 +54,51 @@ body.light-mode .level-badge {
     color: #ffffff;
 }
 
+/* Light mode additional styles */
+body.light-mode .answer-btn {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .answer-btn:hover:not(.disabled) {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+body.light-mode .question-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .feedback-container {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .stat-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .topic-btn {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .topic-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+body.light-mode .triangle-container {
+    background: var(--bg-dark);
+}
+
+body.light-mode .theory-card {
+    background: var(--bg-dark);
+}
+
+body.light-mode .hint-container {
+    background: linear-gradient(135deg, rgba(239, 135, 72, 0.1), rgba(239, 135, 72, 0.03));
+}
+
+body.light-mode .ai-feedback {
+    background: linear-gradient(135deg, rgba(124, 157, 133, 0.1), rgba(124, 157, 133, 0.03));
+}
+
 * {
     margin: 0;
     padding: 0;

@@ -75,31 +75,51 @@ function drawTriangle(canvas, data) {
     ctx.clearRect(0, 0, w, h);
 
     // Triangle coordinates (right angle at bottom-left)
-    const padding = 40;
-    const A = { x: padding, y: h - padding }; // Right angle
-    const B = { x: w - padding, y: h - padding }; // Bottom right
-    const C = { x: padding, y: padding + 20 }; // Top left
+    const padding = 45;
+    const maxWidth = w - 2 * padding;
+    const maxHeight = h - 2 * padding - 10;
+
+    // Default coordinates
+    let A = { x: padding, y: h - padding }; // Right angle (bottom-left)
+    let B = { x: 0, y: h - padding }; // Bottom right
+    let C = { x: padding, y: 0 }; // Top left
 
     // Adjust for different triangle types
     let triangleType = data.triangleType || 'generic';
 
     if (triangleType === '30-60-90') {
-        // Adjust proportions for 30-60-90 triangle
-        const baseLen = w - 2 * padding;
-        C.y = A.y - baseLen * Math.tan(60 * Math.PI / 180) * 0.6;
+        // 30-60-90 triangle: sides ratio is 1 : √3 : 2
+        // Short leg (opposite to 30°) : Long leg (opposite to 60°) : Hypotenuse
+        const shortLeg = maxHeight * 0.5; // vertical leg (opposite to 30° at B)
+        const longLeg = shortLeg * Math.sqrt(3); // horizontal leg (opposite to 60° at C)
+
+        // Ensure it fits
+        const scaledLongLeg = Math.min(longLeg, maxWidth);
+        const scaledShortLeg = scaledLongLeg / Math.sqrt(3);
+
+        B.x = A.x + scaledLongLeg;
+        C.y = A.y - scaledShortLeg;
     } else if (triangleType === '45-45-90') {
         // Equal legs for 45-45-90
-        const legLen = Math.min(w, h) - 2 * padding - 20;
+        const legLen = Math.min(maxWidth, maxHeight) * 0.85;
         B.x = A.x + legLen;
         C.y = A.y - legLen;
+    } else {
+        // Generic triangle - 3-4-5 proportions
+        const scale = Math.min(maxWidth / 4, maxHeight / 3) * 0.9;
+        B.x = A.x + 4 * scale;
+        C.y = A.y - 3 * scale;
     }
 
-    // Get colors
+    // Get colors from CSS variables
     const style = getComputedStyle(document.body);
-    const primaryColor = style.getPropertyValue('--primary-light').trim() || '#A29BFE';
-    const textColor = style.getPropertyValue('--text-primary').trim() || '#FFFFFF';
-    const mutedColor = style.getPropertyValue('--text-muted').trim() || '#6B6B80';
-    const accentColor = style.getPropertyValue('--warning-color').trim() || '#FDCB6E';
+    const isLightMode = document.body.classList.contains('light-mode');
+
+    const primaryColor = style.getPropertyValue('--primary').trim() || '#7C9D85';
+    const textColor = style.getPropertyValue('--text').trim() || (isLightMode ? '#1c1c1e' : '#F5F0EC');
+    const mutedColor = style.getPropertyValue('--text-muted').trim() || (isLightMode ? '#6e6e73' : '#a09a96');
+    const accentColor = style.getPropertyValue('--accent').trim() || '#EF8748';
+    const bgDark = style.getPropertyValue('--bg-dark').trim() || (isLightMode ? '#e5e5ea' : '#12121f');
 
     // Draw triangle
     ctx.beginPath();
@@ -156,24 +176,38 @@ function drawTriangle(canvas, data) {
 
     // Draw angles
     if (data.angles) {
-        // Angle at B
+        // Angle at B (bottom right corner)
         if (data.angles.B) {
+            ctx.strokeStyle = data.highlight?.includes('B') ? accentColor : mutedColor;
             ctx.fillStyle = data.highlight?.includes('B') ? accentColor : mutedColor;
-            const angleB = Math.atan2(C.y - B.y, C.x - B.x);
+
+            // Calculate angle from B to C
+            const angleBtoC = Math.atan2(C.y - B.y, C.x - B.x);
+            // Angle from B to A is always Math.PI (pointing left along horizontal line)
+            const angleBtoA = Math.PI;
+
+            // Draw arc inside the triangle (counterclockwise from BA to BC)
             ctx.beginPath();
-            ctx.arc(B.x, B.y, 25, Math.PI, angleB, true);
+            ctx.arc(B.x, B.y, 25, angleBtoC, angleBtoA, false);
             ctx.stroke();
-            ctx.fillText(data.angles.B, B.x - 35, B.y - 15);
+            ctx.fillText(data.angles.B, B.x - 40, B.y - 20);
         }
 
-        // Angle at C
+        // Angle at C (top left corner)
         if (data.angles.C) {
+            ctx.strokeStyle = data.highlight?.includes('C') ? accentColor : mutedColor;
             ctx.fillStyle = data.highlight?.includes('C') ? accentColor : mutedColor;
-            const angleC = Math.atan2(A.y - C.y, A.x - C.x);
+
+            // Angle from C to A (pointing down)
+            const angleCtoA = Math.PI / 2;
+            // Angle from C to B
+            const angleCtoB = Math.atan2(B.y - C.y, B.x - C.x);
+
+            // Draw arc inside the triangle
             ctx.beginPath();
-            ctx.arc(C.x, C.y, 25, angleC, Math.PI / 2 + 0.1, false);
+            ctx.arc(C.x, C.y, 25, angleCtoA, angleCtoB, false);
             ctx.stroke();
-            ctx.fillText(data.angles.C, C.x + 30, C.y + 20);
+            ctx.fillText(data.angles.C, C.x + 30, C.y + 25);
         }
     }
 

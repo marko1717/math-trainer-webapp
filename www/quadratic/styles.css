@@ -207,18 +207,18 @@ body.retro-mode .topic-badge {
 
 .answer-btn {
     width: 100%;
-    padding: 14px 16px;
+    padding: 16px 18px;
     background: var(--card-bg);
     border: 2px solid var(--border);
     border-radius: 12px;
     text-align: left;
-    font-size: 1rem;
+    font-size: 1.15rem;
     color: var(--text);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     font-family: inherit;
 }
 
@@ -239,17 +239,21 @@ body.retro-mode .answer-btn {
 }
 
 .answer-btn .answer-letter {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     background: var(--bg-dark);
     border: 2px solid var(--border);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 600;
     flex-shrink: 0;
+}
+
+.answer-btn .answer-text {
+    font-size: 1.15rem;
 }
 
 body.retro-mode .answer-btn .answer-letter {

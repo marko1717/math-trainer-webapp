@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="../shared/theme.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -69,6 +71,63 @@
                     </div>
                     <button class="btn btn-primary btn-large" id="startBtn">
                         Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Topic Selection Screen -->
+            <div class="screen" id="topicScreen">
+                <div class="topic-selection">
+                    <h2>🎯 Оберіть тему</h2>
+                    <p class="topic-subtitle">Що хочеш потренувати?</p>
+
+                    <div class="topic-grid">
+                        <button class="topic-btn" data-topic="pythagoras">
+                            <span class="topic-icon">📏</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Теорема Піфагора</span>
+                                <span class="topic-desc">c² = a² + b²</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="specialAngles">
+                            <span class="topic-icon">🔺</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Кути 30°, 45°, 60°</span>
+                                <span class="topic-desc">Особливі трикутники</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="median">
+                            <span class="topic-icon">➗</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Медіана до гіпотенузи</span>
+                                <span class="topic-desc">m = c/2</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="trigValues">
+                            <span class="topic-icon">📊</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Значення sin/cos/tg</span>
+                                <span class="topic-desc">Таблиця тригонометрії</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="trigSolve">
+                            <span class="topic-icon">🔢</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Розв'язати через trig</span>
+                                <span class="topic-desc">Знайти сторону/кут</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn topic-btn-mixed" data-topic="mixed">
+                            <span class="topic-icon">🎲</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Мікс</span>
+                                <span class="topic-desc">Всі теми випадково</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-secondary" id="backToStartBtn">
+                        ← Назад
                     </button>
                 </div>
             </div>

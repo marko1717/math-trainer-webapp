@@ -259,6 +259,82 @@ body::before {
     filter: drop-shadow(2px 2px 0 var(--bg-dark));
 }
 
+/* === Topic Selection Screen === */
+.topic-selection {
+    padding: 16px;
+    text-align: center;
+}
+
+.topic-selection h2 {
+    font-size: 0.6rem;
+    margin-bottom: 8px;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.topic-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 0.4rem;
+}
+
+.topic-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.topic-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--card-bg);
+    border: var(--pixel) solid var(--border);
+    cursor: pointer;
+    transition: all 0.1s ease;
+    text-align: left;
+    color: var(--text);
+    font-family: 'Press Start 2P', monospace;
+    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+.topic-btn:hover, .topic-btn:active {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.topic-btn .topic-icon {
+    font-size: 1.3rem;
+}
+
+.topic-btn .topic-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.topic-btn .topic-name {
+    font-size: 0.45rem;
+}
+
+.topic-btn .topic-desc {
+    font-size: 0.35rem;
+    color: var(--text-muted);
+}
+
+.topic-btn-mixed {
+    background: linear-gradient(135deg, rgba(239, 135, 72, 0.2), rgba(219, 144, 99, 0.1));
+    border-color: var(--accent);
+}
+
+.topic-btn-mixed:hover {
+    background: linear-gradient(135deg, rgba(239, 135, 72, 0.3), rgba(219, 144, 99, 0.2));
+}
+
 /* === Buttons === */
 .btn {
     font-family: 'Press Start 2P', monospace;

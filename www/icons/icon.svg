@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#252542"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EF8748"/>
+      <stop offset="100%" style="stop-color:#DB9063"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+
+  <!-- Border glow -->
+  <rect x="8" y="8" width="496" height="496" rx="88" fill="none" stroke="#EF8748" stroke-width="4" opacity="0.3"/>
+
+  <!-- Grid lines (subtle math paper effect) -->
+  <g opacity="0.1" stroke="#7C9D85" stroke-width="1">
+    <line x1="128" y1="0" x2="128" y2="512"/>
+    <line x1="256" y1="0" x2="256" y2="512"/>
+    <line x1="384" y1="0" x2="384" y2="512"/>
+    <line x1="0" y1="128" x2="512" y2="128"/>
+    <line x1="0" y1="256" x2="512" y2="256"/>
+    <line x1="0" y1="384" x2="512" y2="384"/>
+  </g>
+
+  <!-- Central "M" styled as pixel art -->
+  <g transform="translate(96, 120)">
+    <!-- M letter made of blocks -->
+    <rect x="0" y="0" width="48" height="272" fill="url(#accentGrad)"/>
+    <rect x="48" y="48" width="48" height="48" fill="url(#accentGrad)"/>
+    <rect x="96" y="96" width="48" height="48" fill="url(#accentGrad)"/>
+    <rect x="144" y="144" width="32" height="48" fill="url(#accentGrad)"/>
+    <rect x="176" y="96" width="48" height="48" fill="url(#accentGrad)"/>
+    <rect x="224" y="48" width="48" height="48" fill="url(#accentGrad)"/>
+    <rect x="272" y="0" width="48" height="272" fill="url(#accentGrad)"/>
+  </g>
+
+  <!-- Math symbols decoration -->
+  <!-- Plus -->
+  <g fill="#7C9D85">
+    <rect x="64" y="80" width="32" height="8" rx="2"/>
+    <rect x="76" y="68" width="8" height="32" rx="2"/>
+  </g>
+
+  <!-- Multiply -->
+  <g fill="#7C9D85" transform="translate(408, 80) rotate(45)">
+    <rect x="-16" y="-4" width="32" height="8" rx="2"/>
+    <rect x="-4" y="-16" width="8" height="32" rx="2"/>
+  </g>
+
+  <!-- Equals -->
+  <g fill="#7C9D85">
+    <rect x="64" y="404" width="32" height="8" rx="2"/>
+    <rect x="64" y="420" width="32" height="8" rx="2"/>
+  </g>
+
+  <!-- Pi symbol hint -->
+  <text x="416" y="432" font-family="Georgia, serif" font-size="48" fill="#7C9D85" opacity="0.8">π</text>
+
+  <!-- Quest star/sparkle -->
+  <g transform="translate(432, 120)">
+    <path d="M24 0 L28 16 L44 20 L28 24 L24 40 L20 24 L4 20 L20 16 Z" fill="#EF8748"/>
+  </g>
+
+  <!-- Small pixel decorations -->
+  <rect x="80" y="160" width="12" height="12" fill="#EF8748" opacity="0.5"/>
+  <rect x="420" y="320" width="12" height="12" fill="#7C9D85" opacity="0.5"/>
+
+  <!-- "Q" indicator for Quest -->
+  <g transform="translate(360, 340)">
+    <circle cx="40" cy="40" r="36" fill="none" stroke="#7C9D85" stroke-width="8"/>
+    <line x1="56" y1="56" x2="80" y2="80" stroke="#7C9D85" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

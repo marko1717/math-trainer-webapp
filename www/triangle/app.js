@@ -44,7 +44,8 @@ let state = {
     answered: false,
     hintUsed: false,
     history: [],
-    weakAreas: {}
+    weakAreas: {},
+    selectedTopic: 'mixed' // Track selected topic
 };
 
 function loadProgress() {
@@ -592,31 +593,53 @@ function generateTrigAlpha() {
 
 // === Question Selection ===
 function generateQuestion() {
-    const availableTopics = [];
+    let topicsPool = [];
 
-    // Level 1
-    if (state.level >= 1) {
-        availableTopics.push('pythagoras', 'angle30', 'angle45', 'angle60', 'median');
-    }
-
-    // Level 2
-    if (state.level >= 2) {
-        availableTopics.push('trigFind', 'trigSolve');
-    }
-
-    // Level 3
-    if (state.level >= 3) {
-        availableTopics.push('trigAlpha');
-    }
-
-    // Prefer weak areas
-    let selectedTopic;
-    const weakTopics = availableTopics.filter(t => state.weakAreas[t] > 0);
-
-    if (weakTopics.length > 0 && Math.random() < 0.4) {
-        selectedTopic = weakTopics[Math.floor(Math.random() * weakTopics.length)];
+    // If specific topic selected
+    if (state.selectedTopic && state.selectedTopic !== 'mixed') {
+        switch (state.selectedTopic) {
+            case 'pythagoras':
+                topicsPool = ['pythagoras'];
+                break;
+            case 'specialAngles':
+                topicsPool = ['angle30', 'angle45', 'angle60'];
+                break;
+            case 'median':
+                topicsPool = ['median'];
+                break;
+            case 'trigValues':
+                topicsPool = ['trigFind'];
+                break;
+            case 'trigSolve':
+                topicsPool = ['trigSolve', 'trigAlpha'];
+                break;
+            default:
+                topicsPool = ['pythagoras'];
+        }
     } else {
-        selectedTopic = availableTopics[Math.floor(Math.random() * availableTopics.length)];
+        // Mixed mode - use level-based selection
+        if (state.level >= 1) {
+            topicsPool.push('pythagoras', 'angle30', 'angle45', 'angle60', 'median');
+        }
+        if (state.level >= 2) {
+            topicsPool.push('trigFind', 'trigSolve');
+        }
+        if (state.level >= 3) {
+            topicsPool.push('trigAlpha');
+        }
+    }
+
+    // Prefer weak areas in mixed mode
+    let selectedTopic;
+    if (state.selectedTopic === 'mixed') {
+        const weakTopics = topicsPool.filter(t => state.weakAreas[t] > 0);
+        if (weakTopics.length > 0 && Math.random() < 0.4) {
+            selectedTopic = weakTopics[Math.floor(Math.random() * weakTopics.length)];
+        } else {
+            selectedTopic = topicsPool[Math.floor(Math.random() * topicsPool.length)];
+        }
+    } else {
+        selectedTopic = topicsPool[Math.floor(Math.random() * topicsPool.length)];
     }
 
     switch (selectedTopic) {
@@ -643,13 +666,21 @@ function shuffleArray(array) {
 
 // === UI ===
 function updateUI() {
-    document.getElementById('levelBadge').textContent = `Рівень ${state.level}`;
-    document.getElementById('streakNumber').textContent = state.streak;
+    const levelBadge = document.getElementById('levelBadge');
+    if (levelBadge) levelBadge.textContent = `Рівень ${state.level}`;
+
+    const streakEl = document.getElementById('streakNumber');
+    if (streakEl) streakEl.textContent = state.streak;
 
     const progress = (state.correctCount / state.totalQuestions) * 100;
-    document.getElementById('progressBar').style.setProperty('--progress', `${progress}%`);
-    document.getElementById('correctCount').textContent = state.correctCount;
-    document.getElementById('totalCount').textContent = state.currentQuestion;
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) progressBar.style.setProperty('--progress', `${progress}%`);
+
+    const correctEl = document.getElementById('correctCount');
+    if (correctEl) correctEl.textContent = state.correctCount;
+
+    const totalEl = document.getElementById('totalCount');
+    if (totalEl) totalEl.textContent = state.currentQuestion;
 
     const dots = document.querySelectorAll('.difficulty-dot');
     dots.forEach((dot, i) => dot.classList.toggle('active', i < state.level));
@@ -877,14 +908,33 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
     updateUI();
 
+    // Start button -> Topic selection
     document.getElementById('startBtn').addEventListener('click', () => {
-        state.currentQuestion = 0;
-        state.correctCount = 0;
-        state.streak = 0;
-        state.history = [];
-        state.weakAreas = {};
-        showScreen('quizScreen');
-        displayQuestion();
+        showScreen('topicScreen');
+    });
+
+    // Back to start from topic selection
+    const backToStartBtn = document.getElementById('backToStartBtn');
+    if (backToStartBtn) {
+        backToStartBtn.addEventListener('click', () => {
+            showScreen('startScreen');
+        });
+    }
+
+    // Topic selection buttons
+    document.querySelectorAll('.topic-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const topic = btn.dataset.topic;
+            state.selectedTopic = topic;
+            state.currentQuestion = 0;
+            state.correctCount = 0;
+            state.streak = 0;
+            state.history = [];
+            state.weakAreas = {};
+
+            showScreen('quizScreen');
+            displayQuestion();
+        });
     });
 
     document.getElementById('nextBtn').addEventListener('click', () => {
@@ -903,8 +953,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.correctCount = 0;
         state.streak = 0;
         state.history = [];
-        showScreen('quizScreen');
-        displayQuestion();
+        showScreen('topicScreen');
     });
 
     document.getElementById('reviewBtn').addEventListener('click', () => showScreen('theoryScreen'));

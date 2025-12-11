@@ -407,15 +407,28 @@ async function showHint() {
     hintBtn.disabled = true;
     hintContainer.classList.add('show');
     hintLoading.classList.remove('hidden');
-    hintText.textContent = '';
+    hintText.innerHTML = '';
 
     if (window.AIHints) {
         const result = await window.AIHints.getHint('powers', state.currentQuestion.text, state.level);
         hintLoading.classList.add('hidden');
-        hintText.textContent = result.hint || state.currentQuestion.hint;
+        const hintContent = result.hint || state.currentQuestion.hint;
+        hintText.innerHTML = hintContent;
+        // Render LaTeX if available
+        if (window.renderMathInElement) {
+            renderMathInElement(hintText, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        }
     } else {
         hintLoading.classList.add('hidden');
-        hintText.textContent = state.currentQuestion.hint;
+        hintText.innerHTML = state.currentQuestion.hint;
     }
 }
 

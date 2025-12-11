@@ -419,13 +419,21 @@ function shuffleArray(array) {
 
 // === UI Updates ===
 function updateUI() {
-    document.getElementById('levelBadge').textContent = `Рівень ${state.level}`;
-    document.getElementById('streakNumber').textContent = state.streak;
+    const levelBadge = document.getElementById('levelBadge');
+    if (levelBadge) levelBadge.textContent = `Рівень ${state.level}`;
+
+    const streakEl = document.getElementById('streakNumber');
+    if (streakEl) streakEl.textContent = state.streak;
 
     const progress = (state.correctCount / state.totalQuestions) * 100;
-    document.getElementById('progressBar').style.setProperty('--progress', `${progress}%`);
-    document.getElementById('correctCount').textContent = state.correctCount;
-    document.getElementById('totalCount').textContent = state.currentQuestion;
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) progressBar.style.setProperty('--progress', `${progress}%`);
+
+    const correctEl = document.getElementById('correctCount');
+    if (correctEl) correctEl.textContent = state.correctCount;
+
+    const totalEl = document.getElementById('totalCount');
+    if (totalEl) totalEl.textContent = state.currentQuestion;
 
     const dots = document.querySelectorAll('.difficulty-dot');
     dots.forEach((dot, index) => {

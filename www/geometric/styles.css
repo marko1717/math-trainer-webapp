@@ -35,34 +35,14 @@
 }
 
 body {
-    font-family: 'Press Start 2P', monospace;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     padding: 12px;
     line-height: 1.6;
-    image-rendering: pixelated;
-    -webkit-font-smoothing: none;
 }
 
 /* Scanline effect */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.08) 2px,
-        rgba(0, 0, 0, 0.08) 4px
-    );
-    pointer-events: none;
-    z-index: 9999;
-}
 
 .container {
     max-width: 500px;
@@ -72,7 +52,7 @@ body::before {
 /* Back Link */
 .back-link {
     display: inline-block;
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     font-size: 0.45rem;
     color: var(--accent);
     text-decoration: none;
@@ -206,7 +186,7 @@ body::before {
     cursor: pointer;
     transition: all 0.1s ease;
     box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
 }
 
 .topic-btn:hover, .topic-btn:active {
@@ -283,7 +263,7 @@ body::before {
     flex: 1;
     padding: 14px 16px;
     font-size: 0.55rem;
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     border: var(--pixel) solid var(--border);
     background: var(--bg-dark);
     color: var(--text);
@@ -299,7 +279,7 @@ body::before {
 
 /* Buttons */
 .btn {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     font-size: 0.45rem;
     padding: 14px 20px;
     border: var(--pixel) solid var(--border);

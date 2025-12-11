@@ -73,7 +73,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.75);
+                background: transparent;
                 pointer-events: auto;
             }
 
@@ -82,9 +82,10 @@
                 border-radius: 12px;
                 box-shadow:
                     0 0 0 4px #EF8748,
-                    0 0 0 9999px rgba(0, 0, 0, 0.75);
+                    0 0 0 9999px rgba(0, 0, 0, 0.8);
                 transition: all 0.4s ease;
                 pointer-events: none;
+                background: transparent;
             }
 
             .onboarding-tooltip {

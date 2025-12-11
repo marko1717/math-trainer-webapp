@@ -45,33 +45,13 @@ html {
 }
 
 body {
-    font-family: 'Press Start 2P', monospace;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     line-height: 1.6;
-    image-rendering: pixelated;
-    -webkit-font-smoothing: none;
 }
 
 /* Scanline effect */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.08) 2px,
-        rgba(0, 0, 0, 0.08) 4px
-    );
-    pointer-events: none;
-    z-index: 9999;
-}
 
 .container {
     max-width: 420px;
@@ -96,7 +76,7 @@ body::before {
 
 /* === Back Link === */
 .back-link {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     display: inline-block;
     font-size: 0.4rem;
     color: var(--accent);
@@ -143,7 +123,7 @@ body::before {
 }
 
 .btn-topic {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     width: 100%;
     display: flex;
     align-items: center;
@@ -208,7 +188,7 @@ body::before {
 }
 
 .btn-back {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     width: 36px;
     height: 36px;
     border: var(--pixel) solid var(--border);
@@ -291,7 +271,7 @@ body::before {
 }
 
 .btn-control {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     width: 44px;
     height: 44px;
     border: var(--pixel) solid var(--border);
@@ -324,7 +304,7 @@ body::before {
 }
 
 .btn-hint {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     width: 100%;
     padding: 12px;
     background: transparent;
@@ -355,7 +335,7 @@ body::before {
 
 /* === Check Button === */
 .btn-check {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     width: 100%;
     padding: 16px;
     background: var(--accent);
@@ -460,7 +440,7 @@ body::before {
 
 /* === Buttons === */
 .btn {
-    font-family: 'Press Start 2P', monospace;
+    font-family: inherit;
     padding: 14px 20px;
     border: var(--pixel) solid var(--border);
     font-size: 0.45rem;

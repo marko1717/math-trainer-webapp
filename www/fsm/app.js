@@ -447,6 +447,57 @@ class GameController {
         document.getElementById('restartBtn').addEventListener('click', () => this.startGame());
         document.getElementById('reviewBtn').addEventListener('click', () => this.showFormulas());
         document.getElementById('backToQuizBtn').addEventListener('click', () => this.showResults());
+        document.getElementById('hintBtn').addEventListener('click', () => this.showHint());
+    }
+
+    async showHint() {
+        const hintBtn = document.getElementById('hintBtn');
+        const hintContainer = document.getElementById('hintContainer');
+        const hintLoading = document.getElementById('hintLoading');
+        const hintText = document.getElementById('hintText');
+
+        if (hintBtn.disabled) return;
+
+        hintBtn.disabled = true;
+        hintContainer.classList.add('show');
+        hintLoading.classList.remove('hidden');
+        hintText.textContent = '';
+
+        // Get local hint
+        const localHint = this.getLocalHint();
+
+        // Try to get AI hint
+        try {
+            const aiHint = await getGPTHint(
+                this.currentQuestion.question,
+                FORMULAS[this.currentQuestion.formula]?.name || ''
+            );
+
+            hintLoading.classList.add('hidden');
+            if (aiHint) {
+                hintText.textContent = aiHint;
+            } else {
+                hintText.textContent = localHint;
+            }
+        } catch (e) {
+            hintLoading.classList.add('hidden');
+            hintText.textContent = localHint;
+        }
+    }
+
+    getLocalHint() {
+        if (!this.currentQuestion) return 'Застосуй відповідну формулу ФСМ';
+
+        const formula = this.currentQuestion.formula;
+        const hints = {
+            squareSum: 'Формула квадрата суми: (a + b)² = a² + 2ab + b². Подвій добуток обох членів!',
+            squareDiff: 'Формула квадрата різниці: (a - b)² = a² - 2ab + b². Середній член буде від\'ємний!',
+            diffSquares: 'Різниця квадратів: a² - b² = (a - b)(a + b). Знайди корені квадратів!',
+            sumCubes: 'Сума кубів: a³ + b³ = (a + b)(a² - ab + b²). Перша дужка — сума, у другій середній член від\'ємний!',
+            diffCubes: 'Різниця кубів: a³ - b³ = (a - b)(a² + ab + b²). Перша дужка — різниця, у другій середній член додатний!'
+        };
+
+        return hints[formula] || this.currentQuestion.explanation;
     }
 
     showScreen(screen) {
@@ -520,6 +571,12 @@ class GameController {
         // Hide feedback and next button
         this.feedbackContainer.classList.remove('show', 'correct', 'incorrect');
         this.nextBtn.style.display = 'none';
+
+        // Reset hint
+        const hintBtn = document.getElementById('hintBtn');
+        const hintContainer = document.getElementById('hintContainer');
+        if (hintBtn) hintBtn.disabled = false;
+        if (hintContainer) hintContainer.classList.remove('show');
     }
 
     shuffleAnswers(answers) {

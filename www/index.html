@@ -437,6 +437,39 @@
                 8px 8px 0 var(--primary),
                 16px 8px 0 var(--accent);
         }
+
+        /* Light mode overrides */
+        body.light-mode {
+            --bg: #f5f5f7;
+            --bg-dark: #e5e5ea;
+            --card-bg: #ffffff;
+            --text: #1c1c1e;
+            --text-muted: #6e6e73;
+            --border: #d1d1d6;
+        }
+
+        body.light-mode .pixel-box {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode.retro-mode .pixel-box {
+            box-shadow:
+                var(--pixel-border) var(--pixel-border) 0 var(--border),
+                inset -2px -2px 0 rgba(0,0,0,0.1),
+                inset 2px 2px 0 rgba(255,255,255,0.5);
+        }
+
+        body.light-mode .xp-fill {
+            background: linear-gradient(90deg, var(--primary-dark), var(--accent-dark));
+        }
+
+        body.light-mode .level-badge {
+            color: #ffffff;
+        }
+
+        body.light-mode .trainer-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -552,6 +585,11 @@
         </div>
 
         <div class="settings-toggle pixel-box">
+            <span class="toggle-label">☀ Світла тема</span>
+            <div class="toggle-switch" id="lightToggle"></div>
+        </div>
+
+        <div class="settings-toggle pixel-box">
             <span class="toggle-label">🎮 Ретро режим</span>
             <div class="toggle-switch" id="retroToggle"></div>
         </div>
@@ -563,20 +601,36 @@
     </div>
 
     <script>
-        // Retro mode toggle
-        function initRetroMode() {
-            const toggle = document.getElementById('retroToggle');
+        // Theme toggles
+        function initThemeToggles() {
+            // Retro mode
+            const retroToggle = document.getElementById('retroToggle');
             const isRetro = localStorage.getItem('math_quest_retro_mode') === 'true';
 
             if (isRetro) {
                 document.body.classList.add('retro-mode');
-                toggle.classList.add('active');
+                retroToggle.classList.add('active');
             }
 
-            toggle.addEventListener('click', () => {
-                const isActive = toggle.classList.toggle('active');
+            retroToggle.addEventListener('click', () => {
+                const isActive = retroToggle.classList.toggle('active');
                 document.body.classList.toggle('retro-mode', isActive);
                 localStorage.setItem('math_quest_retro_mode', isActive);
+            });
+
+            // Light mode
+            const lightToggle = document.getElementById('lightToggle');
+            const isLight = localStorage.getItem('math_quest_light_mode') === 'true';
+
+            if (isLight) {
+                document.body.classList.add('light-mode');
+                lightToggle.classList.add('active');
+            }
+
+            lightToggle.addEventListener('click', () => {
+                const isActive = lightToggle.classList.toggle('active');
+                document.body.classList.toggle('light-mode', isActive);
+                localStorage.setItem('math_quest_light_mode', isActive);
             });
         }
 
@@ -613,7 +667,7 @@
             } catch (e) {}
         };
 
-        initRetroMode();
+        initThemeToggles();
         loadStats();
     </script>
     <script src="shared/onboarding.js"></script>

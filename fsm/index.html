@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ФСМ Тренажер | НМТ Математика</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <span class="level-badge" id="levelBadge">Рівень 1</span>
+            </div>
+            <div class="header-center">
+                <h1>ФСМ Тренажер</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter" id="streakCounter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streakNumber">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="start-content">
+                    <div class="start-icon">📐</div>
+                    <h2>Формули скороченого множення</h2>
+                    <p class="start-description">
+                        Адаптивний тренажер, що підлаштовується під твій рівень
+                    </p>
+                    <div class="formula-preview">
+                        <div class="formula-item">(a + b)² = a² + 2ab + b²</div>
+                        <div class="formula-item">(a - b)² = a² - 2ab + b²</div>
+                        <div class="formula-item">a² - b² = (a-b)(a+b)</div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="startBtn">
+                        Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="screen" id="quizScreen">
+                <div class="question-container">
+                    <div class="difficulty-indicator" id="difficultyIndicator">
+                        <span class="difficulty-dot active"></span>
+                        <span class="difficulty-dot"></span>
+                        <span class="difficulty-dot"></span>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-number" id="questionNumber">Питання 1</div>
+                        <div class="question-text" id="questionText">
+                            Розкрийте дужки: (x + 3)²
+                        </div>
+                    </div>
+
+                    <div class="answers-container" id="answersContainer">
+                        <!-- Answers will be inserted here -->
+                    </div>
+
+                    <div class="feedback-container" id="feedbackContainer">
+                        <div class="feedback-icon" id="feedbackIcon"></div>
+                        <div class="feedback-text" id="feedbackText"></div>
+                        <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
+                    Далі →
+                </button>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-content">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultCorrect">0</div>
+                            <div class="stat-label">Правильних</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultAccuracy">0%</div>
+                            <div class="stat-label">Точність</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultLevel">1</div>
+                            <div class="stat-label">Рівень</div>
+                        </div>
+                    </div>
+
+                    <div class="ai-feedback" id="aiFeedback">
+                        <div class="ai-icon">🤖</div>
+                        <div class="ai-text" id="aiText">
+                            Аналізую твої результати...
+                        </div>
+                    </div>
+
+                    <div class="weak-topics" id="weakTopics" style="display: none;">
+                        <h3>Рекомендую попрактикувати:</h3>
+                        <div class="weak-list" id="weakList"></div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-large" id="restartBtn">
+                            Продовжити тренування
+                        </button>
+                        <button class="btn btn-secondary" id="reviewBtn">
+                            Переглянути формули
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulas Reference Screen -->
+            <div class="screen" id="formulasScreen">
+                <div class="formulas-content">
+                    <h2>Формули скороченого множення</h2>
+
+                    <div class="formula-category">
+                        <h3>Квадрат суми та різниці</h3>
+                        <div class="formula-card">
+                            <div class="formula-main">(a + b)² = a² + 2ab + b²</div>
+                            <div class="formula-example">Приклад: (x + 3)² = x² + 6x + 9</div>
+                        </div>
+                        <div class="formula-card">
+                            <div class="formula-main">(a - b)² = a² - 2ab + b²</div>
+                            <div class="formula-example">Приклад: (x - 2)² = x² - 4x + 4</div>
+                        </div>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>Різниця квадратів</h3>
+                        <div class="formula-card">
+                            <div class="formula-main">a² - b² = (a - b)(a + b)</div>
+                            <div class="formula-example">Приклад: x² - 9 = (x - 3)(x + 3)</div>
+                        </div>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>Сума та різниця кубів</h3>
+                        <div class="formula-card">
+                            <div class="formula-main">a³ + b³ = (a + b)(a² - ab + b²)</div>
+                            <div class="formula-example">Приклад: x³ + 8 = (x + 2)(x² - 2x + 4)</div>
+                        </div>
+                        <div class="formula-card">
+                            <div class="formula-main">a³ - b³ = (a - b)(a² + ab + b²)</div>
+                            <div class="formula-example">Приклад: x³ - 27 = (x - 3)(x² + 3x + 9)</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="backToQuizBtn">
+                        ← Повернутись
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

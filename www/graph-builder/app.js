@@ -17,12 +17,23 @@ let lastPoint = null;
 // Game State
 let state = {
     topic: 'linear',
+    topicName: 'Лінійна функція',
     correct: 0,
     wrong: 0,
     questionsAnswered: 0,
     totalQuestions: 5,
     currentQuestion: null,
-    hintUsed: false
+    hintUsed: false,
+    startTime: null
+};
+
+const TOPIC_NAMES = {
+    linear: 'Лінійна функція',
+    quadratic: 'Квадратична функція',
+    hyperbola: 'Обернена пропорційність',
+    modulus: 'Модуль',
+    sqrt: 'Корінь',
+    mixed: 'Змішаний режим'
 };
 
 // Canvas settings
@@ -52,6 +63,7 @@ function setupEventListeners() {
     document.querySelectorAll('.btn-topic').forEach(btn => {
         btn.addEventListener('click', () => {
             state.topic = btn.dataset.topic;
+            state.topicName = TOPIC_NAMES[btn.dataset.topic] || 'Графіки';
             startGame();
         });
     });
@@ -70,6 +82,7 @@ function setupEventListeners() {
     // Result buttons
     document.getElementById('restartBtn').addEventListener('click', startGame);
     document.getElementById('menuBtn').addEventListener('click', () => showScreen('start'));
+    document.getElementById('resultBackBtn')?.addEventListener('click', () => showScreen('start'));
 }
 
 function setupCanvasEvents() {
@@ -225,12 +238,14 @@ function startGame() {
         correct: 0,
         wrong: 0,
         questionsAnswered: 0,
-        hintUsed: false
+        hintUsed: false,
+        startTime: Date.now()
     };
 
     document.getElementById('correct').textContent = '0';
     document.getElementById('wrong').textContent = '0';
     document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('topicTitle').textContent = state.topicName;
 
     showScreen('game');
     nextQuestion();
@@ -674,7 +689,7 @@ function showHint() {
     });
 }
 
-function showResults() {
+async function showResults() {
     const accuracy = state.correct + state.wrong > 0
         ? Math.round((state.correct / (state.correct + state.wrong)) * 100)
         : 0;
@@ -684,12 +699,49 @@ function showResults() {
     document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
 
     const title = document.getElementById('resultTitle');
-    if (accuracy >= 90) title.textContent = '🏆 Бездоганно!';
-    else if (accuracy >= 70) title.textContent = '🎉 Чудово!';
-    else if (accuracy >= 50) title.textContent = '👍 Непогано!';
-    else title.textContent = '📚 Потрібно повторити';
+    const icon = document.getElementById('resultIcon');
+
+    if (accuracy >= 90) {
+        title.textContent = 'Бездоганно!';
+        icon.textContent = '🏆';
+    } else if (accuracy >= 70) {
+        title.textContent = 'Чудово!';
+        icon.textContent = '🎉';
+    } else if (accuracy >= 50) {
+        title.textContent = 'Непогано!';
+        icon.textContent = '👍';
+    } else {
+        title.textContent = 'Потрібно повторити';
+        icon.textContent = '📚';
+    }
 
     showScreen('result');
+
+    // Save to Firebase
+    await saveToFirebase(accuracy);
+}
+
+async function saveToFirebase(accuracy) {
+    if (window.MathQuestFirebase) {
+        const endTime = Date.now();
+        const timeSpent = Math.round((endTime - state.startTime) / 1000);
+
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: `graph-builder-${state.topic}`,
+                trainerName: `Побудова графіків: ${state.topicName}`,
+                score: state.correct,
+                totalQuestions: state.totalQuestions,
+                difficulty: 1,
+                accuracy: accuracy,
+                maxStreak: state.correct,
+                timeSpent: timeSpent
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
+    }
 }
 
 // Helpers

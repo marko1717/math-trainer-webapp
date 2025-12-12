@@ -45,7 +45,7 @@ let state = {
     hintUsed: false,
     history: [],
     weakAreas: {},
-    selectedTopic: 'mixed' // Track selected topic
+    startTime: null
 };
 
 function loadProgress() {
@@ -75,51 +75,31 @@ function drawTriangle(canvas, data) {
     ctx.clearRect(0, 0, w, h);
 
     // Triangle coordinates (right angle at bottom-left)
-    const padding = 45;
-    const maxWidth = w - 2 * padding;
-    const maxHeight = h - 2 * padding - 10;
-
-    // Default coordinates
-    let A = { x: padding, y: h - padding }; // Right angle (bottom-left)
-    let B = { x: 0, y: h - padding }; // Bottom right
-    let C = { x: padding, y: 0 }; // Top left
+    const padding = 40;
+    const A = { x: padding, y: h - padding }; // Right angle
+    const B = { x: w - padding, y: h - padding }; // Bottom right
+    const C = { x: padding, y: padding + 20 }; // Top left
 
     // Adjust for different triangle types
     let triangleType = data.triangleType || 'generic';
 
     if (triangleType === '30-60-90') {
-        // 30-60-90 triangle: sides ratio is 1 : √3 : 2
-        // Short leg (opposite to 30°) : Long leg (opposite to 60°) : Hypotenuse
-        const shortLeg = maxHeight * 0.5; // vertical leg (opposite to 30° at B)
-        const longLeg = shortLeg * Math.sqrt(3); // horizontal leg (opposite to 60° at C)
-
-        // Ensure it fits
-        const scaledLongLeg = Math.min(longLeg, maxWidth);
-        const scaledShortLeg = scaledLongLeg / Math.sqrt(3);
-
-        B.x = A.x + scaledLongLeg;
-        C.y = A.y - scaledShortLeg;
+        // Adjust proportions for 30-60-90 triangle
+        const baseLen = w - 2 * padding;
+        C.y = A.y - baseLen * Math.tan(60 * Math.PI / 180) * 0.6;
     } else if (triangleType === '45-45-90') {
         // Equal legs for 45-45-90
-        const legLen = Math.min(maxWidth, maxHeight) * 0.85;
+        const legLen = Math.min(w, h) - 2 * padding - 20;
         B.x = A.x + legLen;
         C.y = A.y - legLen;
-    } else {
-        // Generic triangle - 3-4-5 proportions
-        const scale = Math.min(maxWidth / 4, maxHeight / 3) * 0.9;
-        B.x = A.x + 4 * scale;
-        C.y = A.y - 3 * scale;
     }
 
-    // Get colors from CSS variables
+    // Get colors
     const style = getComputedStyle(document.body);
-    const isLightMode = document.body.classList.contains('light-mode');
-
-    const primaryColor = style.getPropertyValue('--primary').trim() || '#7C9D85';
-    const textColor = style.getPropertyValue('--text').trim() || (isLightMode ? '#1c1c1e' : '#F5F0EC');
-    const mutedColor = style.getPropertyValue('--text-muted').trim() || (isLightMode ? '#6e6e73' : '#a09a96');
-    const accentColor = style.getPropertyValue('--accent').trim() || '#EF8748';
-    const bgDark = style.getPropertyValue('--bg-dark').trim() || (isLightMode ? '#e5e5ea' : '#12121f');
+    const primaryColor = style.getPropertyValue('--primary-light').trim() || '#A29BFE';
+    const textColor = style.getPropertyValue('--text-primary').trim() || '#FFFFFF';
+    const mutedColor = style.getPropertyValue('--text-muted').trim() || '#6B6B80';
+    const accentColor = style.getPropertyValue('--warning-color').trim() || '#FDCB6E';
 
     // Draw triangle
     ctx.beginPath();
@@ -176,38 +156,24 @@ function drawTriangle(canvas, data) {
 
     // Draw angles
     if (data.angles) {
-        // Angle at B (bottom right corner)
+        // Angle at B
         if (data.angles.B) {
-            ctx.strokeStyle = data.highlight?.includes('B') ? accentColor : mutedColor;
             ctx.fillStyle = data.highlight?.includes('B') ? accentColor : mutedColor;
-
-            // Calculate angle from B to C
-            const angleBtoC = Math.atan2(C.y - B.y, C.x - B.x);
-            // Angle from B to A is always Math.PI (pointing left along horizontal line)
-            const angleBtoA = Math.PI;
-
-            // Draw arc inside the triangle (counterclockwise from BA to BC)
+            const angleB = Math.atan2(C.y - B.y, C.x - B.x);
             ctx.beginPath();
-            ctx.arc(B.x, B.y, 25, angleBtoC, angleBtoA, false);
+            ctx.arc(B.x, B.y, 25, Math.PI, angleB, true);
             ctx.stroke();
-            ctx.fillText(data.angles.B, B.x - 40, B.y - 20);
+            ctx.fillText(data.angles.B, B.x - 35, B.y - 15);
         }
 
-        // Angle at C (top left corner)
+        // Angle at C
         if (data.angles.C) {
-            ctx.strokeStyle = data.highlight?.includes('C') ? accentColor : mutedColor;
             ctx.fillStyle = data.highlight?.includes('C') ? accentColor : mutedColor;
-
-            // Angle from C to A (pointing down)
-            const angleCtoA = Math.PI / 2;
-            // Angle from C to B
-            const angleCtoB = Math.atan2(B.y - C.y, B.x - C.x);
-
-            // Draw arc inside the triangle
+            const angleC = Math.atan2(A.y - C.y, A.x - C.x);
             ctx.beginPath();
-            ctx.arc(C.x, C.y, 25, angleCtoA, angleCtoB, false);
+            ctx.arc(C.x, C.y, 25, angleC, Math.PI / 2 + 0.1, false);
             ctx.stroke();
-            ctx.fillText(data.angles.C, C.x + 30, C.y + 25);
+            ctx.fillText(data.angles.C, C.x + 30, C.y + 20);
         }
     }
 
@@ -627,53 +593,31 @@ function generateTrigAlpha() {
 
 // === Question Selection ===
 function generateQuestion() {
-    let topicsPool = [];
+    const availableTopics = [];
 
-    // If specific topic selected
-    if (state.selectedTopic && state.selectedTopic !== 'mixed') {
-        switch (state.selectedTopic) {
-            case 'pythagoras':
-                topicsPool = ['pythagoras'];
-                break;
-            case 'specialAngles':
-                topicsPool = ['angle30', 'angle45', 'angle60'];
-                break;
-            case 'median':
-                topicsPool = ['median'];
-                break;
-            case 'trigValues':
-                topicsPool = ['trigFind'];
-                break;
-            case 'trigSolve':
-                topicsPool = ['trigSolve', 'trigAlpha'];
-                break;
-            default:
-                topicsPool = ['pythagoras'];
-        }
-    } else {
-        // Mixed mode - use level-based selection
-        if (state.level >= 1) {
-            topicsPool.push('pythagoras', 'angle30', 'angle45', 'angle60', 'median');
-        }
-        if (state.level >= 2) {
-            topicsPool.push('trigFind', 'trigSolve');
-        }
-        if (state.level >= 3) {
-            topicsPool.push('trigAlpha');
-        }
+    // Level 1
+    if (state.level >= 1) {
+        availableTopics.push('pythagoras', 'angle30', 'angle45', 'angle60', 'median');
     }
 
-    // Prefer weak areas in mixed mode
+    // Level 2
+    if (state.level >= 2) {
+        availableTopics.push('trigFind', 'trigSolve');
+    }
+
+    // Level 3
+    if (state.level >= 3) {
+        availableTopics.push('trigAlpha');
+    }
+
+    // Prefer weak areas
     let selectedTopic;
-    if (state.selectedTopic === 'mixed') {
-        const weakTopics = topicsPool.filter(t => state.weakAreas[t] > 0);
-        if (weakTopics.length > 0 && Math.random() < 0.4) {
-            selectedTopic = weakTopics[Math.floor(Math.random() * weakTopics.length)];
-        } else {
-            selectedTopic = topicsPool[Math.floor(Math.random() * topicsPool.length)];
-        }
+    const weakTopics = availableTopics.filter(t => state.weakAreas[t] > 0);
+
+    if (weakTopics.length > 0 && Math.random() < 0.4) {
+        selectedTopic = weakTopics[Math.floor(Math.random() * weakTopics.length)];
     } else {
-        selectedTopic = topicsPool[Math.floor(Math.random() * topicsPool.length)];
+        selectedTopic = availableTopics[Math.floor(Math.random() * availableTopics.length)];
     }
 
     switch (selectedTopic) {
@@ -700,21 +644,12 @@ function shuffleArray(array) {
 
 // === UI ===
 function updateUI() {
-    const levelBadge = document.getElementById('levelBadge');
-    if (levelBadge) levelBadge.textContent = `Рівень ${state.level}`;
-
-    const streakEl = document.getElementById('streakNumber');
-    if (streakEl) streakEl.textContent = state.streak;
+    document.getElementById('streakNumber').textContent = state.streak;
 
     const progress = (state.correctCount / state.totalQuestions) * 100;
-    const progressBar = document.getElementById('progressBar');
-    if (progressBar) progressBar.style.setProperty('--progress', `${progress}%`);
-
-    const correctEl = document.getElementById('correctCount');
-    if (correctEl) correctEl.textContent = state.correctCount;
-
-    const totalEl = document.getElementById('totalCount');
-    if (totalEl) totalEl.textContent = state.currentQuestion;
+    document.getElementById('progressBar').style.width = `${progress}%`;
+    document.getElementById('correctCount').textContent = state.correctCount;
+    document.getElementById('totalCount').textContent = state.totalQuestions;
 
     const dots = document.querySelectorAll('.difficulty-dot');
     dots.forEach((dot, i) => dot.classList.toggle('active', i < state.level));
@@ -738,9 +673,8 @@ function displayQuestion() {
     const canvas = document.getElementById('triangleCanvas');
     drawTriangle(canvas, state.currentQuestionData.drawing);
 
-    // Hide hint
-    document.getElementById('hintContainer').style.display = 'none';
-    document.getElementById('hintBtn').style.display = 'block';
+    // Show help panel
+    document.getElementById('helpPanel').style.display = 'flex';
 
     // Answers
     const answersContainer = document.getElementById('answersContainer');
@@ -763,9 +697,102 @@ function displayQuestion() {
 
 function showHint() {
     state.hintUsed = true;
-    document.getElementById('hintText').textContent = state.currentQuestionData.hint;
-    document.getElementById('hintContainer').style.display = 'block';
-    document.getElementById('hintBtn').style.display = 'none';
+
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+        response.innerHTML = `
+            <div class="ai-hint-content">
+                <h4>💡 Підказка</h4>
+                <p>${state.currentQuestionData.hint}</p>
+            </div>
+        `;
+    }, 400);
+}
+
+function showAIHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        const topic = state.currentQuestionData.topic;
+        let explanation = '';
+
+        if (topic === 'pythagoras') {
+            explanation = `<p><strong>Теорема Піфагора:</strong></p>
+                <p>c² = a² + b²</p>
+                <p>Гіпотенуза — найбільша сторона (навпроти прямого кута)</p>`;
+        } else if (topic.includes('angle')) {
+            explanation = `<p><strong>Особливі трикутники:</strong></p>
+                <p>30-60-90: катети a і a√3, гіпотенуза 2a</p>
+                <p>45-45-90: катети a і a, гіпотенуза a√2</p>`;
+        } else if (topic.includes('trig')) {
+            explanation = `<p><strong>Тригонометрія:</strong></p>
+                <p>sin α = протилежний / гіпотенуза</p>
+                <p>cos α = прилеглий / гіпотенуза</p>
+                <p>tg α = протилежний / прилеглий</p>`;
+        } else {
+            explanation = `<p><strong>Медіана до гіпотенузи:</strong></p>
+                <p>m = c/2</p>
+                <p>Дорівнює половині гіпотенузи</p>`;
+        }
+
+        response.innerHTML = `
+            <div class="ai-help-content">
+                <h4>🤖 Допомога</h4>
+                ${explanation}
+            </div>
+        `;
+    }, 500);
+}
+
+function showFormulaHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    response.innerHTML = `
+        <div class="ai-formula-content">
+            <h4>📐 Формули</h4>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">c² = a² + b²</div>
+                <div class="formula-note">Теорема Піфагора</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">sin α = opp/hyp</div>
+                <div class="formula-main">cos α = adj/hyp</div>
+                <div class="formula-main">tg α = opp/adj</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">m = c/2</div>
+                <div class="formula-note">Медіана до гіпотенузи</div>
+            </div>
+        </div>
+    `;
+}
+
+function closeAIModal() {
+    document.getElementById('aiHelperModal').classList.add('hidden');
 }
 
 async function handleAnswer(answer, btn) {
@@ -804,7 +831,7 @@ async function handleAnswer(answer, btn) {
 
     showFeedback(isCorrect, answer);
     document.getElementById('nextBtn').style.display = 'block';
-    document.getElementById('hintBtn').style.display = 'none';
+    document.getElementById('helpPanel').style.display = 'none';
 
     saveProgress();
     updateUI();
@@ -851,10 +878,13 @@ async function showFeedback(isCorrect, userAnswer) {
     }
 }
 
-function showResults() {
+async function showResults() {
     showScreen('resultsScreen');
+    document.getElementById('progressContainer').style.display = 'none';
 
     const accuracy = Math.round((state.correctCount / state.totalQuestions) * 100);
+    const endTime = Date.now();
+    const timeSpent = Math.round((endTime - state.startTime) / 1000);
 
     document.getElementById('resultCorrect').textContent = state.correctCount;
     document.getElementById('resultAccuracy').textContent = `${accuracy}%`;
@@ -876,6 +906,29 @@ function showResults() {
 
     displayWeakAreas();
     getGPTFeedback();
+
+    // Save to Firebase
+    await saveToFirebase(accuracy, timeSpent);
+}
+
+async function saveToFirebase(accuracy, timeSpent) {
+    if (window.MathQuestFirebase) {
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'triangle',
+                trainerName: 'Прямокутний трикутник',
+                score: state.correctCount,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                accuracy: accuracy,
+                maxStreak: state.maxStreak,
+                timeSpent: timeSpent
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
+    }
 }
 
 function displayWeakAreas() {
@@ -942,33 +995,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
     updateUI();
 
-    // Start button -> Topic selection
     document.getElementById('startBtn').addEventListener('click', () => {
-        showScreen('topicScreen');
-    });
-
-    // Back to start from topic selection
-    const backToStartBtn = document.getElementById('backToStartBtn');
-    if (backToStartBtn) {
-        backToStartBtn.addEventListener('click', () => {
-            showScreen('startScreen');
-        });
-    }
-
-    // Topic selection buttons
-    document.querySelectorAll('.topic-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const topic = btn.dataset.topic;
-            state.selectedTopic = topic;
-            state.currentQuestion = 0;
-            state.correctCount = 0;
-            state.streak = 0;
-            state.history = [];
-            state.weakAreas = {};
-
-            showScreen('quizScreen');
-            displayQuestion();
-        });
+        state.currentQuestion = 0;
+        state.correctCount = 0;
+        state.streak = 0;
+        state.history = [];
+        state.weakAreas = {};
+        state.startTime = Date.now();
+        document.getElementById('progressContainer').style.display = 'block';
+        showScreen('quizScreen');
+        displayQuestion();
     });
 
     document.getElementById('nextBtn').addEventListener('click', () => {
@@ -980,14 +1016,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Help panel buttons
     document.getElementById('hintBtn').addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn').addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn').addEventListener('click', showFormulaHelp);
+
+    // AI Modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
+    });
 
     document.getElementById('restartBtn').addEventListener('click', () => {
         state.currentQuestion = 0;
         state.correctCount = 0;
         state.streak = 0;
         state.history = [];
-        showScreen('topicScreen');
+        state.startTime = Date.now();
+        document.getElementById('progressContainer').style.display = 'block';
+        showScreen('quizScreen');
+        displayQuestion();
     });
 
     document.getElementById('reviewBtn').addEventListener('click', () => showScreen('theoryScreen'));

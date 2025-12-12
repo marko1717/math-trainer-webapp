@@ -1,31 +1,39 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Трансформації графіків | НМТ Математика</title>
+    <title>Трансформації графіків | Math Quest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Shared styles -->
     <link rel="stylesheet" href="../shared/styles/base.css">
     <link rel="stylesheet" href="../shared/styles/components.css">
-    <link rel="stylesheet" href="../shared/styles.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
     <script src="../shared/theme.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="header">
+        <!-- Unified Header -->
+        <header class="trainer-header">
             <div class="header-left">
                 <a href="../index.html" class="back-btn">← Меню</a>
             </div>
             <div class="header-center">
-                <h1>Трансформації</h1>
+                <h1 class="trainer-title">Трансформації</h1>
             </div>
             <div class="header-right">
                 <div class="streak-counter" id="streakCounter">
@@ -36,10 +44,12 @@
         </header>
 
         <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
             <div class="progress-text">
-                <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
+                <span id="correctCount">0</span> / <span id="totalCount">10</span> правильно
             </div>
         </div>
 
@@ -47,19 +57,28 @@
         <main class="main-content">
             <!-- Start Screen -->
             <div class="screen active" id="startScreen">
-                <div class="start-content">
-                    <div class="start-icon">📈</div>
-                    <h2>Трансформації графіків</h2>
-                    <p class="start-description">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📈</div>
+                    <h2 class="welcome-title">Трансформації графіків</h2>
+                    <p class="welcome-description">
                         Навчись визначати зсуви та відображення функцій
                     </p>
-                    <div class="transform-preview">
-                        <div class="transform-item">f(x) → f(x - a) зсув вправо</div>
-                        <div class="transform-item">f(x) → f(x + a) зсув вліво</div>
-                        <div class="transform-item">f(x) → f(x) + b зсув вгору</div>
-                        <div class="transform-item">f(x) → f(x) - b зсув вниз</div>
-                        <div class="transform-item">f(x) → -f(x) відображення</div>
+
+                    <div class="theory-preview">
+                        <div class="theory-card">
+                            <div class="formula-main">f(x - a) → вправо</div>
+                            <div class="formula-note">Зсув на a вправо</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">f(x) + b → вгору</div>
+                            <div class="formula-note">Зсув на b вгору</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">-f(x) → відображення</div>
+                            <div class="formula-note">Відносно осі OX</div>
+                        </div>
                     </div>
+
                     <button class="btn btn-primary btn-large" id="startBtn">
                         Почати тренування
                     </button>
@@ -74,11 +93,11 @@
                         <span class="difficulty-dot"></span>
                     </div>
 
-                    <div class="question-card">
-                        <div class="question-number" id="questionNumber">Питання 1</div>
-                        <div class="question-text" id="questionText">
-                            Яка трансформація застосована до графіка?
-                        </div>
+                    <div class="topic-badge" id="topicBadge">Трансформації</div>
+
+                    <div class="question-number" id="questionNumber">Питання 1</div>
+                    <div class="question-text" id="questionText">
+                        Яка трансформація застосована до графіка?
                     </div>
 
                     <!-- Graph Display -->
@@ -111,6 +130,22 @@
                         <div class="feedback-text" id="feedbackText"></div>
                         <div class="feedback-explanation" id="feedbackExplanation"></div>
                     </div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel" id="helpPanel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>Допомога ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Правила</span>
+                        </button>
+                    </div>
                 </div>
 
                 <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
@@ -122,7 +157,7 @@
             <div class="screen" id="resultsScreen">
                 <div class="results-content">
                     <div class="results-icon" id="resultsIcon">🎉</div>
-                    <h2 id="resultsTitle">Чудова робота!</h2>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
 
                     <div class="results-stats">
                         <div class="stat-card">
@@ -139,24 +174,12 @@
                         </div>
                     </div>
 
-                    <div class="ai-feedback" id="aiFeedback">
-                        <div class="ai-icon">🤖</div>
-                        <div class="ai-text" id="aiText">
-                            Аналізую твої результати...
-                        </div>
-                    </div>
-
-                    <div class="weak-topics" id="weakTopics" style="display: none;">
-                        <h3>Рекомендую попрактикувати:</h3>
-                        <div class="weak-list" id="weakList"></div>
-                    </div>
-
                     <div class="results-actions">
                         <button class="btn btn-primary btn-large" id="restartBtn">
-                            Продовжити тренування
+                            🔄 Ще раз
                         </button>
                         <button class="btn btn-secondary" id="reviewBtn">
-                            Переглянути правила
+                            📖 Правила
                         </button>
                     </div>
                 </div>
@@ -164,38 +187,38 @@
 
             <!-- Rules Reference Screen -->
             <div class="screen" id="rulesScreen">
-                <div class="rules-content">
+                <div class="formulas-content">
                     <h2>Правила трансформацій</h2>
 
-                    <div class="rule-category">
-                        <h3>Горизонтальні зсуви</h3>
-                        <div class="rule-card">
-                            <div class="rule-main">f(x - a) → зсув вправо на a</div>
-                            <div class="rule-example">Приклад: (x-2)² - парабола зсунута вправо на 2</div>
+                    <div class="formula-category">
+                        <h3>↔️ Горизонтальні зсуви</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">f(x - a) → зсув вправо на a</div>
+                            <div class="formula-note">Приклад: (x-2)² - парабола вправо на 2</div>
                         </div>
-                        <div class="rule-card">
-                            <div class="rule-main">f(x + a) → зсув вліво на a</div>
-                            <div class="rule-example">Приклад: (x+3)² - парабола зсунута вліво на 3</div>
-                        </div>
-                    </div>
-
-                    <div class="rule-category">
-                        <h3>Вертикальні зсуви</h3>
-                        <div class="rule-card">
-                            <div class="rule-main">f(x) + b → зсув вгору на b</div>
-                            <div class="rule-example">Приклад: x² + 2 - парабола зсунута вгору на 2</div>
-                        </div>
-                        <div class="rule-card">
-                            <div class="rule-main">f(x) - b → зсув вниз на b</div>
-                            <div class="rule-example">Приклад: x² - 3 - парабола зсунута вниз на 3</div>
+                        <div class="theory-card">
+                            <div class="formula-main">f(x + a) → зсув вліво на a</div>
+                            <div class="formula-note">Приклад: (x+3)² - парабола вліво на 3</div>
                         </div>
                     </div>
 
-                    <div class="rule-category">
-                        <h3>Відображення</h3>
-                        <div class="rule-card">
-                            <div class="rule-main">-f(x) → відображення відносно осі X</div>
-                            <div class="rule-example">Приклад: -x² - парабола перевернута вниз</div>
+                    <div class="formula-category">
+                        <h3>↕️ Вертикальні зсуви</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">f(x) + b → зсув вгору на b</div>
+                            <div class="formula-note">Приклад: x² + 2 - парабола вгору на 2</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">f(x) - b → зсув вниз на b</div>
+                            <div class="formula-note">Приклад: x² - 3 - парабола вниз на 3</div>
+                        </div>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>🔄 Відображення</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">-f(x) → відображення відносно OX</div>
+                            <div class="formula-note">Приклад: -x² - парабола перевернута вниз</div>
                         </div>
                     </div>
 
@@ -207,7 +230,31 @@
         </main>
     </div>
 
-    <script src="app.js"></script>
+    <!-- AI Helper Modal -->
+    <div id="aiHelperModal" class="ai-modal hidden">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">
+                    <span>🤖</span>
+                    <span>Допомога ШІ</span>
+                </div>
+                <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="ai-loading-spinner"></div>
+                    <span>Думаю...</span>
+                </div>
+                <div class="ai-response" id="aiResponse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared components -->
+    <script src="../shared/components/ai-helper.js"></script>
     <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
+    <script src="app.js"></script>
 </body>
 </html>

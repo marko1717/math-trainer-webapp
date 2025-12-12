@@ -1,87 +1,123 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Побудова графіків</title>
+    <title>Побудова графіків | Math Quest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
     <script src="../shared/theme.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <!-- Start Screen -->
         <div id="startScreen" class="screen active">
-            <h1>📈 Побудова графіків</h1>
-            <p class="subtitle">Навчись будувати графіки функцій</p>
+            <header class="trainer-header">
+                <div class="header-left">
+                    <a href="../index.html" class="back-btn">← Меню</a>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Побудова графіків</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
 
-            <div class="topic-select">
-                <h3>Обери тему:</h3>
+            <div class="welcome-screen">
+                <div class="welcome-icon">📈</div>
+                <h2 class="welcome-title">Побудова графіків</h2>
+                <p class="welcome-description">Навчись будувати графіки функцій</p>
 
-                <button class="btn btn-topic" data-topic="linear">
-                    <span class="topic-icon">📏</span>
-                    <div class="topic-info">
-                        <span class="topic-name">Лінійна функція</span>
-                        <span class="topic-formula">y = kx + b</span>
-                    </div>
-                </button>
+                <div class="topic-select">
+                    <h3>Обери тему:</h3>
 
-                <button class="btn btn-topic" data-topic="quadratic">
-                    <span class="topic-icon">🎯</span>
-                    <div class="topic-info">
-                        <span class="topic-name">Квадратична функція</span>
-                        <span class="topic-formula">y = ax² + bx + c</span>
-                    </div>
-                </button>
+                    <button class="btn btn-topic" data-topic="linear">
+                        <span class="topic-icon">📏</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Лінійна функція</span>
+                            <span class="topic-formula">y = kx + b</span>
+                        </div>
+                    </button>
 
-                <button class="btn btn-topic" data-topic="hyperbola">
-                    <span class="topic-icon">〰️</span>
-                    <div class="topic-info">
-                        <span class="topic-name">Обернена пропорційність</span>
-                        <span class="topic-formula">y = k/x</span>
-                    </div>
-                </button>
+                    <button class="btn btn-topic" data-topic="quadratic">
+                        <span class="topic-icon">🎯</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Квадратична функція</span>
+                            <span class="topic-formula">y = ax² + bx + c</span>
+                        </div>
+                    </button>
 
-                <button class="btn btn-topic" data-topic="modulus">
-                    <span class="topic-icon">📐</span>
-                    <div class="topic-info">
-                        <span class="topic-name">Модуль</span>
-                        <span class="topic-formula">y = |x - a| + b</span>
-                    </div>
-                </button>
+                    <button class="btn btn-topic" data-topic="hyperbola">
+                        <span class="topic-icon">〰️</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Обернена пропорційність</span>
+                            <span class="topic-formula">y = k/x</span>
+                        </div>
+                    </button>
 
-                <button class="btn btn-topic" data-topic="sqrt">
-                    <span class="topic-icon">√</span>
-                    <div class="topic-info">
-                        <span class="topic-name">Корінь</span>
-                        <span class="topic-formula">y = √(x - a) + b</span>
-                    </div>
-                </button>
+                    <button class="btn btn-topic" data-topic="modulus">
+                        <span class="topic-icon">📐</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Модуль</span>
+                            <span class="topic-formula">y = |x - a| + b</span>
+                        </div>
+                    </button>
 
-                <button class="btn btn-topic" data-topic="mixed">
-                    <span class="topic-icon">🎲</span>
-                    <div class="topic-info">
-                        <span class="topic-name">Змішаний режим</span>
-                        <span class="topic-formula">Всі типи</span>
-                    </div>
-                </button>
+                    <button class="btn btn-topic" data-topic="sqrt">
+                        <span class="topic-icon">√</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Корінь</span>
+                            <span class="topic-formula">y = √(x - a) + b</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic btn-mixed" data-topic="mixed">
+                        <span class="topic-icon">🎲</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Змішаний режим</span>
+                            <span class="topic-formula">Всі типи</span>
+                        </div>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Game Screen -->
         <div id="gameScreen" class="screen">
-            <div class="header">
-                <div class="stats">
-                    <span class="stat">✅ <span id="correct">0</span></span>
-                    <span class="stat">❌ <span id="wrong">0</span></span>
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="backBtn">← Назад</button>
                 </div>
-                <button class="btn-back" id="backBtn">✕</button>
-            </div>
+                <div class="header-center">
+                    <h1 class="trainer-title" id="topicTitle">Графіки</h1>
+                </div>
+                <div class="header-right">
+                    <div class="stats-mini">
+                        <span class="stat-good">✅ <span id="correct">0</span></span>
+                        <span class="stat-bad">❌ <span id="wrong">0</span></span>
+                    </div>
+                </div>
+            </header>
 
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
             </div>
 
             <div class="task-area">
@@ -107,36 +143,54 @@
                 </div>
             </div>
 
-            <button class="btn btn-check" id="checkBtn">✓ Перевірити</button>
+            <button class="btn btn-primary btn-check" id="checkBtn">✓ Перевірити</button>
 
             <div class="feedback" id="feedback"></div>
         </div>
 
         <!-- Result Screen -->
         <div id="resultScreen" class="screen">
-            <h2 id="resultTitle">🎉 Молодець!</h2>
-            <div class="result-stats">
-                <div class="result-stat">
-                    <span class="result-value" id="finalCorrect">0</span>
-                    <span class="result-label">Правильно</span>
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="resultBackBtn">← Назад</button>
                 </div>
-                <div class="result-stat">
-                    <span class="result-value" id="finalWrong">0</span>
-                    <span class="result-label">Помилок</span>
+                <div class="header-center">
+                    <h1 class="trainer-title">Результати</h1>
                 </div>
-                <div class="result-stat">
-                    <span class="result-value" id="finalAccuracy">0%</span>
-                    <span class="result-label">Точність</span>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="results-content">
+                <div class="results-icon" id="resultIcon">🎉</div>
+                <h2 class="results-title" id="resultTitle">Молодець!</h2>
+
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalCorrect">0</div>
+                        <div class="stat-label">Правильно</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalWrong">0</div>
+                        <div class="stat-label">Помилок</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalAccuracy">0%</div>
+                        <div class="stat-label">Точність</div>
+                    </div>
                 </div>
-            </div>
-            <div class="result-actions">
-                <button class="btn btn-primary" id="restartBtn">🔄 Ще раз</button>
-                <button class="btn btn-secondary" id="menuBtn">📚 Меню</button>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary btn-large" id="restartBtn">🔄 Ще раз</button>
+                    <button class="btn btn-secondary" id="menuBtn">📚 Інші теми</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Shared components -->
     <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
+    <script src="app.js"></script>
 </body>
 </html>

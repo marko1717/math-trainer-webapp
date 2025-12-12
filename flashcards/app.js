@@ -202,12 +202,14 @@ const FLASH_CARDS = {
 // State
 let state = {
     currentSet: null,
+    currentSetName: null,
     currentIndex: 0,
     cards: [],
     known: new Set(),
     learning: new Set(),
     isFlipped: false,
-    nmtOnly: false
+    nmtOnly: false,
+    startTime: null
 };
 
 // DOM Elements
@@ -266,6 +268,7 @@ function setupEventListeners() {
     document.getElementById('reviewLearningBtn').addEventListener('click', reviewLearning);
     document.getElementById('restartBtn').addEventListener('click', restartSet);
     document.getElementById('backToSetsBtn').addEventListener('click', () => showScreen('start'));
+    document.getElementById('resultsBackBtn')?.addEventListener('click', () => showScreen('start'));
 
     // NMT filter
     document.getElementById('nmtOnlyFilter').addEventListener('change', (e) => {
@@ -313,8 +316,10 @@ function startSet(setKey) {
     if (!set) return;
 
     state.currentSet = setKey;
+    state.currentSetName = set.title;
     state.currentIndex = 0;
     state.isFlipped = false;
+    state.startTime = Date.now();
 
     // Filter cards if NMT only
     state.cards = state.nmtOnly
@@ -421,7 +426,7 @@ function animateSwipe(direction) {
     }, 300);
 }
 
-function showResults() {
+async function showResults() {
     const total = state.cards.length;
     const known = state.known.size;
     const learning = state.learning.size;
@@ -431,11 +436,54 @@ function showResults() {
     document.getElementById('learningCount').textContent = learning;
     document.getElementById('remainingCount').textContent = remaining;
 
+    // Results icon based on known percentage
+    const resultsIcon = document.getElementById('resultsIcon');
+    const resultsTitle = document.getElementById('resultsTitle');
+    const knownPercent = total > 0 ? Math.round((known / total) * 100) : 0;
+
+    if (knownPercent >= 80) {
+        resultsIcon.textContent = '🎉';
+        resultsTitle.textContent = 'Чудово!';
+    } else if (knownPercent >= 50) {
+        resultsIcon.textContent = '👍';
+        resultsTitle.textContent = 'Непогано!';
+    } else {
+        resultsIcon.textContent = '📚';
+        resultsTitle.textContent = 'Продовжуй вчити!';
+    }
+
     // Disable review button if no learning cards
     document.getElementById('reviewLearningBtn').disabled = learning === 0;
 
     showScreen('results');
     saveProgress();
+
+    // Save to Firebase
+    await saveToFirebase(known, total);
+}
+
+async function saveToFirebase(known, total) {
+    if (window.MathQuestFirebase) {
+        const endTime = Date.now();
+        const timeSpent = Math.round((endTime - state.startTime) / 1000);
+        const accuracy = total > 0 ? Math.round((known / total) * 100) : 0;
+
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: `flashcards-${state.currentSet}`,
+                trainerName: `Флеш-картки: ${state.currentSetName}`,
+                score: known,
+                totalQuestions: total,
+                difficulty: 1,
+                accuracy: accuracy,
+                maxStreak: known,
+                timeSpent: timeSpent
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
+    }
 }
 
 function reviewLearning() {

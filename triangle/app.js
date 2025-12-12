@@ -44,7 +44,8 @@ let state = {
     answered: false,
     hintUsed: false,
     history: [],
-    weakAreas: {}
+    weakAreas: {},
+    startTime: null
 };
 
 function loadProgress() {
@@ -643,13 +644,12 @@ function shuffleArray(array) {
 
 // === UI ===
 function updateUI() {
-    document.getElementById('levelBadge').textContent = `Рівень ${state.level}`;
     document.getElementById('streakNumber').textContent = state.streak;
 
     const progress = (state.correctCount / state.totalQuestions) * 100;
-    document.getElementById('progressBar').style.setProperty('--progress', `${progress}%`);
+    document.getElementById('progressBar').style.width = `${progress}%`;
     document.getElementById('correctCount').textContent = state.correctCount;
-    document.getElementById('totalCount').textContent = state.currentQuestion;
+    document.getElementById('totalCount').textContent = state.totalQuestions;
 
     const dots = document.querySelectorAll('.difficulty-dot');
     dots.forEach((dot, i) => dot.classList.toggle('active', i < state.level));
@@ -673,9 +673,8 @@ function displayQuestion() {
     const canvas = document.getElementById('triangleCanvas');
     drawTriangle(canvas, state.currentQuestionData.drawing);
 
-    // Hide hint
-    document.getElementById('hintContainer').style.display = 'none';
-    document.getElementById('hintBtn').style.display = 'block';
+    // Show help panel
+    document.getElementById('helpPanel').style.display = 'flex';
 
     // Answers
     const answersContainer = document.getElementById('answersContainer');
@@ -698,9 +697,102 @@ function displayQuestion() {
 
 function showHint() {
     state.hintUsed = true;
-    document.getElementById('hintText').textContent = state.currentQuestionData.hint;
-    document.getElementById('hintContainer').style.display = 'block';
-    document.getElementById('hintBtn').style.display = 'none';
+
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+        response.innerHTML = `
+            <div class="ai-hint-content">
+                <h4>💡 Підказка</h4>
+                <p>${state.currentQuestionData.hint}</p>
+            </div>
+        `;
+    }, 400);
+}
+
+function showAIHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        const topic = state.currentQuestionData.topic;
+        let explanation = '';
+
+        if (topic === 'pythagoras') {
+            explanation = `<p><strong>Теорема Піфагора:</strong></p>
+                <p>c² = a² + b²</p>
+                <p>Гіпотенуза — найбільша сторона (навпроти прямого кута)</p>`;
+        } else if (topic.includes('angle')) {
+            explanation = `<p><strong>Особливі трикутники:</strong></p>
+                <p>30-60-90: катети a і a√3, гіпотенуза 2a</p>
+                <p>45-45-90: катети a і a, гіпотенуза a√2</p>`;
+        } else if (topic.includes('trig')) {
+            explanation = `<p><strong>Тригонометрія:</strong></p>
+                <p>sin α = протилежний / гіпотенуза</p>
+                <p>cos α = прилеглий / гіпотенуза</p>
+                <p>tg α = протилежний / прилеглий</p>`;
+        } else {
+            explanation = `<p><strong>Медіана до гіпотенузи:</strong></p>
+                <p>m = c/2</p>
+                <p>Дорівнює половині гіпотенузи</p>`;
+        }
+
+        response.innerHTML = `
+            <div class="ai-help-content">
+                <h4>🤖 Допомога</h4>
+                ${explanation}
+            </div>
+        `;
+    }, 500);
+}
+
+function showFormulaHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    response.innerHTML = `
+        <div class="ai-formula-content">
+            <h4>📐 Формули</h4>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">c² = a² + b²</div>
+                <div class="formula-note">Теорема Піфагора</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">sin α = opp/hyp</div>
+                <div class="formula-main">cos α = adj/hyp</div>
+                <div class="formula-main">tg α = opp/adj</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">m = c/2</div>
+                <div class="formula-note">Медіана до гіпотенузи</div>
+            </div>
+        </div>
+    `;
+}
+
+function closeAIModal() {
+    document.getElementById('aiHelperModal').classList.add('hidden');
 }
 
 async function handleAnswer(answer, btn) {
@@ -739,7 +831,7 @@ async function handleAnswer(answer, btn) {
 
     showFeedback(isCorrect, answer);
     document.getElementById('nextBtn').style.display = 'block';
-    document.getElementById('hintBtn').style.display = 'none';
+    document.getElementById('helpPanel').style.display = 'none';
 
     saveProgress();
     updateUI();
@@ -786,10 +878,13 @@ async function showFeedback(isCorrect, userAnswer) {
     }
 }
 
-function showResults() {
+async function showResults() {
     showScreen('resultsScreen');
+    document.getElementById('progressContainer').style.display = 'none';
 
     const accuracy = Math.round((state.correctCount / state.totalQuestions) * 100);
+    const endTime = Date.now();
+    const timeSpent = Math.round((endTime - state.startTime) / 1000);
 
     document.getElementById('resultCorrect').textContent = state.correctCount;
     document.getElementById('resultAccuracy').textContent = `${accuracy}%`;
@@ -811,6 +906,29 @@ function showResults() {
 
     displayWeakAreas();
     getGPTFeedback();
+
+    // Save to Firebase
+    await saveToFirebase(accuracy, timeSpent);
+}
+
+async function saveToFirebase(accuracy, timeSpent) {
+    if (window.MathQuestFirebase) {
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'triangle',
+                trainerName: 'Прямокутний трикутник',
+                score: state.correctCount,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                accuracy: accuracy,
+                maxStreak: state.maxStreak,
+                timeSpent: timeSpent
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
+    }
 }
 
 function displayWeakAreas() {
@@ -883,6 +1001,8 @@ document.addEventListener('DOMContentLoaded', () => {
         state.streak = 0;
         state.history = [];
         state.weakAreas = {};
+        state.startTime = Date.now();
+        document.getElementById('progressContainer').style.display = 'block';
         showScreen('quizScreen');
         displayQuestion();
     });
@@ -896,13 +1016,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Help panel buttons
     document.getElementById('hintBtn').addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn').addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn').addEventListener('click', showFormulaHelp);
+
+    // AI Modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
+    });
 
     document.getElementById('restartBtn').addEventListener('click', () => {
         state.currentQuestion = 0;
         state.correctCount = 0;
         state.streak = 0;
         state.history = [];
+        state.startTime = Date.now();
+        document.getElementById('progressContainer').style.display = 'block';
         showScreen('quizScreen');
         displayQuestion();
     });

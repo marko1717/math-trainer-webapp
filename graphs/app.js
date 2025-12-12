@@ -66,8 +66,10 @@ let state = {
     maxLevel: 2,
     currentQuestionData: null,
     answered: false,
+    hintUsed: false,
     history: [],
-    weakAreas: {}
+    weakAreas: {},
+    startTime: null
 };
 
 // Load saved progress
@@ -423,17 +425,14 @@ function drawGraph(canvas, baseFunction, transformParams) {
 
 // === UI Updates ===
 function updateUI() {
-    // Update level badge
-    document.getElementById('levelBadge').textContent = `Рівень ${state.level}`;
-
     // Update streak
     document.getElementById('streakNumber').textContent = state.streak;
 
     // Update progress
     const progress = (state.correctCount / state.totalQuestions) * 100;
-    document.getElementById('progressBar').style.setProperty('--progress', `${progress}%`);
+    document.getElementById('progressBar').style.width = `${progress}%`;
     document.getElementById('correctCount').textContent = state.correctCount;
-    document.getElementById('totalCount').textContent = state.currentQuestion;
+    document.getElementById('totalCount').textContent = state.totalQuestions;
 
     // Update difficulty indicator
     const dots = document.querySelectorAll('.difficulty-dot');
@@ -452,10 +451,15 @@ function showScreen(screenId) {
 function displayQuestion() {
     state.currentQuestionData = generateQuestion();
     state.answered = false;
+    state.hintUsed = false;
 
     // Update question number
     document.getElementById('questionNumber').textContent = `Питання ${state.currentQuestion + 1}`;
     document.getElementById('questionText').textContent = state.currentQuestionData.questionText;
+
+    // Update topic badge
+    const transformName = TRANSFORMATIONS[state.currentQuestionData.transformationType]?.name || 'Трансформація';
+    document.getElementById('topicBadge').textContent = transformName;
 
     // Update equations display
     document.getElementById('originalEquation').textContent = `f(x) = ${state.currentQuestionData.baseFunction.name}`;
@@ -481,9 +485,10 @@ function displayQuestion() {
         answersContainer.appendChild(btn);
     });
 
-    // Hide feedback and next button
+    // Hide feedback and next button, show help panel
     document.getElementById('feedbackContainer').classList.remove('show', 'correct', 'incorrect');
     document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('helpPanel').style.display = 'flex';
 
     updateUI();
 }
@@ -553,8 +558,9 @@ async function handleAnswer(answer, btn) {
         getGPTExplanation();
     }
 
-    // Show next button
+    // Show next button, hide help panel
     document.getElementById('nextBtn').style.display = 'block';
+    document.getElementById('helpPanel').style.display = 'none';
 
     saveProgress();
     updateUI();
@@ -637,11 +643,99 @@ async function getGPTExplanation() {
     }
 }
 
+// === Help Panel Functions ===
+function showHint() {
+    state.hintUsed = true;
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+        response.innerHTML = `
+            <div class="ai-hint-content">
+                <h4>💡 Підказка</h4>
+                <p>${getTransformationHint()}</p>
+            </div>
+        `;
+    }, 400);
+}
+
+function showAIHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        response.innerHTML = `
+            <div class="ai-help-content">
+                <h4>🤖 Допомога</h4>
+                <p><strong>Як визначити трансформацію:</strong></p>
+                <p>1. Подивись, чи графік зсунутий вліво/вправо</p>
+                <p>2. Подивись, чи графік зсунутий вгору/вниз</p>
+                <p>3. Перевір, чи графік відображений (перевернутий)</p>
+                <p><strong>Правила:</strong></p>
+                <p>• f(x - a) → зсув вправо на a</p>
+                <p>• f(x + a) → зсув вліво на a</p>
+                <p>• f(x) + b → зсув вгору на b</p>
+                <p>• -f(x) → відображення відносно OX</p>
+            </div>
+        `;
+    }, 500);
+}
+
+function showFormulaHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    response.innerHTML = `
+        <div class="ai-formula-content">
+            <h4>📐 Правила трансформацій</h4>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">f(x - a) → вправо на a</div>
+                <div class="formula-main">f(x + a) → вліво на a</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">f(x) + b → вгору на b</div>
+                <div class="formula-main">f(x) - b → вниз на b</div>
+            </div>
+            <div class="theory-card">
+                <div class="formula-main">-f(x) → відображення</div>
+                <div class="formula-note">Відносно осі OX</div>
+            </div>
+        </div>
+    `;
+}
+
+function closeAIModal() {
+    document.getElementById('aiHelperModal').classList.add('hidden');
+}
+
 // === Results Screen ===
-function showResults() {
+async function showResults() {
     showScreen('resultsScreen');
+    document.getElementById('progressContainer').style.display = 'none';
 
     const accuracy = Math.round((state.correctCount / state.totalQuestions) * 100);
+    const endTime = Date.now();
+    const timeSpent = Math.round((endTime - state.startTime) / 1000);
 
     // Update results stats
     document.getElementById('resultCorrect').textContent = state.correctCount;
@@ -663,11 +757,28 @@ function showResults() {
         resultsTitle.textContent = 'Продовжуй тренуватись!';
     }
 
-    // Show weak areas
-    displayWeakAreas();
+    // Save to Firebase
+    await saveToFirebase(accuracy, timeSpent);
+}
 
-    // Get AI feedback
-    getGPTFeedback();
+async function saveToFirebase(accuracy, timeSpent) {
+    if (window.MathQuestFirebase) {
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'graphs',
+                trainerName: 'Трансформації графіків',
+                score: state.correctCount,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                accuracy: accuracy,
+                maxStreak: state.maxStreak,
+                timeSpent: timeSpent
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
+    }
 }
 
 function displayWeakAreas() {
@@ -767,7 +878,9 @@ document.addEventListener('DOMContentLoaded', () => {
         state.streak = 0;
         state.history = [];
         state.weakAreas = {};
+        state.startTime = Date.now();
 
+        document.getElementById('progressContainer').style.display = 'block';
         showScreen('quizScreen');
         displayQuestion();
     });
@@ -783,14 +896,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Help panel buttons
+    document.getElementById('hintBtn').addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn').addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn').addEventListener('click', showFormulaHelp);
+
+    // AI Modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
+    });
+
     // Restart button
     document.getElementById('restartBtn').addEventListener('click', () => {
         state.currentQuestion = 0;
         state.correctCount = 0;
         state.streak = 0;
         state.history = [];
-        // Keep weak areas for adaptive learning
+        state.startTime = Date.now();
 
+        document.getElementById('progressContainer').style.display = 'block';
         showScreen('quizScreen');
         displayQuestion();
     });
@@ -809,9 +934,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof renderMathInElement !== 'undefined') {
         renderMath(document.body);
     } else {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => renderMath(document.body), 100);
-        });
+        setTimeout(() => renderMath(document.body), 100);
     }
 });
 

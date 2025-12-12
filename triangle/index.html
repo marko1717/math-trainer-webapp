@@ -1,28 +1,39 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Прямокутний трикутник | НМТ Математика</title>
+    <title>Прямокутний трикутник | Math Quest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
     <script src="../shared/theme.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="header">
+        <!-- Unified Header -->
+        <header class="trainer-header">
             <div class="header-left">
-                <span class="level-badge" id="levelBadge">Рівень 1</span>
+                <a href="../index.html" class="back-btn">← Меню</a>
             </div>
             <div class="header-center">
-                <h1>Прямокутний △</h1>
+                <h1 class="trainer-title">Прямокутний △</h1>
             </div>
             <div class="header-right">
                 <div class="streak-counter" id="streakCounter">
@@ -33,10 +44,12 @@
         </header>
 
         <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
             <div class="progress-text">
-                <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
+                <span id="correctCount">0</span> / <span id="totalCount">10</span> правильно
             </div>
         </div>
 
@@ -44,30 +57,28 @@
         <main class="main-content">
             <!-- Start Screen -->
             <div class="screen active" id="startScreen">
-                <div class="start-content">
-                    <div class="start-icon">📐</div>
-                    <h2>Прямокутний трикутник</h2>
-                    <p class="start-description">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📐</div>
+                    <h2 class="welcome-title">Прямокутний трикутник</h2>
+                    <p class="welcome-description">
                         Тригонометрія, теорема Піфагора та особливі трикутники
                     </p>
-                    <div class="topics-preview">
-                        <div class="topic-item">
-                            <span class="topic-icon">📏</span>
-                            <span>Теорема Піфагора</span>
+
+                    <div class="theory-preview">
+                        <div class="theory-card">
+                            <div class="formula-main">c² = a² + b²</div>
+                            <div class="formula-note">Теорема Піфагора</div>
                         </div>
-                        <div class="topic-item">
-                            <span class="topic-icon">🔺</span>
-                            <span>Кути 30°, 45°, 60°</span>
+                        <div class="theory-card">
+                            <div class="formula-main">sin α = a/c</div>
+                            <div class="formula-note">протилежний / гіпотенуза</div>
                         </div>
-                        <div class="topic-item">
-                            <span class="topic-icon">📊</span>
-                            <span>sin, cos, tg кута</span>
-                        </div>
-                        <div class="topic-item">
-                            <span class="topic-icon">➗</span>
-                            <span>Медіана до гіпотенузи</span>
+                        <div class="theory-card">
+                            <div class="formula-main">m = c/2</div>
+                            <div class="formula-note">Медіана до гіпотенузи</div>
                         </div>
                     </div>
+
                     <button class="btn btn-primary btn-large" id="startBtn">
                         Почати тренування
                     </button>
@@ -86,23 +97,13 @@
                     <div class="topic-badge" id="topicBadge">Теорема Піфагора</div>
 
                     <!-- Triangle Visualization -->
-                    <div class="triangle-container">
+                    <div class="triangle-container" style="display: flex; justify-content: center; margin: 1rem 0;">
                         <canvas id="triangleCanvas" width="280" height="200"></canvas>
                     </div>
 
-                    <div class="question-card">
-                        <div class="question-number" id="questionNumber">Питання 1</div>
-                        <div class="question-text" id="questionText">
-                            Знайдіть гіпотенузу
-                        </div>
-                    </div>
-
-                    <!-- Hint Button -->
-                    <button class="btn btn-hint" id="hintBtn">
-                        💡 Підказка
-                    </button>
-                    <div class="hint-container" id="hintContainer" style="display: none;">
-                        <div class="hint-text" id="hintText"></div>
+                    <div class="question-number" id="questionNumber">Питання 1</div>
+                    <div class="question-text" id="questionText">
+                        Знайдіть гіпотенузу
                     </div>
 
                     <div class="answers-container" id="answersContainer">
@@ -113,6 +114,22 @@
                         <div class="feedback-icon" id="feedbackIcon"></div>
                         <div class="feedback-text" id="feedbackText"></div>
                         <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel" id="helpPanel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>Допомога ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Формула</span>
+                        </button>
                     </div>
                 </div>
 
@@ -125,7 +142,7 @@
             <div class="screen" id="resultsScreen">
                 <div class="results-content">
                     <div class="results-icon" id="resultsIcon">🎉</div>
-                    <h2 id="resultsTitle">Чудова робота!</h2>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
 
                     <div class="results-stats">
                         <div class="stat-card">
@@ -142,24 +159,12 @@
                         </div>
                     </div>
 
-                    <div class="ai-feedback" id="aiFeedback">
-                        <div class="ai-icon">🤖</div>
-                        <div class="ai-text" id="aiText">
-                            Аналізую твої результати...
-                        </div>
-                    </div>
-
-                    <div class="weak-topics" id="weakTopics" style="display: none;">
-                        <h3>Рекомендую попрактикувати:</h3>
-                        <div class="weak-list" id="weakList"></div>
-                    </div>
-
                     <div class="results-actions">
                         <button class="btn btn-primary btn-large" id="restartBtn">
-                            Продовжити тренування
+                            🔄 Ще раз
                         </button>
                         <button class="btn btn-secondary" id="reviewBtn">
-                            Переглянути теорію
+                            📖 Теорія
                         </button>
                     </div>
                 </div>
@@ -167,50 +172,46 @@
 
             <!-- Theory Reference Screen -->
             <div class="screen" id="theoryScreen">
-                <div class="theory-content">
-                    <h2>Теорія прямокутного трикутника</h2>
+                <div class="formulas-content">
+                    <h2>Прямокутний трикутник</h2>
 
-                    <div class="theory-category">
+                    <div class="formula-category">
                         <h3>📏 Теорема Піфагора</h3>
                         <div class="theory-card">
                             <div class="formula-main">c² = a² + b²</div>
-                            <div class="formula-example">Квадрат гіпотенузи = сума квадратів катетів</div>
+                            <div class="formula-note">Квадрат гіпотенузи = сума квадратів катетів</div>
                         </div>
                     </div>
 
-                    <div class="theory-category">
-                        <h3>➗ Медіана до гіпотенузи</h3>
+                    <div class="formula-category">
+                        <h3>🔺 Особливі трикутники</h3>
                         <div class="theory-card">
-                            <div class="formula-main">m = c/2</div>
-                            <div class="formula-example">Медіана = половина гіпотенузи</div>
+                            <div class="formula-main">30-60-90: a, a√3, 2a</div>
+                            <div class="formula-note">Катет навпроти 30° = c/2</div>
                         </div>
-                    </div>
-
-                    <div class="theory-category">
-                        <h3>🔺 Трикутник з кутом 30°</h3>
                         <div class="theory-card">
-                            <div class="formula-main">Катети: a і a√3, гіпотенуза: 2a</div>
-                            <div class="formula-example">Катет навпроти 30° = половина гіпотенузи</div>
+                            <div class="formula-main">45-45-90: a, a, a√2</div>
+                            <div class="formula-note">Рівнобедрений прямокутний</div>
                         </div>
                     </div>
 
-                    <div class="theory-category">
-                        <h3>🔺 Трикутник з кутом 45°</h3>
-                        <div class="theory-card">
-                            <div class="formula-main">Катети: a і a, гіпотенуза: a√2</div>
-                            <div class="formula-example">Рівнобедрений прямокутний трикутник</div>
-                        </div>
-                    </div>
-
-                    <div class="theory-category">
-                        <h3>📊 Тригонометричні функції</h3>
+                    <div class="formula-category">
+                        <h3>📊 Тригонометрія</h3>
                         <div class="theory-card">
                             <div class="formula-main">sin α = протилежний / гіпотенуза</div>
+                        </div>
+                        <div class="theory-card">
                             <div class="formula-main">cos α = прилеглий / гіпотенуза</div>
+                        </div>
+                        <div class="theory-card">
                             <div class="formula-main">tg α = протилежний / прилеглий</div>
                         </div>
-                        <div class="theory-card trig-table">
-                            <table>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>📋 Таблиця значень</h3>
+                        <div class="theory-card" style="overflow-x: auto;">
+                            <table style="width: 100%; text-align: center; font-size: 0.9rem;">
                                 <tr><th>α</th><th>30°</th><th>45°</th><th>60°</th></tr>
                                 <tr><td>sin</td><td>1/2</td><td>√2/2</td><td>√3/2</td></tr>
                                 <tr><td>cos</td><td>√3/2</td><td>√2/2</td><td>1/2</td></tr>
@@ -227,7 +228,31 @@
         </main>
     </div>
 
-    <script src="app.js"></script>
+    <!-- AI Helper Modal -->
+    <div id="aiHelperModal" class="ai-modal hidden">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">
+                    <span>🤖</span>
+                    <span>Допомога ШІ</span>
+                </div>
+                <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="ai-loading-spinner"></div>
+                    <span>Думаю...</span>
+                </div>
+                <div class="ai-response" id="aiResponse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared components -->
+    <script src="../shared/components/ai-helper.js"></script>
     <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
+    <script src="app.js"></script>
 </body>
 </html>

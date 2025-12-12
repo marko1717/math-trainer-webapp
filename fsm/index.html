@@ -1,39 +1,54 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ФСМ Тренажер | НМТ Математика</title>
+    <title>ФСМ Тренажер | Math Quest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="header">
+        <!-- Unified Header -->
+        <header class="trainer-header">
             <div class="header-left">
-                <span class="level-badge" id="levelBadge">Рівень 1</span>
+                <a href="../index.html" class="back-btn">← Меню</a>
             </div>
             <div class="header-center">
-                <h1>ФСМ Тренажер</h1>
+                <h1 class="trainer-title">ФСМ Тренажер</h1>
             </div>
             <div class="header-right">
                 <div class="streak-counter" id="streakCounter">
                     <span class="streak-icon">🔥</span>
                     <span class="streak-number" id="streakNumber">0</span>
                 </div>
+                <span class="level-badge" id="levelBadge">Рівень 1</span>
             </div>
         </header>
 
         <!-- Progress Bar -->
         <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
             <div class="progress-text">
                 <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
             </div>
@@ -43,16 +58,22 @@
         <main class="main-content">
             <!-- Start Screen -->
             <div class="screen active" id="startScreen">
-                <div class="start-content">
-                    <div class="start-icon">📐</div>
-                    <h2>Формули скороченого множення</h2>
-                    <p class="start-description">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📐</div>
+                    <h2 class="welcome-title">Формули скороченого множення</h2>
+                    <p class="welcome-description">
                         Адаптивний тренажер, що підлаштовується під твій рівень
                     </p>
                     <div class="formula-preview">
-                        <div class="formula-item">(a + b)² = a² + 2ab + b²</div>
-                        <div class="formula-item">(a - b)² = a² - 2ab + b²</div>
-                        <div class="formula-item">a² - b² = (a-b)(a+b)</div>
+                        <div class="theory-card">
+                            <div class="formula-main">(a + b)² = a² + 2ab + b²</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">(a - b)² = a² - 2ab + b²</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">a² - b² = (a-b)(a+b)</div>
+                        </div>
                     </div>
                     <button class="btn btn-primary btn-large" id="startBtn">
                         Почати тренування
@@ -85,6 +106,22 @@
                         <div class="feedback-text" id="feedbackText"></div>
                         <div class="feedback-explanation" id="feedbackExplanation"></div>
                     </div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel" id="helpPanel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>Допомога ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Формула</span>
+                        </button>
+                    </div>
                 </div>
 
                 <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
@@ -96,7 +133,7 @@
             <div class="screen" id="resultsScreen">
                 <div class="results-content">
                     <div class="results-icon" id="resultsIcon">🎉</div>
-                    <h2 id="resultsTitle">Чудова робота!</h2>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
 
                     <div class="results-stats">
                         <div class="stat-card">
@@ -143,33 +180,43 @@
 
                     <div class="formula-category">
                         <h3>Квадрат суми та різниці</h3>
-                        <div class="formula-card">
+                        <div class="theory-card">
                             <div class="formula-main">(a + b)² = a² + 2ab + b²</div>
-                            <div class="formula-example">Приклад: (x + 3)² = x² + 6x + 9</div>
+                            <div class="formula-note">Приклад: (x + 3)² = x² + 6x + 9</div>
                         </div>
-                        <div class="formula-card">
+                        <div class="theory-card">
                             <div class="formula-main">(a - b)² = a² - 2ab + b²</div>
-                            <div class="formula-example">Приклад: (x - 2)² = x² - 4x + 4</div>
+                            <div class="formula-note">Приклад: (x - 2)² = x² - 4x + 4</div>
                         </div>
                     </div>
 
                     <div class="formula-category">
                         <h3>Різниця квадратів</h3>
-                        <div class="formula-card">
+                        <div class="theory-card">
                             <div class="formula-main">a² - b² = (a - b)(a + b)</div>
-                            <div class="formula-example">Приклад: x² - 9 = (x - 3)(x + 3)</div>
+                            <div class="formula-note">Приклад: x² - 9 = (x - 3)(x + 3)</div>
+                        </div>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>Куб суми та різниці</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">(a + b)³ = a³ + 3a²b + 3ab² + b³</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">(a - b)³ = a³ - 3a²b + 3ab² - b³</div>
                         </div>
                     </div>
 
                     <div class="formula-category">
                         <h3>Сума та різниця кубів</h3>
-                        <div class="formula-card">
+                        <div class="theory-card">
                             <div class="formula-main">a³ + b³ = (a + b)(a² - ab + b²)</div>
-                            <div class="formula-example">Приклад: x³ + 8 = (x + 2)(x² - 2x + 4)</div>
+                            <div class="formula-note">Приклад: x³ + 8 = (x + 2)(x² - 2x + 4)</div>
                         </div>
-                        <div class="formula-card">
+                        <div class="theory-card">
                             <div class="formula-main">a³ - b³ = (a - b)(a² + ab + b²)</div>
-                            <div class="formula-example">Приклад: x³ - 27 = (x - 3)(x² + 3x + 9)</div>
+                            <div class="formula-note">Приклад: x³ - 27 = (x - 3)(x² + 3x + 9)</div>
                         </div>
                     </div>
 
@@ -181,6 +228,31 @@
         </main>
     </div>
 
+    <!-- AI Helper Modal -->
+    <div id="aiHelperModal" class="ai-modal hidden">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">
+                    <span>🤖</span>
+                    <span>Допомога ШІ</span>
+                </div>
+                <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="ai-loading-spinner"></div>
+                    <span>Думаю...</span>
+                </div>
+                <div class="ai-response" id="aiResponse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared components -->
+    <script src="../shared/components/ai-helper.js"></script>
+    <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
     <script src="app.js"></script>
 </body>
 </html>

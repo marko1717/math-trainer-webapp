@@ -1,0 +1,788 @@
+/* ===================================
+   MATH QUEST - SHARED COMPONENTS
+   =================================== */
+
+/* ==========================================
+   TRAINER HEADER
+   ========================================== */
+.trainer-header {
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+}
+
+body.retro-mode .trainer-header {
+    border-bottom-width: 4px;
+    box-shadow: 0 4px 0 var(--bg-dark);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.header-center {
+    flex: 1;
+    text-align: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(79, 70, 229, 0.1);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: rgba(79, 70, 229, 0.2);
+    transform: translateX(-2px);
+}
+
+body.retro-mode .back-btn {
+    border-radius: 0;
+    font-size: var(--font-xs);
+}
+
+.trainer-title {
+    font-size: var(--font-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+body.retro-mode .trainer-title {
+    font-size: var(--font-sm);
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    color: white;
+    border-radius: var(--radius-full);
+}
+
+body.retro-mode .level-badge {
+    border-radius: 0;
+}
+
+.score-display {
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+body.retro-mode .score-display {
+    font-size: var(--font-xs);
+}
+
+.streak-counter {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-dark);
+    border-radius: var(--radius-sm);
+}
+
+body.retro-mode .streak-counter {
+    border-radius: 0;
+}
+
+.streak-icon {
+    font-size: var(--font-base);
+}
+
+.streak-number {
+    font-size: var(--font-sm);
+    font-weight: 700;
+    color: var(--warning);
+}
+
+/* ==========================================
+   PROGRESS BAR
+   ========================================== */
+.progress-container {
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--bg-dark);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+}
+
+body.retro-mode .progress-bar {
+    border-radius: 0;
+    border: 2px solid var(--border);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success), var(--accent));
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+body.retro-mode .progress-text {
+    font-size: var(--font-xs);
+}
+
+/* ==========================================
+   QUESTION CARD
+   ========================================== */
+.question-container {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md);
+    box-shadow: var(--shadow);
+}
+
+body.retro-mode .question-container {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.question-number {
+    display: inline-block;
+    font-size: var(--font-xs);
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-sm);
+}
+
+body.retro-mode .question-number {
+    font-size: 0.3rem;
+}
+
+.question-text {
+    font-size: var(--font-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin-bottom: var(--spacing-lg);
+}
+
+body.retro-mode .question-text {
+    font-size: var(--font-sm);
+}
+
+.topic-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-xs);
+    background: var(--bg-dark);
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+body.retro-mode .topic-badge {
+    border-radius: 0;
+    font-size: 0.3rem;
+}
+
+/* ==========================================
+   ANSWER OPTIONS
+   ========================================== */
+.answers-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.answer-btn {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-base);
+    font-weight: 500;
+    text-align: left;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.answer-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(79, 70, 229, 0.05);
+}
+
+.answer-btn.selected {
+    border-color: var(--accent);
+    background: rgba(79, 70, 229, 0.1);
+}
+
+.answer-btn.correct {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.answer-btn.incorrect {
+    border-color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.answer-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+body.retro-mode .answer-btn {
+    border-radius: 0;
+    font-size: var(--font-sm);
+}
+
+/* ==========================================
+   HELP PANEL
+   ========================================== */
+.help-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border);
+}
+
+.help-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.help-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.help-btn-ai {
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    color: white;
+    border: none;
+}
+
+.help-btn-ai:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+body.retro-mode .help-btn {
+    border-radius: 0;
+    font-size: var(--font-xs);
+}
+
+/* ==========================================
+   FEEDBACK
+   ========================================== */
+.feedback-container {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.feedback-container.correct {
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--success);
+}
+
+.feedback-container.incorrect {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid var(--error);
+}
+
+body.retro-mode .feedback-container {
+    border-radius: 0;
+}
+
+.feedback-icon {
+    font-size: var(--font-3xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.feedback-text {
+    font-size: var(--font-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+body.retro-mode .feedback-text {
+    font-size: var(--font-sm);
+}
+
+.feedback-explanation {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+body.retro-mode .feedback-explanation {
+    font-size: var(--font-xs);
+}
+
+/* ==========================================
+   NAVIGATION BUTTONS
+   ========================================== */
+.nav-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.nav-buttons .btn {
+    flex: 1;
+}
+
+.btn-next {
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    color: white;
+}
+
+.btn-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   RESULTS SCREEN
+   ========================================== */
+.results-content {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.results-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.results-title {
+    font-size: var(--font-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+body.retro-mode .results-title {
+    font-size: var(--font-lg);
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.results-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.stat-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+body.retro-mode .stat-card {
+    border-radius: 0;
+}
+
+.stat-value {
+    font-size: var(--font-2xl);
+    font-weight: 700;
+    color: var(--accent);
+}
+
+body.retro-mode .stat-value {
+    font-size: var(--font-lg);
+}
+
+.stat-label {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+}
+
+body.retro-mode .stat-label {
+    font-size: 0.3rem;
+}
+
+.results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/* ==========================================
+   AI HELPER MODAL
+   ========================================== */
+.ai-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--spacing-md);
+}
+
+.ai-modal.hidden {
+    display: none;
+}
+
+.ai-modal-content {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    width: 100%;
+    max-width: 500px;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+body.retro-mode .ai-modal-content {
+    border-radius: 0;
+    border: 4px solid var(--border);
+}
+
+.ai-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--border);
+}
+
+.ai-modal-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-lg);
+    font-weight: 600;
+}
+
+body.retro-mode .ai-modal-title {
+    font-size: var(--font-sm);
+}
+
+.ai-close-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-xl);
+    color: var(--text-muted);
+    background: var(--bg-dark);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ai-close-btn:hover {
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+body.retro-mode .ai-close-btn {
+    border-radius: 0;
+}
+
+.ai-modal-body {
+    padding: var(--spacing-lg);
+}
+
+.ai-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
+    color: var(--text-muted);
+}
+
+.ai-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.ai-response {
+    font-size: var(--font-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+body.retro-mode .ai-response {
+    font-size: var(--font-sm);
+}
+
+.ai-response p {
+    margin-bottom: var(--spacing-md);
+}
+
+.ai-response strong {
+    color: var(--accent);
+}
+
+/* ==========================================
+   WELCOME/START SCREEN
+   ========================================== */
+.welcome-screen {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.welcome-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.welcome-title {
+    font-size: var(--font-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+body.retro-mode .welcome-title {
+    font-size: var(--font-lg);
+}
+
+.welcome-description {
+    font-size: var(--font-base);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xl);
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.retro-mode .welcome-description {
+    font-size: var(--font-sm);
+}
+
+/* Topic selection */
+.topic-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.topic-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    width: 100%;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topic-btn:hover {
+    border-color: var(--accent);
+    background: rgba(79, 70, 229, 0.05);
+}
+
+body.retro-mode .topic-btn {
+    border-radius: 0;
+}
+
+.topic-icon {
+    font-size: var(--font-2xl);
+}
+
+.topic-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.topic-name {
+    font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+body.retro-mode .topic-name {
+    font-size: var(--font-sm);
+}
+
+.topic-desc {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+}
+
+body.retro-mode .topic-desc {
+    font-size: var(--font-xs);
+}
+
+/* Level selection */
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.level-btn {
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.level-btn:hover {
+    border-color: var(--accent);
+}
+
+.level-btn.active {
+    border-color: var(--accent);
+    background: rgba(79, 70, 229, 0.1);
+}
+
+body.retro-mode .level-btn {
+    border-radius: 0;
+}
+
+.level-number {
+    font-size: var(--font-2xl);
+    font-weight: 700;
+    color: var(--accent);
+}
+
+body.retro-mode .level-number {
+    font-size: var(--font-lg);
+}
+
+.level-name {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+}
+
+body.retro-mode .level-name {
+    font-size: 0.3rem;
+}
+
+/* ==========================================
+   THEORY CARD
+   ========================================== */
+.theory-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+body.retro-mode .theory-card {
+    border-radius: 0;
+}
+
+.formula-main {
+    font-size: var(--font-xl);
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    padding: var(--spacing-md);
+}
+
+body.retro-mode .formula-main {
+    font-size: var(--font-sm);
+}
+
+.formula-note {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+body.retro-mode .formula-note {
+    font-size: var(--font-xs);
+}

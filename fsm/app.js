@@ -447,6 +447,92 @@ class GameController {
         document.getElementById('restartBtn').addEventListener('click', () => this.startGame());
         document.getElementById('reviewBtn').addEventListener('click', () => this.showFormulas());
         document.getElementById('backToQuizBtn').addEventListener('click', () => this.showResults());
+
+        // Help panel buttons
+        document.getElementById('hintBtn')?.addEventListener('click', () => this.showHint());
+        document.getElementById('aiHelpBtn')?.addEventListener('click', () => this.showAIHelp());
+        document.getElementById('formulaBtn')?.addEventListener('click', () => this.showFormulaHelp());
+
+        // AI modal close
+        document.getElementById('aiCloseBtn')?.addEventListener('click', () => this.closeAIModal());
+        document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'aiHelperModal') this.closeAIModal();
+        });
+    }
+
+    // Help panel methods
+    async showHint() {
+        if (!this.currentQuestion) return;
+
+        const modal = document.getElementById('aiHelperModal');
+        const loading = document.getElementById('aiLoading');
+        const response = document.getElementById('aiResponse');
+
+        modal.classList.remove('hidden');
+        loading.style.display = 'flex';
+        response.style.display = 'none';
+
+        const hint = await getGPTHint(
+            this.currentQuestion.question,
+            FORMULAS[this.currentQuestion.formula]?.name || ''
+        );
+
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        if (hint) {
+            response.innerHTML = `<p><strong>💡 Підказка:</strong></p><p>${hint}</p>`;
+        } else {
+            // Fallback hint
+            const formula = FORMULAS[this.currentQuestion.formula];
+            response.innerHTML = `
+                <p><strong>💡 Підказка:</strong></p>
+                <p>Пригадай формулу: <strong>${formula?.formula || ''}</strong></p>
+                <p>${formula?.name || 'Формули скороченого множення'}</p>
+            `;
+        }
+    }
+
+    async showAIHelp() {
+        this.showHint(); // Same as hint for now
+    }
+
+    showFormulaHelp() {
+        const modal = document.getElementById('aiHelperModal');
+        const loading = document.getElementById('aiLoading');
+        const response = document.getElementById('aiResponse');
+
+        modal.classList.remove('hidden');
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        response.innerHTML = `
+            <h3 style="color: var(--accent); margin-bottom: 1rem;">📐 Формули скороченого множення</h3>
+            <div style="margin-bottom: 1rem;">
+                <p><strong>(a + b)² = a² + 2ab + b²</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Квадрат суми</p>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <p><strong>(a - b)² = a² - 2ab + b²</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Квадрат різниці</p>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <p><strong>a² - b² = (a-b)(a+b)</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Різниця квадратів</p>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <p><strong>a³ + b³ = (a+b)(a²-ab+b²)</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Сума кубів</p>
+            </div>
+            <div>
+                <p><strong>a³ - b³ = (a-b)(a²+ab+b²)</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Різниця кубів</p>
+            </div>
+        `;
+    }
+
+    closeAIModal() {
+        document.getElementById('aiHelperModal')?.classList.add('hidden');
     }
 
     showScreen(screen) {
@@ -674,6 +760,29 @@ class GameController {
 
         // Update progress bar to 100%
         this.progressBar.style.setProperty('--progress', '100%');
+
+        // Save to Firebase
+        this.saveToFirebase();
+    }
+
+    async saveToFirebase() {
+        if (window.MathQuestFirebase) {
+            try {
+                const result = await window.MathQuestFirebase.saveTrainerSession({
+                    trainerId: 'fsm',
+                    trainerName: 'Формули скороч. множення',
+                    score: this.correctInSession,
+                    totalQuestions: this.questionsPerSession,
+                    difficulty: this.ai.level,
+                    timeSpent: 0
+                });
+                if (result) {
+                    console.log('✅ FSM session saved to Firebase');
+                }
+            } catch (error) {
+                console.log('Could not save to Firebase:', error);
+            }
+        }
     }
 
     showFormulas() {

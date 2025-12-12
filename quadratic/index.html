@@ -12,13 +12,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="../shared/theme.js"></script>
+    <script src="../shared/firebase.js"></script>
 </head>
 <body>
     <div class="app-container">
         <!-- Header -->
         <header class="header">
             <div class="header-left">
-                <span class="level-badge" id="levelBadge">Рівень 1</span>
+                <a href="../index.html" class="back-btn">← Меню</a>
             </div>
             <div class="header-center">
                 <h1>Квадратні рівняння</h1>
@@ -69,6 +72,63 @@
                     </div>
                     <button class="btn btn-primary btn-large" id="startBtn">
                         Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Topic Selection Screen -->
+            <div class="screen" id="topicScreen">
+                <div class="topic-selection">
+                    <h2>🎯 Оберіть тему</h2>
+                    <p class="topic-subtitle">Що хочеш потренувати?</p>
+
+                    <div class="topic-grid">
+                        <button class="topic-btn" data-topic="incomplete">
+                            <span class="topic-icon">1️⃣</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Неповні рівняння</span>
+                                <span class="topic-desc">ax² + c = 0, ax² + bx = 0</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="discriminant">
+                            <span class="topic-icon">2️⃣</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Дискримінант</span>
+                                <span class="topic-desc">D = b² - 4ac, корені</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="vieta">
+                            <span class="topic-icon">3️⃣</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Теорема Вієта</span>
+                                <span class="topic-desc">Сума і добуток коренів</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="factorization">
+                            <span class="topic-icon">4️⃣</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Розклад на множники</span>
+                                <span class="topic-desc">a(x - x₁)(x - x₂)</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn" data-topic="findCoefficients">
+                            <span class="topic-icon">5️⃣</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Знайти коефіцієнти</span>
+                                <span class="topic-desc">За коренями знайти b, c</span>
+                            </div>
+                        </button>
+                        <button class="topic-btn topic-btn-mixed" data-topic="mixed">
+                            <span class="topic-icon">🎲</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Мікс</span>
+                                <span class="topic-desc">Всі теми випадково</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-secondary" id="backToStartBtn">
+                        ← Назад
                     </button>
                 </div>
             </div>

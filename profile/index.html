@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Особистий кабінет - Math Quest</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="login-card">
+                <div class="login-icon">🧙</div>
+                <h1>Math Quest</h1>
+                <p class="login-subtitle">Увійди, щоб зберігати прогрес</p>
+
+                <button id="googleLoginBtn" class="btn-google">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Увійти через Google
+                </button>
+
+                <p class="login-info">
+                    Твій прогрес буде зберігатися в хмарі та синхронізуватися між пристроями
+                </p>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profileScreen" class="screen">
+            <a href="../index.html" class="back-link">← На головну</a>
+
+            <!-- User Header -->
+            <div class="profile-header">
+                <img id="userAvatar" class="avatar" src="" alt="Avatar">
+                <div class="user-info">
+                    <h1 id="userName">Користувач</h1>
+                    <p id="userEmail" class="user-email">email@example.com</p>
+                </div>
+                <button id="logoutBtn" class="btn-logout" title="Вийти">🚪</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value" id="totalXP">0</div>
+                    <div class="stat-label">Досвід (XP)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value" id="userLevel">1</div>
+                    <div class="stat-label">Рівень</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value" id="userStreak">0</div>
+                    <div class="stat-label">Streak (днів)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-value" id="trainersCompleted">0</div>
+                    <div class="stat-label">Сесій</div>
+                </div>
+            </div>
+
+            <!-- Level Progress -->
+            <div class="level-progress-card">
+                <div class="level-header">
+                    <span>Рівень <span id="currentLevel">1</span></span>
+                    <span id="xpProgress">0/100 XP</span>
+                </div>
+                <div class="level-bar">
+                    <div class="level-fill" id="levelFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Trainer Progress -->
+            <div class="section-card">
+                <h2>📊 Прогрес по тренажерах</h2>
+                <div id="trainerProgressList" class="trainer-list">
+                    <div class="loading-message">Завантаження...</div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="section-card">
+                <h2>📜 Остання активність</h2>
+                <div id="recentActivity" class="activity-list">
+                    <div class="loading-message">Завантаження...</div>
+                </div>
+            </div>
+
+            <!-- Achievements (placeholder) -->
+            <div class="section-card">
+                <h2>🏆 Досягнення</h2>
+                <div class="achievements-grid" id="achievementsList">
+                    <div class="achievement locked" title="Перша перемога">🎯</div>
+                    <div class="achievement locked" title="Streak 7 днів">🔥</div>
+                    <div class="achievement locked" title="100% результат">⭐</div>
+                    <div class="achievement locked" title="10 сесій">📚</div>
+                    <div class="achievement locked" title="Всі тренажери">🏅</div>
+                    <div class="achievement locked" title="Рівень 10">👑</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/theme.js"></script>
+    <script src="../shared/firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

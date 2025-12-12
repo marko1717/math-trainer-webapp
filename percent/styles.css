@@ -1,25 +1,216 @@
-/* Percent trainer specific styles */
+/* ===================================
+   MATH QUEST - PERCENT TRAINER
+   Trainer-specific styles only
+   Base styles come from ../shared/styles.css
+   =================================== */
 
-.theory-box {
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 25px;
-    border: 1px solid var(--border-color);
+/* === Header === */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.theory-box h3 {
-    color: var(--accent-light);
-    margin-bottom: 15px;
+body.retro-mode .header {
+    border-bottom-width: 4px;
+    box-shadow: 0 4px 0 var(--bg-dark);
+}
+
+.header h1 {
+    font-size: 1.1rem;
+    color: var(--accent);
+}
+
+body.retro-mode .header h1 {
+    font-size: 0.5rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.back-btn {
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 8px 12px;
+    background: rgba(239, 135, 72, 0.15);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+body.retro-mode .back-btn {
+    font-size: 0.4rem;
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.back-btn:hover, .back-btn:active {
+    background: rgba(239, 135, 72, 0.3);
+}
+
+body.retro-mode .back-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--bg-dark);
+}
+
+.level-badge {
+    background: var(--accent);
+    color: var(--text-dark);
+    padding: 6px 12px;
+    border: 2px solid var(--accent-dark);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .level-badge {
+    font-size: 0.4rem;
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.streak-counter {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg-dark);
+    padding: 6px 10px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .streak-counter {
+    border-radius: 0;
+    font-size: 0.5rem;
+}
+
+.streak-icon {
     font-size: 1rem;
 }
 
+body.retro-mode .streak-icon {
+    font-size: 0.9rem;
+}
+
+.streak-number {
+    color: var(--accent);
+}
+
+/* === Progress Bar === */
+.progress-container {
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border-bottom: 2px solid var(--border);
+}
+
+.progress-bar {
+    height: 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+body.retro-mode .progress-bar {
+    border-radius: 0;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: var(--progress, 0%);
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transition: width 0.5s ease;
+}
+
+body.retro-mode .progress-bar::after {
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+body.retro-mode .progress-text {
+    font-size: 0.4rem;
+}
+
+/* === Main Content === */
+.main-content {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.screen {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    animation: screenIn 0.3s ease;
+}
+
+.screen.active {
+    display: flex;
+}
+
+@keyframes screenIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* === Theory Box === */
+.theory-box {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+body.retro-mode .theory-box {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.theory-box h3 {
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+body.retro-mode .theory-box h3 {
+    font-size: 0.5rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
 .formula-row {
-    background: rgba(124, 58, 237, 0.1);
-    padding: 10px 15px;
+    background: rgba(239, 135, 72, 0.15);
+    padding: 10px 14px;
+    border: 2px solid var(--border);
     border-radius: 8px;
     margin-bottom: 8px;
     text-align: center;
+}
+
+body.retro-mode .formula-row {
+    border-radius: 0;
 }
 
 .formula-row:last-child {
@@ -27,39 +218,66 @@
 }
 
 .formula {
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text);
 }
 
+body.retro-mode .formula {
+    font-size: 0.45rem;
+}
+
+/* === Question Card === */
 .question-card {
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 25px 20px;
-    margin-bottom: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
     text-align: center;
 }
 
+body.retro-mode .question-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .question-type {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 12px;
 }
 
+body.retro-mode .question-type {
+    font-size: 0.35rem;
+}
+
 .question-text {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     line-height: 1.6;
     margin-bottom: 10px;
+    color: var(--text);
+}
+
+body.retro-mode .question-text {
+    font-size: 0.5rem;
+    line-height: 1.8;
 }
 
 .method-hint {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     font-style: italic;
 }
 
+body.retro-mode .method-hint {
+    font-size: 0.35rem;
+}
+
+/* === Answer Section === */
 .answer-section {
     display: flex;
     gap: 10px;
@@ -68,15 +286,23 @@
 
 .answer-input {
     flex: 1;
-    padding: 16px;
-    font-size: 1.2rem;
-    background: var(--bg-card);
-    border: 2px solid var(--border-color);
+    padding: 14px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
     border-radius: 12px;
-    color: var(--text-primary);
+    color: var(--text);
     text-align: center;
     outline: none;
     transition: border-color 0.2s;
+}
+
+body.retro-mode .answer-input {
+    font-size: 0.5rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .answer-input:focus {
@@ -85,32 +311,271 @@
 
 .answer-input.correct {
     border-color: var(--success);
-    background: rgba(16, 185, 129, 0.1);
+    background: rgba(124, 157, 133, 0.2);
 }
 
 .answer-input.wrong {
     border-color: var(--error);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(231, 76, 60, 0.2);
 }
 
 .btn-submit {
-    padding: 16px 24px;
+    font-family: inherit;
+    padding: 14px 18px;
     background: var(--accent);
-    border: none;
+    border: 2px solid var(--accent-dark);
     border-radius: 12px;
-    color: white;
+    color: var(--text-dark);
     font-size: 1rem;
-    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
 }
 
+body.retro-mode .btn-submit {
+    font-size: 0.4rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .btn-submit:hover {
     background: var(--accent-light);
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn-submit:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+body.retro-mode .btn-submit:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .btn-submit:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+}
+
+/* === Buttons === */
+.btn {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 14px 20px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+body.retro-mode .btn {
+    font-size: 0.45rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+}
+
+body.retro-mode .btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+body.retro-mode .btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--text-dark);
+    border-color: var(--accent-dark);
+}
+
+.btn-primary:hover {
+    background: var(--accent-light);
+}
+
+.btn-secondary {
+    background: var(--primary);
+    color: var(--text-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-light);
+}
+
+.btn-large {
+    width: 100%;
+    max-width: 320px;
+    padding: 18px 32px;
+    font-size: 1.1rem;
+}
+
+body.retro-mode .btn-large {
+    font-size: 0.5rem;
+}
+
+/* === Feedback === */
+.feedback-container {
+    display: none;
+    text-align: center;
+    padding: 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    animation: screenIn 0.3s ease;
+}
+
+body.retro-mode .feedback-container {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.feedback-container.show {
+    display: block;
+}
+
+.feedback-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.feedback-text {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+body.retro-mode .feedback-text {
+    font-size: 0.5rem;
+}
+
+.feedback-container.correct .feedback-text {
+    color: var(--success);
+}
+
+.feedback-container.incorrect .feedback-text {
+    color: var(--error);
+}
+
+.feedback-explanation {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+body.retro-mode .feedback-explanation {
+    font-size: 0.4rem;
+    line-height: 1.8;
+}
+
+/* === Results Screen === */
+.results-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.results-icon {
+    font-size: 3rem;
+}
+
+body.retro-mode .results-icon {
+    filter: drop-shadow(3px 3px 0 var(--bg-dark));
+}
+
+.results-content h2 {
+    font-size: 1.5rem;
+    color: var(--accent);
+}
+
+body.retro-mode .results-content h2 {
+    font-size: 0.7rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.results-stats {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.stat-card {
+    flex: 1;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+body.retro-mode .stat-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    color: var(--accent);
+}
+
+body.retro-mode .stat-value {
+    font-size: 1rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+body.retro-mode .stat-label {
+    font-size: 0.35rem;
+}
+
+.results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+}
+
+/* === Responsive === */
+@media (max-width: 360px) {
+    .header {
+        padding: 10px 14px;
+    }
+
+    .main-content {
+        padding: 12px;
+    }
+
+    .question-text {
+        font-size: 1rem;
+    }
+
+    body.retro-mode .question-text {
+        font-size: 0.45rem;
+    }
 }

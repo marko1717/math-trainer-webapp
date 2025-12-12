@@ -1,86 +1,118 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* ===================================
+   MATH QUEST - PARITY TRAINER
+   Trainer-specific styles only
+   Base styles come from ../shared/styles.css
+   =================================== */
 
 :root {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-card: #1f2847;
-    --text-primary: #eee;
-    --text-secondary: #aaa;
-    --accent: #6c5ce7;
-    --accent-light: #a29bfe;
-    --success: #00b894;
-    --error: #ff6b6b;
-    --warning: #ffeaa7;
+    /* Parity specific colors */
     --even-color: #74b9ff;
     --odd-color: #fd79a8;
     --neither-color: #fdcb6e;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100vh;
-    line-height: 1.5;
-}
-
+/* Container override for parity */
 .container {
-    max-width: 500px;
+    max-width: 480px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 16px;
     min-height: 100vh;
 }
 
-.screen {
-    display: none;
+/* === Back Link === */
+.back-link {
+    font-family: inherit;
+    display: inline-block;
+    font-size: 0.9rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+    background: rgba(239, 135, 72, 0.15);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
 }
 
-.screen.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
+.back-link:hover, .back-link:active {
+    background: rgba(239, 135, 72, 0.3);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+body.retro-mode .back-link {
+    font-size: 0.4rem;
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
-/* Start Screen */
+body.retro-mode .back-link:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--bg-dark);
+}
+
+/* === Start Screen === */
 #startScreen h1 {
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     margin-bottom: 8px;
+    color: var(--accent);
+}
+
+body.retro-mode #startScreen h1 {
+    font-size: 0.7rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .subtitle {
     text-align: center;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     margin-bottom: 25px;
+    font-size: 0.95rem;
 }
 
-/* Theory Preview */
+body.retro-mode .subtitle {
+    font-size: 0.4rem;
+}
+
+/* === Theory Preview === */
 .theory-preview {
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 25px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+body.retro-mode .theory-preview {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .theory-preview h3 {
     margin-bottom: 15px;
-    color: var(--accent-light);
+    color: var(--accent);
+    font-size: 1rem;
+}
+
+body.retro-mode .theory-preview h3 {
+    font-size: 0.45rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .definition {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     padding: 12px;
-    background: rgba(108, 92, 231, 0.1);
-    border-radius: 10px;
-    border-left: 3px solid var(--accent);
+    background: rgba(239, 135, 72, 0.1);
+    border: 2px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+}
+
+body.retro-mode .definition {
+    border-radius: 0;
 }
 
 .definition:last-child {
@@ -89,21 +121,34 @@ body {
 
 .definition p {
     margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .definition p {
+    font-size: 0.35rem;
 }
 
 .formula {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     text-align: center;
     padding: 8px 0;
 }
 
+body.retro-mode .formula {
+    font-size: 0.5rem;
+}
+
 .hint-text {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     font-style: italic;
 }
 
-/* Level Select */
+body.retro-mode .hint-text {
+    font-size: 0.35rem;
+}
+
+/* === Level Select === */
 .level-select {
     margin-top: 20px;
 }
@@ -111,46 +156,74 @@ body {
 .level-select h3 {
     text-align: center;
     margin-bottom: 15px;
-    color: var(--text-secondary);
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+body.retro-mode .level-select h3 {
+    font-size: 0.4rem;
 }
 
 .btn-level {
+    font-family: inherit;
     width: 100%;
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 16px 20px;
+    padding: 14px 16px;
     margin-bottom: 12px;
-    background: var(--bg-card);
-    border: 2px solid transparent;
-    border-radius: 14px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
 }
 
+body.retro-mode .btn-level {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .btn-level:hover, .btn-level:active {
     border-color: var(--accent);
-    transform: translateX(5px);
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn-level:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
 }
 
 .level-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
+}
+
+body.retro-mode .level-icon {
+    filter: drop-shadow(2px 2px 0 var(--bg-dark));
 }
 
 .level-text {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 1rem;
+    color: var(--text);
+}
+
+body.retro-mode .level-text {
+    font-size: 0.45rem;
 }
 
 .level-desc {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     margin-left: auto;
 }
 
-/* Game Screen */
+body.retro-mode .level-desc {
+    font-size: 0.35rem;
+}
+
+/* === Game Screen === */
 .header {
     display: flex;
     justify-content: space-between;
@@ -160,78 +233,123 @@ body {
 
 .stats {
     display: flex;
-    gap: 15px;
+    gap: 12px;
 }
 
 .stat {
-    font-size: 1rem;
-    background: var(--bg-card);
+    font-size: 0.9rem;
+    background: var(--card-bg);
     padding: 6px 12px;
-    border-radius: 20px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+body.retro-mode .stat {
+    font-size: 0.45rem;
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .level-indicator {
     background: var(--accent);
     padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 600;
+    border: 2px solid var(--accent-dark);
+    border-radius: 8px;
     font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+body.retro-mode .level-indicator {
+    font-size: 0.4rem;
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .progress-bar {
-    height: 6px;
-    background: var(--bg-secondary);
-    border-radius: 3px;
+    height: 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 6px;
     margin-bottom: 20px;
     overflow: hidden;
+    position: relative;
+}
+
+body.retro-mode .progress-bar {
+    border-radius: 0;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-    border-radius: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
     transition: width 0.3s ease;
     width: 0%;
 }
 
-/* Graph Container */
+body.retro-mode .progress-fill {
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
+}
+
+/* === Graph Container === */
 .graph-container {
-    background: var(--bg-card);
-    border-radius: 16px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 15px;
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
 }
 
-#graphCanvas {
-    max-width: 100%;
-    border-radius: 10px;
+body.retro-mode .graph-container {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
-/* Question Area */
+#graphCanvas {
+    max-width: 100%;
+}
+
+/* === Question Area === */
 .question-area {
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 25px 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
     margin-bottom: 20px;
     text-align: center;
 }
 
+body.retro-mode .question-area {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .question-type {
     font-size: 0.85rem;
-    color: var(--accent-light);
+    color: var(--accent);
     margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
+body.retro-mode .question-type {
+    font-size: 0.35rem;
+}
+
 .question {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     line-height: 1.6;
 }
 
-/* Answers */
+body.retro-mode .question {
+    font-size: 0.5rem;
+    line-height: 1.8;
+}
+
+/* === Answers === */
 .answers {
     display: grid;
     gap: 12px;
@@ -243,12 +361,13 @@ body {
 }
 
 .btn-answer {
-    padding: 16px 20px;
-    background: var(--bg-card);
-    border: 2px solid var(--bg-secondary);
-    border-radius: 14px;
-    color: var(--text-primary);
-    font-size: 1.05rem;
+    font-family: inherit;
+    padding: 16px 18px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -257,9 +376,21 @@ body {
     gap: 10px;
 }
 
+body.retro-mode .btn-answer {
+    font-size: 0.45rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .btn-answer:hover {
     border-color: var(--accent);
-    background: rgba(108, 92, 231, 0.1);
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn-answer:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
 }
 
 .btn-answer.even {
@@ -289,13 +420,15 @@ body {
 .btn-answer.correct {
     background: var(--success) !important;
     border-color: var(--success) !important;
-    color: white;
+    color: var(--text-dark);
+    animation: correctPulse 0.5s ease;
 }
 
 .btn-answer.wrong {
     background: var(--error) !important;
     border-color: var(--error) !important;
-    color: white;
+    color: var(--text);
+    animation: wrongShake 0.5s ease;
 }
 
 .btn-answer:disabled {
@@ -303,22 +436,39 @@ body {
     opacity: 0.7;
 }
 
-/* Hint Button */
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}
+
+/* === Hint Button === */
 .btn-hint {
+    font-family: inherit;
     width: 100%;
     padding: 14px;
     background: transparent;
     border: 2px dashed var(--accent);
     border-radius: 12px;
-    color: var(--accent-light);
-    font-size: 1rem;
+    color: var(--accent);
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 15px;
 }
 
+body.retro-mode .btn-hint {
+    font-size: 0.4rem;
+    border-radius: 0;
+}
+
 .btn-hint:hover {
-    background: rgba(108, 92, 231, 0.1);
+    background: rgba(239, 135, 72, 0.1);
 }
 
 .btn-hint:disabled {
@@ -327,85 +477,118 @@ body {
 }
 
 .hint-container {
-    background: linear-gradient(135deg, rgba(108, 92, 231, 0.15), rgba(162, 155, 254, 0.1));
-    border: 1px solid var(--accent);
+    background: rgba(239, 135, 72, 0.15);
+    border: 2px solid var(--accent);
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 15px;
 }
 
-.hint-container .hint-text {
-    color: var(--text-primary);
-    font-style: normal;
-    line-height: 1.6;
+body.retro-mode .hint-container {
+    border-radius: 0;
 }
 
-/* Feedback */
+.hint-container .hint-text {
+    color: var(--text);
+    font-style: normal;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+body.retro-mode .hint-container .hint-text {
+    font-size: 0.4rem;
+    line-height: 1.8;
+}
+
+/* === Feedback === */
 .feedback {
     text-align: center;
     padding: 15px;
+    border: 2px solid var(--border);
     border-radius: 12px;
-    font-weight: 600;
     display: none;
     margin-top: 10px;
 }
 
+body.retro-mode .feedback {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .feedback.show {
     display: block;
-    animation: slideUp 0.3s ease;
+    animation: screenIn 0.3s ease;
 }
 
 .feedback.correct {
-    background: rgba(0, 184, 148, 0.2);
+    background: rgba(124, 157, 133, 0.2);
     color: var(--success);
+    border-color: var(--success);
 }
 
 .feedback.wrong {
-    background: rgba(255, 107, 107, 0.2);
+    background: rgba(231, 76, 60, 0.2);
     color: var(--error);
+    border-color: var(--error);
 }
 
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Result Screen */
+/* === Result Screen === */
 #resultScreen {
     text-align: center;
     padding-top: 40px;
 }
 
 #resultScreen h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     margin-bottom: 30px;
+    color: var(--accent);
+}
+
+body.retro-mode #resultScreen h2 {
+    font-size: 0.7rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .result-stats {
     display: flex;
     justify-content: center;
-    gap: 25px;
+    gap: 20px;
     margin-bottom: 40px;
 }
 
 .result-stat {
-    background: var(--bg-card);
-    padding: 20px 25px;
-    border-radius: 16px;
-    min-width: 90px;
+    background: var(--card-bg);
+    padding: 16px 20px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    min-width: 80px;
+}
+
+body.retro-mode .result-stat {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .result-value {
     display: block;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--accent-light);
+    font-size: 1.8rem;
+    color: var(--accent);
     margin-bottom: 5px;
+}
+
+body.retro-mode .result-value {
+    text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .result-label {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--text-muted);
+}
+
+body.retro-mode .result-label {
+    font-size: 0.35rem;
 }
 
 .result-actions {
@@ -414,19 +597,42 @@ body {
     gap: 12px;
 }
 
+/* === Buttons === */
 .btn {
-    padding: 16px 24px;
-    border: none;
+    font-family: inherit;
+    padding: 14px 20px;
+    border: 2px solid var(--border);
     border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
+body.retro-mode .btn {
+    font-size: 0.45rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+body.retro-mode .btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
 .btn-primary {
     background: var(--accent);
-    color: white;
+    color: var(--text-dark);
+    border-color: var(--accent-dark);
 }
 
 .btn-primary:hover {
@@ -434,16 +640,16 @@ body {
 }
 
 .btn-secondary {
-    background: var(--bg-card);
-    color: var(--text-primary);
-    border: 2px solid var(--bg-secondary);
+    background: var(--card-bg);
+    color: var(--text);
+    border-color: var(--border);
 }
 
 .btn-secondary:hover {
     border-color: var(--accent);
 }
 
-/* Theory Screen */
+/* === Theory Screen === */
 #theoryScreen {
     padding-top: 20px;
 }
@@ -451,20 +657,39 @@ body {
 #theoryScreen h2 {
     text-align: center;
     margin-bottom: 25px;
+    font-size: 1.3rem;
+    color: var(--accent);
+}
+
+body.retro-mode #theoryScreen h2 {
+    font-size: 0.6rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .theory-content {
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
     margin-bottom: 20px;
 }
 
+body.retro-mode .theory-content {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .theory-content h3 {
-    color: var(--accent-light);
-    margin: 20px 0 12px;
+    color: var(--accent);
+    margin: 16px 0 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--bg-secondary);
+    border-bottom: 2px solid var(--border);
+    font-size: 1rem;
+}
+
+body.retro-mode .theory-content h3 {
+    font-size: 0.45rem;
 }
 
 .theory-content h3:first-child {
@@ -479,37 +704,53 @@ body {
 }
 
 .function-list li {
-    background: rgba(108, 92, 231, 0.15);
+    background: rgba(239, 135, 72, 0.15);
     padding: 6px 12px;
+    border: 2px solid var(--border);
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .function-list li {
+    font-size: 0.35rem;
+    border-radius: 0;
 }
 
 .properties {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+body.retro-mode .properties {
+    font-size: 0.35rem;
     line-height: 1.8;
 }
 
 .properties p {
     margin-bottom: 8px;
     padding: 8px 12px;
-    background: rgba(108, 92, 231, 0.1);
+    background: rgba(239, 135, 72, 0.1);
+    border: 2px solid var(--border);
     border-radius: 8px;
 }
 
-/* Responsive */
+body.retro-mode .properties p {
+    border-radius: 0;
+}
+
+/* === Responsive === */
 @media (max-width: 400px) {
     .container {
         padding: 15px;
     }
 
     .result-stats {
-        gap: 15px;
+        gap: 12px;
     }
 
     .result-stat {
-        padding: 15px;
-        min-width: 80px;
+        padding: 12px;
+        min-width: 70px;
     }
 
     .stats {
@@ -518,26 +759,10 @@ body {
 
     .stat {
         padding: 5px 8px;
-        font-size: 0.9rem;
-    }
-}
-
-/* Light theme support */
-@media (prefers-color-scheme: light) {
-    :root {
-        --bg-primary: #f5f6fa;
-        --bg-secondary: #e8e9f0;
-        --bg-card: #ffffff;
-        --text-primary: #2d3436;
-        --text-secondary: #636e72;
+        font-size: 0.85rem;
     }
 
-    .btn-level,
-    .btn-answer {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .graph-container {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    body.retro-mode .stat {
+        font-size: 0.4rem;
     }
 }

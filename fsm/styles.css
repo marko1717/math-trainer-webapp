@@ -1,16 +1,8 @@
 /* ===================================
-   MATH QUEST - GRAPHS TRAINER
+   MATH QUEST - FSM TRAINER
    Trainer-specific styles only
    Base styles come from ../shared/styles.css
    =================================== */
-
-:root {
-    /* Graph specific colors */
-    --graph-original: #9ab8a2;
-    --graph-transformed: #EF8748;
-    --graph-grid: #3a3a5a;
-    --graph-axis: #5a5a7a;
-}
 
 /* === Header === */
 .header {
@@ -223,7 +215,7 @@ body.retro-mode .start-description {
     line-height: 1.8;
 }
 
-.topics-preview {
+.formula-preview {
     background: var(--card-bg);
     border: 2px solid var(--border);
     border-radius: 12px;
@@ -232,36 +224,118 @@ body.retro-mode .start-description {
     max-width: 320px;
 }
 
-body.retro-mode .topics-preview {
+body.retro-mode .formula-preview {
     border-radius: 0;
     border-width: 4px;
     box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
-.topic-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.formula-item {
     padding: 10px;
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--text-muted);
     border-bottom: 2px solid var(--border);
 }
 
-body.retro-mode .topic-item {
+body.retro-mode .formula-item {
     font-size: 0.4rem;
 }
 
-.topic-item:last-child {
+.formula-item:last-child {
     border-bottom: none;
 }
 
-.topic-icon {
-    font-size: 1.2rem;
+/* === Topic Selection Screen === */
+.topic-selection {
+    padding: 16px;
+    text-align: center;
 }
 
-body.retro-mode .topic-icon {
-    filter: drop-shadow(2px 2px 0 var(--bg-dark));
+.topic-selection h2 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: var(--accent);
+}
+
+body.retro-mode .topic-selection h2 {
+    font-size: 0.6rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.topic-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+body.retro-mode .topic-subtitle {
+    font-size: 0.4rem;
+}
+
+.topic-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.topic-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    color: var(--text);
+    font-family: inherit;
+}
+
+body.retro-mode .topic-btn {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.topic-btn:hover, .topic-btn:active {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+body.retro-mode .topic-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.topic-btn .topic-icon {
+    font-size: 1.3rem;
+}
+
+.topic-btn .topic-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.topic-btn .topic-name {
+    font-size: 1rem;
+}
+
+body.retro-mode .topic-btn .topic-name {
+    font-size: 0.45rem;
+}
+
+.topic-btn .topic-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+body.retro-mode .topic-btn .topic-desc {
+    font-size: 0.35rem;
 }
 
 /* === Buttons === */
@@ -335,6 +409,39 @@ body.retro-mode .btn-large {
     font-size: 0.5rem;
 }
 
+.btn-next {
+    margin-top: auto;
+    width: 100%;
+}
+
+.btn-hint {
+    font-family: inherit;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 2px dashed var(--accent);
+    border-radius: 12px;
+    color: var(--accent);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 12px;
+}
+
+body.retro-mode .btn-hint {
+    font-size: 0.4rem;
+    border-radius: 0;
+}
+
+.btn-hint:hover {
+    background: rgba(239, 135, 72, 0.1);
+}
+
+.btn-hint:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* === Quiz Screen === */
 .question-container {
     flex: 1;
@@ -378,8 +485,8 @@ body.retro-mode .question-text {
     line-height: 1.8;
 }
 
-/* Graph specific - Canvas display */
-.graph-container {
+/* FSM specific - Automaton display */
+.automaton-display {
     background: var(--bg-dark);
     border: 2px solid var(--border);
     border-radius: 12px;
@@ -387,17 +494,56 @@ body.retro-mode .question-text {
     margin: 16px 0;
 }
 
-body.retro-mode .graph-container {
+body.retro-mode .automaton-display {
     border-radius: 0;
     border-width: 4px;
     box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
-.graph-container canvas {
+.automaton-display canvas {
     width: 100%;
     max-width: 300px;
     margin: 0 auto;
     display: block;
+}
+
+/* === Hint Container === */
+.hint-container {
+    display: none;
+    background: rgba(239, 135, 72, 0.15);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 12px;
+}
+
+body.retro-mode .hint-container {
+    border-radius: 0;
+}
+
+.hint-container.show {
+    display: block;
+}
+
+.hint-loading {
+    text-align: center;
+    color: var(--accent);
+    font-size: 0.95rem;
+}
+
+body.retro-mode .hint-loading {
+    font-size: 0.4rem;
+}
+
+.hint-text {
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+body.retro-mode .hint-text {
+    font-size: 0.4rem;
+    line-height: 1.8;
 }
 
 /* === Answers === */
@@ -459,6 +605,7 @@ body.retro-mode .answer-btn .answer-letter {
 .answer-btn.correct {
     border-color: var(--success);
     background: rgba(124, 157, 133, 0.2);
+    animation: correctPulse 0.5s ease;
 }
 
 .answer-btn.correct .answer-letter {
@@ -469,6 +616,7 @@ body.retro-mode .answer-btn .answer-letter {
 .answer-btn.incorrect {
     border-color: var(--error);
     background: rgba(231, 76, 60, 0.2);
+    animation: wrongShake 0.5s ease;
 }
 
 .answer-btn.incorrect .answer-letter {
@@ -479,6 +627,17 @@ body.retro-mode .answer-btn .answer-letter {
 .answer-btn.disabled {
     cursor: not-allowed;
     opacity: 0.7;
+}
+
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
 }
 
 /* === Feedback === */
@@ -533,6 +692,86 @@ body.retro-mode .feedback-text {
 body.retro-mode .feedback-explanation {
     font-size: 0.4rem;
     line-height: 1.8;
+}
+
+/* === Formulas Screen === */
+.formulas-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.formulas-content h2 {
+    text-align: center;
+    font-size: 1.3rem;
+    color: var(--accent);
+}
+
+body.retro-mode .formulas-content h2 {
+    font-size: 0.6rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.formula-category {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+body.retro-mode .formula-category {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.formula-category h3 {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+
+body.retro-mode .formula-category h3 {
+    font-size: 0.45rem;
+}
+
+.formula-card {
+    margin-bottom: 12px;
+    padding: 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+body.retro-mode .formula-card {
+    border-radius: 0;
+}
+
+.formula-card:last-child {
+    margin-bottom: 0;
+}
+
+.formula-main {
+    font-size: 1.1rem;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
+
+body.retro-mode .formula-main {
+    font-size: 0.5rem;
+}
+
+.formula-example {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+body.retro-mode .formula-example {
+    font-size: 0.35rem;
 }
 
 /* === Results Screen === */
@@ -603,12 +842,80 @@ body.retro-mode .stat-label {
     font-size: 0.35rem;
 }
 
+.ai-feedback {
+    background: linear-gradient(135deg, rgba(124, 157, 133, 0.15), rgba(124, 157, 133, 0.05));
+    border: 2px dashed var(--primary);
+    border-radius: 12px;
+    padding: 16px;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+}
+
+body.retro-mode .ai-feedback {
+    border-radius: 0;
+}
+
+.ai-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.ai-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+body.retro-mode .ai-text {
+    font-size: 0.4rem;
+    line-height: 1.8;
+}
+
+.weak-topics {
+    width: 100%;
+    text-align: left;
+}
+
+.weak-topics h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+}
+
+body.retro-mode .weak-topics h3 {
+    font-size: 0.45rem;
+}
+
+.weak-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.weak-tag {
+    background: rgba(231, 76, 60, 0.2);
+    border: 2px solid var(--error);
+    border-radius: 8px;
+    color: var(--error);
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+body.retro-mode .weak-tag {
+    border-radius: 0;
+    font-size: 0.35rem;
+}
+
 .results-actions {
     display: flex;
     flex-direction: column;
     gap: 10px;
     width: 100%;
     max-width: 320px;
+    margin-top: 10px;
 }
 
 /* === Responsive === */

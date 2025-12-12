@@ -55,7 +55,8 @@ let state = {
     currentQuestionData: null,
     answered: false,
     history: [],
-    weakAreas: {}
+    weakAreas: {},
+    selectedTopic: 'mixed' // Track selected topic
 };
 
 // Load saved progress
@@ -356,35 +357,42 @@ function generateFindCoefficients() {
 
 // === Question Selection ===
 function generateQuestion() {
-    const availableTopics = [];
+    let topicToGenerate;
 
-    // Level 1: Incomplete + Discriminant
-    if (state.level >= 1) {
-        availableTopics.push('incomplete', 'discriminant');
-    }
-
-    // Level 2: Add Vieta + Factorization
-    if (state.level >= 2) {
-        availableTopics.push('vieta', 'factorization');
-    }
-
-    // Level 3: Add Find Coefficients
-    if (state.level >= 3) {
-        availableTopics.push('findCoefficients');
-    }
-
-    // Prefer weak areas (40% chance)
-    let selectedTopic;
-    const weakTopics = availableTopics.filter(t => state.weakAreas[t] > 0);
-
-    if (weakTopics.length > 0 && Math.random() < 0.4) {
-        selectedTopic = weakTopics[Math.floor(Math.random() * weakTopics.length)];
+    // If specific topic selected, use that
+    if (state.selectedTopic && state.selectedTopic !== 'mixed') {
+        topicToGenerate = state.selectedTopic;
     } else {
-        selectedTopic = availableTopics[Math.floor(Math.random() * availableTopics.length)];
+        // Mixed mode - use level-based topic selection
+        const availableTopics = [];
+
+        // Level 1: Incomplete + Discriminant
+        if (state.level >= 1) {
+            availableTopics.push('incomplete', 'discriminant');
+        }
+
+        // Level 2: Add Vieta + Factorization
+        if (state.level >= 2) {
+            availableTopics.push('vieta', 'factorization');
+        }
+
+        // Level 3: Add Find Coefficients
+        if (state.level >= 3) {
+            availableTopics.push('findCoefficients');
+        }
+
+        // Prefer weak areas (40% chance)
+        const weakTopics = availableTopics.filter(t => state.weakAreas[t] > 0);
+
+        if (weakTopics.length > 0 && Math.random() < 0.4) {
+            topicToGenerate = weakTopics[Math.floor(Math.random() * weakTopics.length)];
+        } else {
+            topicToGenerate = availableTopics[Math.floor(Math.random() * availableTopics.length)];
+        }
     }
 
     // Generate question based on topic
-    switch (selectedTopic) {
+    switch (topicToGenerate) {
         case 'incomplete':
             return generateIncomplete();
         case 'discriminant':
@@ -411,13 +419,21 @@ function shuffleArray(array) {
 
 // === UI Updates ===
 function updateUI() {
-    document.getElementById('levelBadge').textContent = `Рівень ${state.level}`;
-    document.getElementById('streakNumber').textContent = state.streak;
+    const levelBadge = document.getElementById('levelBadge');
+    if (levelBadge) levelBadge.textContent = `Рівень ${state.level}`;
+
+    const streakEl = document.getElementById('streakNumber');
+    if (streakEl) streakEl.textContent = state.streak;
 
     const progress = (state.correctCount / state.totalQuestions) * 100;
-    document.getElementById('progressBar').style.setProperty('--progress', `${progress}%`);
-    document.getElementById('correctCount').textContent = state.correctCount;
-    document.getElementById('totalCount').textContent = state.currentQuestion;
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) progressBar.style.setProperty('--progress', `${progress}%`);
+
+    const correctEl = document.getElementById('correctCount');
+    if (correctEl) correctEl.textContent = state.correctCount;
+
+    const totalEl = document.getElementById('totalCount');
+    if (totalEl) totalEl.textContent = state.currentQuestion;
 
     const dots = document.querySelectorAll('.difficulty-dot');
     dots.forEach((dot, index) => {
@@ -599,6 +615,30 @@ function showResults() {
 
     displayWeakAreas();
     getGPTFeedback();
+
+    // Save to Firebase if available
+    saveToFirebase();
+}
+
+// Save session to Firebase
+async function saveToFirebase() {
+    if (window.MathQuestFirebase) {
+        try {
+            const result = await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'quadratic',
+                trainerName: 'Квадратні рівняння',
+                score: state.correctCount,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                timeSpent: 0 // TODO: track time
+            });
+            if (result) {
+                console.log('✅ Session saved to Firebase');
+            }
+        } catch (error) {
+            console.log('Could not save to Firebase:', error);
+        }
+    }
 }
 
 function displayWeakAreas() {
@@ -691,15 +731,30 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
     updateUI();
 
+    // Start button -> Topic selection
     document.getElementById('startBtn').addEventListener('click', () => {
-        state.currentQuestion = 0;
-        state.correctCount = 0;
-        state.streak = 0;
-        state.history = [];
-        state.weakAreas = {};
+        showScreen('topicScreen');
+    });
 
-        showScreen('quizScreen');
-        displayQuestion();
+    // Back to start from topic selection
+    document.getElementById('backToStartBtn').addEventListener('click', () => {
+        showScreen('startScreen');
+    });
+
+    // Topic selection buttons
+    document.querySelectorAll('.topic-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const topic = btn.dataset.topic;
+            state.selectedTopic = topic;
+            state.currentQuestion = 0;
+            state.correctCount = 0;
+            state.streak = 0;
+            state.history = [];
+            state.weakAreas = {};
+
+            showScreen('quizScreen');
+            displayQuestion();
+        });
     });
 
     document.getElementById('nextBtn').addEventListener('click', () => {
@@ -718,8 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.streak = 0;
         state.history = [];
 
-        showScreen('quizScreen');
-        displayQuestion();
+        showScreen('topicScreen');
     });
 
     document.getElementById('reviewBtn').addEventListener('click', () => {

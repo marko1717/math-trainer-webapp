@@ -2,16 +2,25 @@
 // Applies retro mode and light mode if saved in localStorage
 
 (function() {
-    // Check for saved retro mode preference
-    const isRetro = localStorage.getItem('math_quest_retro_mode') === 'true';
-    const isLight = localStorage.getItem('math_quest_light_mode') === 'true';
+    function applyTheme() {
+        // Check for saved preferences
+        const isRetro = localStorage.getItem('math_quest_retro_mode') === 'true';
+        const isLight = localStorage.getItem('math_quest_light_mode') === 'true';
 
-    if (isRetro) {
-        document.body.classList.add('retro-mode');
+        if (isRetro) {
+            document.body.classList.add('retro-mode');
+        }
+
+        if (isLight) {
+            document.body.classList.add('light-mode');
+        }
     }
 
-    if (isLight) {
-        document.body.classList.add('light-mode');
+    // Apply theme when DOM is ready
+    if (document.body) {
+        applyTheme();
+    } else {
+        document.addEventListener('DOMContentLoaded', applyTheme);
     }
 
     // Export function to toggle retro mode

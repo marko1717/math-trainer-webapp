@@ -1,0 +1,498 @@
+/* ===================================
+   MATH QUEST - PROFILE PAGE
+   =================================== */
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 100vh;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Login Screen === */
+.login-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+    margin-top: 60px;
+}
+
+body.retro-mode .login-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.login-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.login-card h1 {
+    font-size: 1.5rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+}
+
+body.retro-mode .login-card h1 {
+    font-size: 0.8rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.login-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    font-size: 0.95rem;
+}
+
+body.retro-mode .login-subtitle {
+    font-size: 0.4rem;
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 24px;
+    background: white;
+    color: #333;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .btn-google {
+    font-size: 0.45rem;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.btn-google:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+body.retro-mode .btn-google:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+.login-info {
+    margin-top: 24px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+body.retro-mode .login-info {
+    font-size: 0.35rem;
+}
+
+/* === Back Link === */
+.back-link {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    background: rgba(239, 135, 72, 0.15);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .back-link {
+    font-size: 0.4rem;
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.back-link:hover {
+    background: rgba(239, 135, 72, 0.3);
+}
+
+/* === Profile Header === */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+body.retro-mode .profile-header {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid var(--accent);
+    object-fit: cover;
+}
+
+body.retro-mode .avatar {
+    border-radius: 0;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h1 {
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+body.retro-mode .user-info h1 {
+    font-size: 0.5rem;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+body.retro-mode .user-email {
+    font-size: 0.35rem;
+}
+
+.btn-logout {
+    width: 44px;
+    height: 44px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .btn-logout {
+    border-radius: 0;
+}
+
+.btn-logout:hover {
+    background: var(--error);
+    border-color: var(--error);
+}
+
+/* === Stats Grid === */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+body.retro-mode .stat-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+body.retro-mode .stat-value {
+    font-size: 0.8rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+body.retro-mode .stat-label {
+    font-size: 0.35rem;
+}
+
+/* === Level Progress === */
+.level-progress-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+body.retro-mode .level-progress-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.level-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+body.retro-mode .level-header {
+    font-size: 0.4rem;
+}
+
+.level-bar {
+    height: 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+body.retro-mode .level-bar {
+    border-radius: 0;
+}
+
+.level-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    transition: width 0.5s ease;
+}
+
+/* === Section Cards === */
+.section-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+body.retro-mode .section-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.section-card h2 {
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+}
+
+body.retro-mode .section-card h2 {
+    font-size: 0.5rem;
+    text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+/* === Trainer Progress List === */
+.trainer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.trainer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+body.retro-mode .trainer-item {
+    border-radius: 0;
+}
+
+.trainer-icon {
+    font-size: 1.3rem;
+}
+
+.trainer-info {
+    flex: 1;
+}
+
+.trainer-name {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+body.retro-mode .trainer-name {
+    font-size: 0.4rem;
+}
+
+.trainer-stats {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+body.retro-mode .trainer-stats {
+    font-size: 0.35rem;
+}
+
+.trainer-score {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+body.retro-mode .trainer-score {
+    font-size: 0.5rem;
+}
+
+/* === Activity List === */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+body.retro-mode .activity-item {
+    border-radius: 0;
+}
+
+.activity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.activity-trainer {
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+body.retro-mode .activity-trainer {
+    font-size: 0.4rem;
+}
+
+.activity-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+body.retro-mode .activity-date {
+    font-size: 0.3rem;
+}
+
+.activity-score {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+body.retro-mode .activity-score {
+    font-size: 0.4rem;
+}
+
+.activity-score.good { color: var(--success); }
+.activity-score.medium { color: var(--warning); }
+.activity-score.bad { color: var(--error); }
+
+/* === Achievements === */
+.achievements-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.achievement {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+body.retro-mode .achievement {
+    border-radius: 0;
+}
+
+.achievement.locked {
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+.achievement.unlocked {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(239, 135, 72, 0.3);
+}
+
+/* === Loading === */
+.loading-message {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .loading-message {
+    font-size: 0.4rem;
+}
+
+.empty-message {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .empty-message {
+    font-size: 0.4rem;
+}

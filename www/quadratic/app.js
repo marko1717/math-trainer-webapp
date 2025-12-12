@@ -615,6 +615,30 @@ function showResults() {
 
     displayWeakAreas();
     getGPTFeedback();
+
+    // Save to Firebase if available
+    saveToFirebase();
+}
+
+// Save session to Firebase
+async function saveToFirebase() {
+    if (window.MathQuestFirebase) {
+        try {
+            const result = await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'quadratic',
+                trainerName: 'Квадратні рівняння',
+                score: state.correctCount,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                timeSpent: 0 // TODO: track time
+            });
+            if (result) {
+                console.log('✅ Session saved to Firebase');
+            }
+        } catch (error) {
+            console.log('Could not save to Firebase:', error);
+        }
+    }
 }
 
 function displayWeakAreas() {

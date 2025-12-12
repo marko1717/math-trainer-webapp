@@ -1,61 +1,8 @@
 /* ===================================
    MATH QUEST - PERCENT TRAINER
-   8-BIT RETRO THEME
+   Trainer-specific styles only
+   Base styles come from ../shared/styles.css
    =================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-:root {
-    --primary: #7C9D85;
-    --primary-dark: #5a7a63;
-    --primary-light: #9ab8a2;
-    --accent: #EF8748;
-    --accent-dark: #DB9063;
-    --accent-light: #f5a06a;
-    --bg: #1a1a2e;
-    --bg-dark: #12121f;
-    --bg-light: #252542;
-    --card-bg: #252542;
-    --text: #F5F0EC;
-    --text-muted: #a09a96;
-    --text-dark: #1a1a2e;
-    --border: #3a3a5a;
-    --success: #7C9D85;
-    --error: #e74c3c;
-    --warning: #EF8748;
-    --pixel: 4px;
-    --pixel-sm: 2px;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html {
-    font-size: 16px;
-}
-
-body {
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-    line-height: 1.6;
-}
-
-/* Scanline effect */
-
-.app-container {
-    max-width: 480px;
-    margin: 0 auto;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: env(safe-area-inset-bottom, 20px);
-}
 
 /* === Header === */
 .header {
@@ -64,36 +11,51 @@ body {
     justify-content: space-between;
     padding: 12px 16px;
     background: var(--card-bg);
-    border-bottom: var(--pixel) solid var(--border);
+    border-bottom: 2px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .header {
+    border-bottom-width: 4px;
+    box-shadow: 0 4px 0 var(--bg-dark);
 }
 
 .header h1 {
-    font-size: 0.5rem;
+    font-size: 1.1rem;
     color: var(--accent);
+}
+
+body.retro-mode .header h1 {
+    font-size: 0.5rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .back-btn {
     font-family: inherit;
-    font-size: 0.4rem;
+    font-size: 0.9rem;
     color: var(--accent);
     text-decoration: none;
     padding: 8px 12px;
     background: rgba(239, 135, 72, 0.15);
     border: 2px solid var(--accent);
-    transition: all 0.1s ease;
-    position: relative;
-    z-index: 10;
+    border-radius: 8px;
+    transition: all 0.2s ease;
     cursor: pointer;
+}
+
+body.retro-mode .back-btn {
+    font-size: 0.4rem;
+    border-radius: 0;
     box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .back-btn:hover, .back-btn:active {
     background: rgba(239, 135, 72, 0.3);
+}
+
+body.retro-mode .back-btn:hover {
     transform: translate(-1px, -1px);
     box-shadow: 3px 3px 0 var(--bg-dark);
 }
@@ -103,7 +65,13 @@ body {
     color: var(--text-dark);
     padding: 6px 12px;
     border: 2px solid var(--accent-dark);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .level-badge {
     font-size: 0.4rem;
+    border-radius: 0;
     box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
@@ -114,10 +82,20 @@ body {
     background: var(--bg-dark);
     padding: 6px 10px;
     border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .streak-counter {
+    border-radius: 0;
     font-size: 0.5rem;
 }
 
 .streak-icon {
+    font-size: 1rem;
+}
+
+body.retro-mode .streak-icon {
     font-size: 0.9rem;
 }
 
@@ -136,8 +114,13 @@ body {
     height: 12px;
     background: var(--bg-dark);
     border: 2px solid var(--border);
+    border-radius: 6px;
     overflow: hidden;
     position: relative;
+}
+
+body.retro-mode .progress-bar {
+    border-radius: 0;
 }
 
 .progress-bar::after {
@@ -149,14 +132,21 @@ body {
     width: var(--progress, 0%);
     background: linear-gradient(90deg, var(--primary), var(--accent));
     transition: width 0.5s ease;
+}
+
+body.retro-mode .progress-bar::after {
     box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
 }
 
 .progress-text {
     text-align: center;
-    font-size: 0.4rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     margin-top: 8px;
+}
+
+body.retro-mode .progress-text {
+    font-size: 0.4rem;
 }
 
 /* === Main Content === */
@@ -186,15 +176,26 @@ body {
 /* === Theory Box === */
 .theory-box {
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 16px;
     margin-bottom: 20px;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .theory-box {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .theory-box h3 {
     color: var(--accent);
     margin-bottom: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+body.retro-mode .theory-box h3 {
     font-size: 0.5rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
@@ -203,8 +204,13 @@ body {
     background: rgba(239, 135, 72, 0.15);
     padding: 10px 14px;
     border: 2px solid var(--border);
+    border-radius: 8px;
     margin-bottom: 8px;
     text-align: center;
+}
+
+body.retro-mode .formula-row {
+    border-radius: 0;
 }
 
 .formula-row:last-child {
@@ -213,39 +219,62 @@ body {
 
 .formula {
     font-family: inherit;
-    font-size: 0.45rem;
+    font-size: 1rem;
     color: var(--text);
+}
+
+body.retro-mode .formula {
+    font-size: 0.45rem;
 }
 
 /* === Question Card === */
 .question-card {
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 20px;
     margin-bottom: 16px;
     text-align: center;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .question-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .question-type {
-    font-size: 0.35rem;
+    font-size: 0.85rem;
     color: var(--accent);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 12px;
 }
 
+body.retro-mode .question-type {
+    font-size: 0.35rem;
+}
+
 .question-text {
-    font-size: 0.5rem;
-    line-height: 1.8;
+    font-size: 1.1rem;
+    line-height: 1.6;
     margin-bottom: 10px;
     color: var(--text);
 }
 
+body.retro-mode .question-text {
+    font-size: 0.5rem;
+    line-height: 1.8;
+}
+
 .method-hint {
-    font-size: 0.35rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     font-style: italic;
+}
+
+body.retro-mode .method-hint {
+    font-size: 0.35rem;
 }
 
 /* === Answer Section === */
@@ -259,14 +288,21 @@ body {
     flex: 1;
     padding: 14px;
     font-family: inherit;
-    font-size: 0.5rem;
+    font-size: 1.1rem;
     background: var(--bg-dark);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     color: var(--text);
     text-align: center;
     outline: none;
     transition: border-color 0.2s;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .answer-input {
+    font-size: 0.5rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .answer-input:focus {
@@ -287,22 +323,33 @@ body {
     font-family: inherit;
     padding: 14px 18px;
     background: var(--accent);
-    border: var(--pixel) solid var(--accent-dark);
+    border: 2px solid var(--accent-dark);
+    border-radius: 12px;
     color: var(--text-dark);
-    font-size: 0.4rem;
+    font-size: 1rem;
     cursor: pointer;
-    transition: all 0.1s;
+    transition: all 0.2s;
     white-space: nowrap;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .btn-submit {
+    font-size: 0.4rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .btn-submit:hover {
     background: var(--accent-light);
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn-submit:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--bg-dark);
 }
 
-.btn-submit:active {
+body.retro-mode .btn-submit:active {
     transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 var(--bg-dark);
 }
@@ -316,14 +363,14 @@ body {
 /* === Buttons === */
 .btn {
     font-family: inherit;
-    font-size: 0.45rem;
+    font-size: 1rem;
     padding: 14px 20px;
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     background: var(--card-bg);
     color: var(--text);
     cursor: pointer;
-    transition: all 0.1s ease;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+    transition: all 0.2s ease;
     text-transform: uppercase;
     display: inline-flex;
     align-items: center;
@@ -331,13 +378,24 @@ body {
     gap: 8px;
 }
 
+body.retro-mode .btn {
+    font-size: 0.45rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
 .btn:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--bg-dark);
+    transform: translateY(-2px);
     border-color: var(--accent);
 }
 
-.btn:active {
+body.retro-mode .btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
+body.retro-mode .btn:active {
     transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 var(--bg-dark);
 }
@@ -366,6 +424,10 @@ body {
     width: 100%;
     max-width: 320px;
     padding: 18px 32px;
+    font-size: 1.1rem;
+}
+
+body.retro-mode .btn-large {
     font-size: 0.5rem;
 }
 
@@ -375,9 +437,15 @@ body {
     text-align: center;
     padding: 16px;
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     animation: screenIn 0.3s ease;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .feedback-container {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .feedback-container.show {
@@ -390,8 +458,12 @@ body {
 }
 
 .feedback-text {
-    font-size: 0.5rem;
+    font-size: 1.1rem;
     margin-bottom: 8px;
+}
+
+body.retro-mode .feedback-text {
+    font-size: 0.5rem;
 }
 
 .feedback-container.correct .feedback-text {
@@ -403,8 +475,13 @@ body {
 }
 
 .feedback-explanation {
-    font-size: 0.4rem;
+    font-size: 0.95rem;
     color: var(--text-muted);
+    line-height: 1.6;
+}
+
+body.retro-mode .feedback-explanation {
+    font-size: 0.4rem;
     line-height: 1.8;
 }
 
@@ -420,12 +497,19 @@ body {
 
 .results-icon {
     font-size: 3rem;
+}
+
+body.retro-mode .results-icon {
     filter: drop-shadow(3px 3px 0 var(--bg-dark));
 }
 
 .results-content h2 {
-    font-size: 0.7rem;
+    font-size: 1.5rem;
     color: var(--accent);
+}
+
+body.retro-mode .results-content h2 {
+    font-size: 0.7rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
@@ -438,21 +522,35 @@ body {
 .stat-card {
     flex: 1;
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 14px;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .stat-card {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .stat-value {
-    font-size: 1rem;
+    font-size: 1.8rem;
     color: var(--accent);
+}
+
+body.retro-mode .stat-value {
+    font-size: 1rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .stat-label {
-    font-size: 0.35rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     margin-top: 4px;
+}
+
+body.retro-mode .stat-label {
+    font-size: 0.35rem;
 }
 
 .results-actions {
@@ -465,10 +563,6 @@ body {
 
 /* === Responsive === */
 @media (max-width: 360px) {
-    html {
-        font-size: 14px;
-    }
-
     .header {
         padding: 10px 14px;
     }
@@ -478,6 +572,10 @@ body {
     }
 
     .question-text {
+        font-size: 1rem;
+    }
+
+    body.retro-mode .question-text {
         font-size: 0.45rem;
     }
 }

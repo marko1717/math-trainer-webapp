@@ -1,57 +1,17 @@
 /* ===================================
    MATH QUEST - PARITY TRAINER
-   8-BIT RETRO THEME
+   Trainer-specific styles only
+   Base styles come from ../shared/styles.css
    =================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
 :root {
-    --primary: #7C9D85;
-    --primary-dark: #5a7a63;
-    --primary-light: #9ab8a2;
-    --accent: #EF8748;
-    --accent-dark: #DB9063;
-    --accent-light: #f5a06a;
-    --bg: #1a1a2e;
-    --bg-dark: #12121f;
-    --bg-light: #252542;
-    --card-bg: #252542;
-    --text: #F5F0EC;
-    --text-muted: #a09a96;
-    --text-dark: #1a1a2e;
-    --border: #3a3a5a;
-    --success: #7C9D85;
-    --error: #e74c3c;
-    --warning: #EF8748;
-    --pixel: 4px;
-    --pixel-sm: 2px;
     /* Parity specific colors */
     --even-color: #74b9ff;
     --odd-color: #fd79a8;
     --neither-color: #fdcb6e;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html {
-    font-size: 16px;
-}
-
-body {
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-    line-height: 1.6;
-}
-
-/* Scanline effect */
-
+/* Container override for parity */
 .container {
     max-width: 480px;
     margin: 0 auto;
@@ -59,40 +19,35 @@ body {
     min-height: 100vh;
 }
 
-.screen {
-    display: none;
-}
-
-.screen.active {
-    display: block;
-    animation: screenIn 0.3s ease;
-}
-
-@keyframes screenIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
 /* === Back Link === */
 .back-link {
     font-family: inherit;
     display: inline-block;
-    font-size: 0.4rem;
+    font-size: 0.9rem;
     color: var(--accent);
     text-decoration: none;
     padding: 10px 14px;
     margin-bottom: 16px;
-    transition: all 0.1s ease;
+    transition: all 0.2s ease;
     position: relative;
     z-index: 10;
     cursor: pointer;
     background: rgba(239, 135, 72, 0.15);
     border: 2px solid var(--accent);
-    box-shadow: 2px 2px 0 var(--bg-dark);
+    border-radius: 8px;
 }
 
 .back-link:hover, .back-link:active {
     background: rgba(239, 135, 72, 0.3);
+}
+
+body.retro-mode .back-link {
+    font-size: 0.4rem;
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+body.retro-mode .back-link:hover {
     transform: translate(-1px, -1px);
     box-shadow: 3px 3px 0 var(--bg-dark);
 }
@@ -100,9 +55,13 @@ body {
 /* === Start Screen === */
 #startScreen h1 {
     text-align: center;
-    font-size: 0.7rem;
+    font-size: 1.5rem;
     margin-bottom: 8px;
     color: var(--accent);
+}
+
+body.retro-mode #startScreen h1 {
+    font-size: 0.7rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
@@ -110,21 +69,35 @@ body {
     text-align: center;
     color: var(--text-muted);
     margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+body.retro-mode .subtitle {
     font-size: 0.4rem;
 }
 
 /* === Theory Preview === */
 .theory-preview {
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 16px;
     margin-bottom: 20px;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .theory-preview {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .theory-preview h3 {
     margin-bottom: 15px;
     color: var(--accent);
+    font-size: 1rem;
+}
+
+body.retro-mode .theory-preview h3 {
     font-size: 0.45rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
@@ -134,7 +107,12 @@ body {
     padding: 12px;
     background: rgba(239, 135, 72, 0.1);
     border: 2px solid var(--border);
-    border-left: var(--pixel) solid var(--accent);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+}
+
+body.retro-mode .definition {
+    border-radius: 0;
 }
 
 .definition:last-child {
@@ -143,19 +121,31 @@ body {
 
 .definition p {
     margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .definition p {
     font-size: 0.35rem;
 }
 
 .formula {
-    font-size: 0.5rem;
+    font-size: 1.1rem;
     text-align: center;
     padding: 8px 0;
 }
 
+body.retro-mode .formula {
+    font-size: 0.5rem;
+}
+
 .hint-text {
-    font-size: 0.35rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     font-style: italic;
+}
+
+body.retro-mode .hint-text {
+    font-size: 0.35rem;
 }
 
 /* === Level Select === */
@@ -167,6 +157,10 @@ body {
     text-align: center;
     margin-bottom: 15px;
     color: var(--text-muted);
+    font-size: 1rem;
+}
+
+body.retro-mode .level-select h3 {
     font-size: 0.4rem;
 }
 
@@ -179,33 +173,54 @@ body {
     padding: 14px 16px;
     margin-bottom: 12px;
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: all 0.2s ease;
     text-align: left;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .btn-level {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .btn-level:hover, .btn-level:active {
     border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn-level:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--bg-dark);
 }
 
 .level-icon {
     font-size: 1.5rem;
+}
+
+body.retro-mode .level-icon {
     filter: drop-shadow(2px 2px 0 var(--bg-dark));
 }
 
 .level-text {
-    font-size: 0.45rem;
+    font-size: 1rem;
     color: var(--text);
 }
 
+body.retro-mode .level-text {
+    font-size: 0.45rem;
+}
+
 .level-desc {
-    font-size: 0.35rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     margin-left: auto;
+}
+
+body.retro-mode .level-desc {
+    font-size: 0.35rem;
 }
 
 /* === Game Screen === */
@@ -222,10 +237,16 @@ body {
 }
 
 .stat {
-    font-size: 0.45rem;
+    font-size: 0.9rem;
     background: var(--card-bg);
     padding: 6px 12px;
     border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+body.retro-mode .stat {
+    font-size: 0.45rem;
+    border-radius: 0;
     box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
@@ -233,8 +254,14 @@ body {
     background: var(--accent);
     padding: 6px 14px;
     border: 2px solid var(--accent-dark);
-    font-size: 0.4rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     color: var(--text-dark);
+}
+
+body.retro-mode .level-indicator {
+    font-size: 0.4rem;
+    border-radius: 0;
     box-shadow: 2px 2px 0 var(--bg-dark);
 }
 
@@ -242,9 +269,14 @@ body {
     height: 12px;
     background: var(--bg-dark);
     border: 2px solid var(--border);
+    border-radius: 6px;
     margin-bottom: 20px;
     overflow: hidden;
     position: relative;
+}
+
+body.retro-mode .progress-bar {
+    border-radius: 0;
 }
 
 .progress-fill {
@@ -252,18 +284,27 @@ body {
     background: linear-gradient(90deg, var(--primary), var(--accent));
     transition: width 0.3s ease;
     width: 0%;
+}
+
+body.retro-mode .progress-fill {
     box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3);
 }
 
 /* === Graph Container === */
 .graph-container {
     background: var(--bg-dark);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 15px;
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .graph-container {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 #graphCanvas {
@@ -273,22 +314,37 @@ body {
 /* === Question Area === */
 .question-area {
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
     text-align: center;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .question-area {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .question-type {
-    font-size: 0.35rem;
+    font-size: 0.85rem;
     color: var(--accent);
     margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
+body.retro-mode .question-type {
+    font-size: 0.35rem;
+}
+
 .question {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+body.retro-mode .question {
     font-size: 0.5rem;
     line-height: 1.8;
 }
@@ -306,22 +362,33 @@ body {
 
 .btn-answer {
     font-family: inherit;
-    padding: 14px 18px;
+    padding: 16px 18px;
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     color: var(--text);
-    font-size: 0.45rem;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .btn-answer {
+    font-size: 0.45rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .btn-answer:hover {
     border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn-answer:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--bg-dark);
 }
@@ -387,11 +454,17 @@ body {
     padding: 14px;
     background: transparent;
     border: 2px dashed var(--accent);
+    border-radius: 12px;
     color: var(--accent);
-    font-size: 0.4rem;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: all 0.2s ease;
     margin-bottom: 15px;
+}
+
+body.retro-mode .btn-hint {
+    font-size: 0.4rem;
+    border-radius: 0;
 }
 
 .btn-hint:hover {
@@ -406,25 +479,41 @@ body {
 .hint-container {
     background: rgba(239, 135, 72, 0.15);
     border: 2px solid var(--accent);
+    border-radius: 12px;
     padding: 15px;
     margin-bottom: 15px;
+}
+
+body.retro-mode .hint-container {
+    border-radius: 0;
 }
 
 .hint-container .hint-text {
     color: var(--text);
     font-style: normal;
-    line-height: 1.8;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+body.retro-mode .hint-container .hint-text {
     font-size: 0.4rem;
+    line-height: 1.8;
 }
 
 /* === Feedback === */
 .feedback {
     text-align: center;
     padding: 15px;
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     display: none;
     margin-top: 10px;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .feedback {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .feedback.show {
@@ -451,9 +540,13 @@ body {
 }
 
 #resultScreen h2 {
-    font-size: 0.7rem;
+    font-size: 1.5rem;
     margin-bottom: 30px;
     color: var(--accent);
+}
+
+body.retro-mode #resultScreen h2 {
+    font-size: 0.7rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
@@ -467,22 +560,35 @@ body {
 .result-stat {
     background: var(--card-bg);
     padding: 16px 20px;
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     min-width: 80px;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .result-stat {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .result-value {
     display: block;
-    font-size: 1.2rem;
+    font-size: 1.8rem;
     color: var(--accent);
     margin-bottom: 5px;
+}
+
+body.retro-mode .result-value {
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .result-label {
-    font-size: 0.35rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
+}
+
+body.retro-mode .result-label {
+    font-size: 0.35rem;
 }
 
 .result-actions {
@@ -495,19 +601,30 @@ body {
 .btn {
     font-family: inherit;
     padding: 14px 20px;
-    border: var(--pixel) solid var(--border);
-    font-size: 0.45rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 1rem;
     cursor: pointer;
-    transition: all 0.1s ease;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .btn {
+    font-size: 0.45rem;
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .btn:hover {
+    transform: translateY(-2px);
+}
+
+body.retro-mode .btn:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--bg-dark);
 }
 
-.btn:active {
+body.retro-mode .btn:active {
     transform: translate(2px, 2px);
     box-shadow: 2px 2px 0 var(--bg-dark);
 }
@@ -540,17 +657,27 @@ body {
 #theoryScreen h2 {
     text-align: center;
     margin-bottom: 25px;
-    font-size: 0.6rem;
+    font-size: 1.3rem;
     color: var(--accent);
+}
+
+body.retro-mode #theoryScreen h2 {
+    font-size: 0.6rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
 }
 
 .theory-content {
     background: var(--card-bg);
-    border: var(--pixel) solid var(--border);
+    border: 2px solid var(--border);
+    border-radius: 12px;
     padding: 16px;
     margin-bottom: 20px;
-    box-shadow: var(--pixel) var(--pixel) 0 var(--bg-dark);
+}
+
+body.retro-mode .theory-content {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
 }
 
 .theory-content h3 {
@@ -558,6 +685,10 @@ body {
     margin: 16px 0 12px;
     padding-bottom: 8px;
     border-bottom: 2px solid var(--border);
+    font-size: 1rem;
+}
+
+body.retro-mode .theory-content h3 {
     font-size: 0.45rem;
 }
 
@@ -576,10 +707,21 @@ body {
     background: rgba(239, 135, 72, 0.15);
     padding: 6px 12px;
     border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+body.retro-mode .function-list li {
     font-size: 0.35rem;
+    border-radius: 0;
 }
 
 .properties {
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+body.retro-mode .properties {
     font-size: 0.35rem;
     line-height: 1.8;
 }
@@ -589,6 +731,11 @@ body {
     padding: 8px 12px;
     background: rgba(239, 135, 72, 0.1);
     border: 2px solid var(--border);
+    border-radius: 8px;
+}
+
+body.retro-mode .properties p {
+    border-radius: 0;
 }
 
 /* === Responsive === */
@@ -612,6 +759,10 @@ body {
 
     .stat {
         padding: 5px 8px;
+        font-size: 0.85rem;
+    }
+
+    body.retro-mode .stat {
         font-size: 0.4rem;
     }
 }

@@ -1,5 +1,5 @@
 // Powers/Exponents Trainer
-// Learn exponent rules with numbers and expressions
+// Learn exponent rules with topic selection
 
 const tg = window.Telegram?.WebApp;
 if (tg) {
@@ -7,20 +7,45 @@ if (tg) {
     tg.expand();
 }
 
+// Topic names mapping
+const TOPIC_NAMES = {
+    multiply: 'Множення степенів',
+    divide: 'Ділення степенів',
+    power: 'Степінь степеня',
+    zero: 'Нульовий показник',
+    negative: "Від'ємний показник",
+    product: 'Степінь добутку',
+    fraction: 'Степінь дробу',
+    expression: 'Складні вирази',
+    mixed: 'Змішаний режим'
+};
+
+// Formulas for each topic
+const TOPIC_FORMULAS = {
+    multiply: 'aⁿ × aᵐ = aⁿ⁺ᵐ',
+    divide: 'aⁿ ÷ aᵐ = aⁿ⁻ᵐ',
+    power: '(aⁿ)ᵐ = aⁿᵐ',
+    zero: 'a⁰ = 1 (при a ≠ 0)',
+    negative: 'a⁻ⁿ = 1/aⁿ',
+    product: '(ab)ⁿ = aⁿbⁿ',
+    fraction: '(a/b)ⁿ = aⁿ/bⁿ',
+    expression: 'Комбінація правил',
+    mixed: 'Всі правила степенів'
+};
+
 // State
 let state = {
-    level: 1,
+    topic: 'mixed',
     correct: 0,
     wrong: 0,
-    streak: 0,
-    maxStreak: 0,
     questionsAnswered: 0,
     totalQuestions: 10,
     currentQuestion: null,
-    hintUsed: false
+    answered: false,
+    startTime: null
 };
 
-// DOM
+// DOM Elements
 const screens = {
     start: document.getElementById('startScreen'),
     game: document.getElementById('gameScreen'),
@@ -33,35 +58,59 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
-    document.querySelectorAll('.btn-level').forEach(btn => {
+    // Topic selection buttons
+    document.querySelectorAll('.btn-topic').forEach(btn => {
         btn.addEventListener('click', () => {
-            state.level = parseInt(btn.dataset.level);
+            state.topic = btn.dataset.topic;
             startGame();
         });
     });
 
-    document.getElementById('hintBtn').addEventListener('click', showHint);
-    document.getElementById('nextLevelBtn').addEventListener('click', () => {
-        if (state.level < 3) state.level++;
-        startGame();
+    // Back buttons
+    document.getElementById('backBtn')?.addEventListener('click', () => showScreen('start'));
+    document.getElementById('resultBackBtn')?.addEventListener('click', () => showScreen('start'));
+    document.getElementById('menuBtn')?.addEventListener('click', () => showScreen('start'));
+
+    // Restart
+    document.getElementById('restartBtn')?.addEventListener('click', startGame);
+
+    // Help panel
+    document.getElementById('hintBtn')?.addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn')?.addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn')?.addEventListener('click', showFormula);
+
+    // AI Modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
     });
-    document.getElementById('restartBtn').addEventListener('click', startGame);
-    document.getElementById('menuBtn').addEventListener('click', () => showScreen('start'));
+
+    // Next button
+    document.getElementById('nextBtn')?.addEventListener('click', nextQuestion);
 }
 
 function showScreen(name) {
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[name].classList.add('active');
+    Object.values(screens).forEach(s => s?.classList.remove('active'));
+    screens[name]?.classList.add('active');
 }
 
 function startGame() {
-    state = { ...state, correct: 0, wrong: 0, streak: 0, maxStreak: 0, questionsAnswered: 0, hintUsed: false };
+    state = {
+        ...state,
+        correct: 0,
+        wrong: 0,
+        questionsAnswered: 0,
+        currentQuestion: null,
+        answered: false,
+        startTime: Date.now()
+    };
 
+    // Update UI
     document.getElementById('correct').textContent = '0';
     document.getElementById('wrong').textContent = '0';
-    document.getElementById('streak').textContent = '0';
-    document.getElementById('currentLevel').textContent = state.level;
     document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('topicTitle').textContent = TOPIC_NAMES[state.topic] || 'Степені';
+    document.getElementById('nextBtn').style.display = 'none';
 
     showScreen('game');
     nextQuestion();
@@ -73,18 +122,27 @@ function nextQuestion() {
         return;
     }
 
-    state.hintUsed = false;
+    state.answered = false;
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').innerHTML = '';
+    document.getElementById('feedback').className = 'feedback-container';
+
+    // Enable help buttons
     document.getElementById('hintBtn').disabled = false;
-    document.getElementById('hintContainer').classList.remove('show');
-    document.getElementById('feedback').classList.remove('show');
+    document.getElementById('aiHelpBtn').disabled = false;
+    document.getElementById('formulaBtn').disabled = false;
 
     state.currentQuestion = generateQuestion();
     displayQuestion();
 }
 
 function generateQuestion() {
-    const types = getQuestionTypes();
-    const type = types[Math.floor(Math.random() * types.length)];
+    let type = state.topic;
+
+    if (type === 'mixed') {
+        const types = ['multiply', 'divide', 'power', 'zero', 'negative', 'product', 'fraction', 'expression'];
+        type = types[Math.floor(Math.random() * types.length)];
+    }
 
     switch (type) {
         case 'multiply': return generateMultiply();
@@ -99,60 +157,49 @@ function generateQuestion() {
     }
 }
 
-function getQuestionTypes() {
-    switch (state.level) {
-        case 1: return ['multiply', 'divide', 'power', 'zero'];
-        case 2: return ['multiply', 'divide', 'power', 'negative', 'product'];
-        case 3: return ['multiply', 'divide', 'power', 'negative', 'product', 'fraction', 'expression'];
-        default: return ['multiply'];
-    }
-}
-
 // aⁿ × aᵐ = aⁿ⁺ᵐ
 function generateMultiply() {
     const a = randomChoice([2, 3, 5, 7, 'a', 'x']);
-    const n = randomInt(2, 5);
-    const m = randomInt(2, 5);
+    const n = randomInt(2, 6);
+    const m = randomInt(2, 6);
     const answer = n + m;
 
     const display = `${a}${sup(n)} × ${a}${sup(m)}`;
-    const options = generateOptions(answer, -2, 15, [n * m, n - m, Math.max(n, m)]);
+    const options = generateOptions(answer, 2, 15, [n * m, n - m, Math.max(n, m)]);
 
     return {
         type: 'multiply',
         questionType: 'Множення степенів',
         text: display,
-        ruleHint: 'aⁿ × aᵐ = aⁿ⁺ᵐ',
+        formula: 'aⁿ × aᵐ = aⁿ⁺ᵐ',
         answer: `${a}${sup(answer)}`,
         answerValue: answer,
         options: options.map(o => `${a}${sup(o)}`),
         optionValues: options,
-        hint: `При множенні степенів з однаковою основою показники додаються:
-${a}${sup(n)} × ${a}${sup(m)} = ${a}${sup(n + '+' + m)} = ${a}${sup(answer)}`
+        hint: `При множенні степенів з однаковою основою показники додаються:\n${a}${sup(n)} × ${a}${sup(m)} = ${a}${sup(n + '+' + m)} = ${a}${sup(answer)}`
     };
 }
 
 // aⁿ ÷ aᵐ = aⁿ⁻ᵐ
 function generateDivide() {
     const a = randomChoice([2, 3, 5, 'a', 'x']);
-    const n = randomInt(4, 8);
+    const n = randomInt(5, 10);
     const m = randomInt(1, n - 1);
     const answer = n - m;
 
     const display = `${a}${sup(n)} ÷ ${a}${sup(m)}`;
-    const options = generateOptions(answer, 1, 10, [n + m, n * m, Math.max(n, m)]);
+    const options = generateOptions(answer, 1, 12, [n + m, n * m, Math.max(n, m)]);
 
     return {
         type: 'divide',
         questionType: 'Ділення степенів',
         text: display,
-        ruleHint: 'aⁿ ÷ aᵐ = aⁿ⁻ᵐ',
+        formula: 'aⁿ ÷ aᵐ = aⁿ⁻ᵐ',
         answer: `${a}${sup(answer)}`,
         answerValue: answer,
         options: options.map(o => `${a}${sup(o)}`),
         optionValues: options,
-        hint: `При діленні степенів з однаковою основою показники віднімаються:
-${a}${sup(n)} ÷ ${a}${sup(m)} = ${a}${sup(n + '-' + m)} = ${a}${sup(answer)}`
+        hint: `При діленні степенів з однаковою основою показники віднімаються:\n${a}${sup(n)} ÷ ${a}${sup(m)} = ${a}${sup(n + '-' + m)} = ${a}${sup(answer)}`
     };
 }
 
@@ -170,13 +217,12 @@ function generatePower() {
         type: 'power',
         questionType: 'Степінь степеня',
         text: display,
-        ruleHint: '(aⁿ)ᵐ = aⁿᵐ',
+        formula: '(aⁿ)ᵐ = aⁿᵐ',
         answer: `${a}${sup(answer)}`,
         answerValue: answer,
         options: options.map(o => `${a}${sup(o)}`),
         optionValues: options,
-        hint: `При піднесенні степеня до степеня показники множаться:
-(${a}${sup(n)})${sup(m)} = ${a}${sup(n + '×' + m)} = ${a}${sup(answer)}`
+        hint: `При піднесенні степеня до степеня показники множаться:\n(${a}${sup(n)})${sup(m)} = ${a}${sup(n + '×' + m)} = ${a}${sup(answer)}`
     };
 }
 
@@ -191,13 +237,12 @@ function generateZero() {
         type: 'zero',
         questionType: 'Нульовий показник',
         text: display,
-        ruleHint: 'a⁰ = 1 (при a ≠ 0)',
+        formula: 'a⁰ = 1 (при a ≠ 0)',
         answer: '1',
         answerValue: 1,
         options: ['1', '0', `${a}`, '-1'],
         optionValues: [1, 0, a, -1],
-        hint: `Будь-яке число (крім 0) в нульовому степені дорівнює 1:
-${a}${sup(0)} = 1`
+        hint: `Будь-яке число (крім 0) в нульовому степені дорівнює 1:\n${a}${sup(0)} = 1`
     };
 }
 
@@ -207,27 +252,23 @@ function generateNegative() {
     const n = randomInt(1, 3);
 
     const display = `${a}${sup(-n)}`;
+    const answerDisplay = `1/${a}${sup(n)}`;
 
-    // For numbers, calculate actual value
-    let answerDisplay, options;
+    let options;
     if (typeof a === 'number') {
-        const value = 1 / Math.pow(a, n);
-        answerDisplay = `1/${a}${sup(n)}`;
         options = [`1/${a}${sup(n)}`, `${a}${sup(n)}`, `-${a}${sup(n)}`, `${-a}${sup(n)}`];
     } else {
-        answerDisplay = `1/${a}${sup(n)}`;
         options = [`1/${a}${sup(n)}`, `${a}${sup(n)}`, `-${a}${sup(n)}`, `-1/${a}${sup(n)}`];
     }
 
     return {
         type: 'negative',
-        questionType: 'Від\'ємний показник',
+        questionType: "Від'ємний показник",
         text: display,
-        ruleHint: 'a⁻ⁿ = 1/aⁿ',
+        formula: 'a⁻ⁿ = 1/aⁿ',
         answer: answerDisplay,
         options: options,
-        hint: `Від'ємний показник означає обернене число:
-${a}${sup(-n)} = 1/${a}${sup(n)}`
+        hint: `Від'ємний показник означає обернене число:\n${a}${sup(-n)} = 1/${a}${sup(n)}`
     };
 }
 
@@ -244,16 +285,15 @@ function generateProduct() {
         type: 'product',
         questionType: 'Степінь добутку',
         text: display,
-        ruleHint: '(ab)ⁿ = aⁿbⁿ',
+        formula: '(ab)ⁿ = aⁿbⁿ',
         answer: answer,
         options: [
             `${a}${sup(n)}${b}${sup(n)}`,
             `${a}${sup(n)}${b}`,
             `${a}${b}${sup(n)}`,
-            `(${a}${b})${sup(n)}`
+            `(${a}${b})${sup(n + 1)}`
         ],
-        hint: `Степінь добутку дорівнює добутку степенів:
-(${a}${b})${sup(n)} = ${a}${sup(n)} × ${b}${sup(n)} = ${a}${sup(n)}${b}${sup(n)}`
+        hint: `Степінь добутку дорівнює добутку степенів:\n(${a}${b})${sup(n)} = ${a}${sup(n)} × ${b}${sup(n)} = ${a}${sup(n)}${b}${sup(n)}`
     };
 }
 
@@ -270,16 +310,15 @@ function generateFraction() {
         type: 'fraction',
         questionType: 'Степінь дробу',
         text: display,
-        ruleHint: '(a/b)ⁿ = aⁿ/bⁿ',
+        formula: '(a/b)ⁿ = aⁿ/bⁿ',
         answer: answer,
         options: [
             `${a}${sup(n)}/${b}${sup(n)}`,
             `${a}/${b}${sup(n)}`,
             `${a}${sup(n)}/${b}`,
-            `(${a}/${b})${sup(n)}`
+            `${a}${sup(n)}${b}${sup(n)}`
         ],
-        hint: `Степінь дробу дорівнює дробу степенів:
-(${a}/${b})${sup(n)} = ${a}${sup(n)}/${b}${sup(n)}`
+        hint: `Степінь дробу дорівнює дробу степенів:\n(${a}/${b})${sup(n)} = ${a}${sup(n)}/${b}${sup(n)}`
     };
 }
 
@@ -315,6 +354,24 @@ function generateExpression() {
             answer: `a${sup(3)}`,
             options: [`a${sup(3)}`, `a${sup(7)}`, `a${sup(-10)}`, `a${sup(-3)}`],
             hint: `a⁵ × a⁻² = a⁵⁺⁽⁻²⁾ = a³`
+        },
+        {
+            text: `(2${sup(3)})${sup(2)} × 2${sup(-4)}`,
+            answer: `2${sup(2)}`,
+            options: [`2${sup(2)}`, `2${sup(10)}`, `2${sup(1)}`, `2${sup(0)}`],
+            hint: `(2³)² = 2⁶\n2⁶ × 2⁻⁴ = 2²`
+        },
+        {
+            text: `4${sup(2)} ÷ 2${sup(3)}`,
+            answer: '2',
+            options: ['2', '4', '8', '1'],
+            hint: `4² = 16\n2³ = 8\n16 ÷ 8 = 2`
+        },
+        {
+            text: `(ab)${sup(3)} ÷ a${sup(3)}`,
+            answer: `b${sup(3)}`,
+            options: [`b${sup(3)}`, `ab`, `(ab)${sup(3)}`, `a${sup(3)}b${sup(3)}`],
+            hint: `(ab)³ = a³b³\na³b³ ÷ a³ = b³`
         }
     ];
 
@@ -323,7 +380,7 @@ function generateExpression() {
         type: 'expression',
         questionType: 'Спрости вираз',
         text: expr.text,
-        ruleHint: 'Застосуй правила степенів',
+        formula: 'Комбінація правил',
         answer: expr.answer,
         options: expr.options,
         hint: expr.hint
@@ -334,8 +391,8 @@ function displayQuestion() {
     const q = state.currentQuestion;
 
     document.getElementById('questionType').textContent = q.questionType;
+    document.getElementById('questionNumber').textContent = `Питання ${state.questionsAnswered + 1} / ${state.totalQuestions}`;
     document.getElementById('questionText').innerHTML = q.text;
-    document.getElementById('ruleHint').textContent = q.ruleHint;
 
     const answersDiv = document.getElementById('answers');
     answersDiv.innerHTML = '';
@@ -353,127 +410,172 @@ function displayQuestion() {
 }
 
 function checkAnswer(selected) {
+    if (state.answered) return;
+    state.answered = true;
+
     const q = state.currentQuestion;
     const isCorrect = selected === q.answer;
 
-    // Disable all buttons
+    // Disable all buttons and highlight
     document.querySelectorAll('.btn-answer').forEach(btn => {
         btn.disabled = true;
         if (btn.innerHTML === q.answer) btn.classList.add('correct');
         else if (btn.innerHTML === selected && !isCorrect) btn.classList.add('wrong');
     });
 
+    // Update state
     if (isCorrect) {
         state.correct++;
-        state.streak++;
-        if (state.streak > state.maxStreak) state.maxStreak = state.streak;
-        showFeedback(true);
     } else {
         state.wrong++;
-        state.streak = 0;
-        showFeedback(false);
     }
 
+    // Update UI
     document.getElementById('correct').textContent = state.correct;
     document.getElementById('wrong').textContent = state.wrong;
-    document.getElementById('streak').textContent = state.streak;
 
     state.questionsAnswered++;
     document.getElementById('progressFill').style.width = `${(state.questionsAnswered / state.totalQuestions) * 100}%`;
 
-    setTimeout(nextQuestion, isCorrect ? 1000 : 2000);
+    // Show feedback
+    showFeedback(isCorrect);
+
+    // Show next button or auto-advance
+    if (state.questionsAnswered < state.totalQuestions) {
+        document.getElementById('nextBtn').style.display = 'block';
+    } else {
+        setTimeout(showResults, 1500);
+    }
 }
 
 function showFeedback(isCorrect) {
     const feedback = document.getElementById('feedback');
     if (isCorrect) {
-        feedback.textContent = randomChoice(['Правильно! 🎉', 'Вірно! ✅', 'Молодець! ✨']);
-        feedback.className = 'feedback show correct';
+        feedback.innerHTML = randomChoice(['Правильно! ✅', 'Вірно! 🎉', 'Молодець! ⭐']);
+        feedback.className = 'feedback-container feedback-correct show';
     } else {
-        feedback.textContent = `Відповідь: ${state.currentQuestion.answer}`;
-        feedback.className = 'feedback show wrong';
+        feedback.innerHTML = `Відповідь: ${state.currentQuestion.answer}`;
+        feedback.className = 'feedback-container feedback-wrong show';
     }
 }
 
-async function showHint() {
-    if (state.hintUsed) return;
-    state.hintUsed = true;
+// Help functions
+function showHint() {
+    const q = state.currentQuestion;
+    if (!q) return;
 
-    const hintBtn = document.getElementById('hintBtn');
-    const hintContainer = document.getElementById('hintContainer');
-    const hintLoading = document.getElementById('hintLoading');
-    const hintText = document.getElementById('hintText');
+    showAIModal('💡 Підказка', q.hint);
+    document.getElementById('hintBtn').disabled = true;
+}
 
-    hintBtn.disabled = true;
-    hintContainer.classList.add('show');
-    hintLoading.classList.remove('hidden');
-    hintText.innerHTML = '';
+function showAIHelp() {
+    const q = state.currentQuestion;
+    if (!q) return;
 
-    if (window.AIHints) {
-        const result = await window.AIHints.getHint('powers', state.currentQuestion.text, state.level);
-        hintLoading.classList.add('hidden');
-        const hintContent = result.hint || state.currentQuestion.hint;
-        hintText.innerHTML = hintContent;
-        // Render LaTeX if available
-        if (window.renderMathInElement) {
-            renderMathInElement(hintText, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false},
-                    {left: '\\(', right: '\\)', display: false},
-                    {left: '\\[', right: '\\]', display: true}
-                ],
-                throwOnError: false
-            });
-        }
-    } else {
-        hintLoading.classList.add('hidden');
-        hintText.innerHTML = state.currentQuestion.hint;
-    }
+    const explanation = `${q.hint}\n\n📐 Формула: ${q.formula}`;
+    showAIModal('🤖 Допомога ШІ', explanation);
+    document.getElementById('aiHelpBtn').disabled = true;
+}
+
+function showFormula() {
+    const q = state.currentQuestion;
+    if (!q) return;
+
+    showAIModal('📐 Формула', q.formula);
+    document.getElementById('formulaBtn').disabled = true;
+}
+
+function showAIModal(title, content) {
+    const modal = document.getElementById('aiHelperModal');
+    const titleEl = modal.querySelector('.ai-modal-title');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    titleEl.innerHTML = `<span>${title.split(' ')[0]}</span><span>${title.split(' ').slice(1).join(' ')}</span>`;
+    loading.style.display = 'none';
+    response.innerHTML = content.replace(/\n/g, '<br>');
+    modal.classList.remove('hidden');
+}
+
+function closeAIModal() {
+    document.getElementById('aiHelperModal').classList.add('hidden');
 }
 
 function showResults() {
     const accuracy = state.correct + state.wrong > 0
         ? Math.round((state.correct / (state.correct + state.wrong)) * 100) : 0;
+    const timeSpent = Math.round((Date.now() - state.startTime) / 1000);
 
     document.getElementById('finalCorrect').textContent = state.correct;
     document.getElementById('finalWrong').textContent = state.wrong;
     document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
 
+    // Set result icon and title
+    const icon = document.getElementById('resultIcon');
     const title = document.getElementById('resultTitle');
-    if (accuracy >= 90) title.textContent = '🏆 Бездоганно!';
-    else if (accuracy >= 70) title.textContent = '🎉 Чудово!';
-    else if (accuracy >= 50) title.textContent = '👍 Непогано!';
-    else title.textContent = '📚 Потрібно повторити';
 
-    document.getElementById('nextLevelBtn').style.display = state.level < 3 ? 'block' : 'none';
-
-    if (window.Progress) {
-        window.Progress.saveSession('powers', {
-            level: state.level, correct: state.correct, wrong: state.wrong,
-            streak: state.maxStreak, accuracy, completed: accuracy >= 70
-        });
+    if (accuracy >= 90) {
+        icon.textContent = '🏆';
+        title.textContent = 'Бездоганно!';
+    } else if (accuracy >= 70) {
+        icon.textContent = '🎉';
+        title.textContent = 'Чудово!';
+    } else if (accuracy >= 50) {
+        icon.textContent = '👍';
+        title.textContent = 'Непогано!';
+    } else {
+        icon.textContent = '📚';
+        title.textContent = 'Потрібно повторити';
     }
 
+    // Save to Firebase
+    saveToFirebase(accuracy, timeSpent);
+
     showScreen('result');
+}
+
+async function saveToFirebase(accuracy, timeSpent) {
+    if (window.MathQuestFirebase) {
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'powers',
+                trainerName: `Степені: ${TOPIC_NAMES[state.topic]}`,
+                score: state.correct,
+                totalQuestions: state.totalQuestions,
+                timeSpent: timeSpent,
+                difficulty: state.topic
+            });
+            console.log('✅ Session saved to Firebase');
+        } catch (error) {
+            console.error('❌ Firebase save error:', error);
+        }
+    }
 }
 
 // Helpers
 function sup(n) { return `<sup>${n}</sup>`; }
 function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
 function shuffleArray(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
 }
+
 function generateOptions(correct, min, max, distractors) {
     const options = new Set([correct]);
-    distractors.forEach(d => { if (d >= min && d <= max && d !== correct) options.add(d); });
+    distractors.forEach(d => {
+        if (d >= min && d <= max && d !== correct && Number.isInteger(d)) {
+            options.add(d);
+        }
+    });
     while (options.size < 4) {
         const r = randomInt(min, max);
         if (r !== correct) options.add(r);
     }
     return Array.from(options).slice(0, 4);
 }
+
+console.log('⚡ Powers Trainer loaded');

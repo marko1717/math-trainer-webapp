@@ -634,7 +634,28 @@ function generateQuestion() {
 }
 
 function shuffleArray(array) {
-    const arr = [...array];
+    // Remove duplicates first
+    const unique = [...new Set(array)];
+
+    // If we lost options due to duplicates, generate replacements
+    while (unique.length < 4) {
+        // Add a random variation that doesn't exist
+        const base = unique[0];
+        if (typeof base === 'string' && !isNaN(parseFloat(base))) {
+            const num = parseFloat(base);
+            const variation = `${num + unique.length}`;
+            if (!unique.includes(variation)) {
+                unique.push(variation);
+            } else {
+                unique.push(`${num + unique.length + 1}`);
+            }
+        } else {
+            unique.push(`Варіант ${unique.length + 1}`);
+        }
+    }
+
+    // Shuffle
+    const arr = [...unique];
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];

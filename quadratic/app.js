@@ -116,12 +116,12 @@ function generateIncomplete() {
             topic: 'incomplete',
             question: `Розв'яжіть рівняння: ${equation}`,
             correctAnswer: `x = ±${root}`,
-            answers: [
+            answers: shuffleArray([
                 `x = ±${root}`,
                 `x = ${root}`,
                 `x = -${root}`,
                 `x = ±${root + 1}`
-            ],
+            ]),
             explanation: `${equation}\nx² = ${square}\nx = ±√${square} = ±${root}`,
             coefficients: { a, b: 0, c }
         };
@@ -139,12 +139,12 @@ function generateIncomplete() {
             topic: 'incomplete',
             question: `Розв'яжіть рівняння: ${equation}`,
             correctAnswer: `x = 0; x = ${x2}`,
-            answers: [
+            answers: shuffleArray([
                 `x = 0; x = ${x2}`,
                 `x = ${x2}`,
                 `x = 0; x = ${-x2}`,
                 `x = 0`
-            ],
+            ]),
             explanation: `${equation}\nx(x ${bSign} ${Math.abs(b)}) = 0\nx = 0 або x = ${x2}`,
             coefficients: { a, b, c: 0 }
         };

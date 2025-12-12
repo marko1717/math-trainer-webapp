@@ -1,30 +1,39 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Квадратні рівняння | НМТ Математика</title>
+    <title>Квадратні рівняння | Math Quest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-    <link rel="stylesheet" href="../shared/styles.css">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
     <script src="../shared/theme.js"></script>
-    <script src="../shared/firebase.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="header">
+        <!-- Unified Header -->
+        <header class="trainer-header">
             <div class="header-left">
                 <a href="../index.html" class="back-btn">← Меню</a>
             </div>
             <div class="header-center">
-                <h1>Квадратні рівняння</h1>
+                <h1 class="trainer-title">Квадратні рівняння</h1>
             </div>
             <div class="header-right">
                 <div class="streak-counter" id="streakCounter">
@@ -36,7 +45,9 @@
 
         <!-- Progress Bar -->
         <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
             <div class="progress-text">
                 <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
             </div>
@@ -46,28 +57,36 @@
         <main class="main-content">
             <!-- Start Screen -->
             <div class="screen active" id="startScreen">
-                <div class="start-content">
-                    <div class="start-icon">📊</div>
-                    <h2>Квадратні рівняння</h2>
-                    <p class="start-description">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📊</div>
+                    <h2 class="welcome-title">Квадратні рівняння</h2>
+                    <p class="welcome-description">
                         Навчись розв'язувати всі типи квадратних рівнянь
                     </p>
-                    <div class="topics-preview">
-                        <div class="topic-item">
+                    <div class="topic-grid">
+                        <div class="topic-btn" style="pointer-events: none;">
                             <span class="topic-icon">1️⃣</span>
-                            <span>Неповні квадратні рівняння</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Неповні рівняння</span>
+                            </div>
                         </div>
-                        <div class="topic-item">
+                        <div class="topic-btn" style="pointer-events: none;">
                             <span class="topic-icon">2️⃣</span>
-                            <span>Дискримінант та корені</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Дискримінант</span>
+                            </div>
                         </div>
-                        <div class="topic-item">
+                        <div class="topic-btn" style="pointer-events: none;">
                             <span class="topic-icon">3️⃣</span>
-                            <span>Теорема Вієта</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Теорема Вієта</span>
+                            </div>
                         </div>
-                        <div class="topic-item">
+                        <div class="topic-btn" style="pointer-events: none;">
                             <span class="topic-icon">4️⃣</span>
-                            <span>Розклад на множники</span>
+                            <div class="topic-info">
+                                <span class="topic-name">Розклад на множники</span>
+                            </div>
                         </div>
                     </div>
                     <button class="btn btn-primary btn-large" id="startBtn">
@@ -78,9 +97,9 @@
 
             <!-- Topic Selection Screen -->
             <div class="screen" id="topicScreen">
-                <div class="topic-selection">
-                    <h2>🎯 Оберіть тему</h2>
-                    <p class="topic-subtitle">Що хочеш потренувати?</p>
+                <div class="welcome-screen">
+                    <h2 class="welcome-title">🎯 Оберіть тему</h2>
+                    <p class="welcome-description">Що хочеш потренувати?</p>
 
                     <div class="topic-grid">
                         <button class="topic-btn" data-topic="incomplete">
@@ -118,7 +137,7 @@
                                 <span class="topic-desc">За коренями знайти b, c</span>
                             </div>
                         </button>
-                        <button class="topic-btn topic-btn-mixed" data-topic="mixed">
+                        <button class="topic-btn" data-topic="mixed" style="background: linear-gradient(135deg, var(--accent), var(--primary)); color: white;">
                             <span class="topic-icon">🎲</span>
                             <div class="topic-info">
                                 <span class="topic-name">Мікс</span>
@@ -144,11 +163,9 @@
 
                     <div class="topic-badge" id="topicBadge">Неповні рівняння</div>
 
-                    <div class="question-card">
-                        <div class="question-number" id="questionNumber">Питання 1</div>
-                        <div class="question-text" id="questionText">
-                            Розв'яжіть рівняння: x² - 9 = 0
-                        </div>
+                    <div class="question-number" id="questionNumber">Питання 1</div>
+                    <div class="question-text" id="questionText">
+                        Розв'яжіть рівняння: x² - 9 = 0
                     </div>
 
                     <div class="answers-container" id="answersContainer">
@@ -159,6 +176,22 @@
                         <div class="feedback-icon" id="feedbackIcon"></div>
                         <div class="feedback-text" id="feedbackText"></div>
                         <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel" id="helpPanel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>Допомога ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Формула</span>
+                        </button>
                     </div>
                 </div>
 
@@ -171,7 +204,7 @@
             <div class="screen" id="resultsScreen">
                 <div class="results-content">
                     <div class="results-icon" id="resultsIcon">🎉</div>
-                    <h2 id="resultsTitle">Чудова робота!</h2>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
 
                     <div class="results-stats">
                         <div class="stat-card">
@@ -213,10 +246,10 @@
 
             <!-- Theory Reference Screen -->
             <div class="screen" id="theoryScreen">
-                <div class="theory-content">
+                <div class="formulas-content">
                     <h2>Теорія квадратних рівнянь</h2>
 
-                    <div class="theory-category">
+                    <div class="formula-category">
                         <h3>📌 Загальний вигляд</h3>
                         <div class="theory-card">
                             <div class="formula-main">ax² + bx + c = 0</div>
@@ -224,59 +257,47 @@
                         </div>
                     </div>
 
-                    <div class="theory-category">
+                    <div class="formula-category">
                         <h3>1️⃣ Неповні квадратні рівняння</h3>
                         <div class="theory-card">
                             <div class="formula-main">ax² + c = 0</div>
-                            <div class="formula-example">x² = -c/a → x = ±√(-c/a)</div>
+                            <div class="formula-note">x² = -c/a → x = ±√(-c/a)</div>
                         </div>
                         <div class="theory-card">
                             <div class="formula-main">ax² + bx = 0</div>
-                            <div class="formula-example">x(ax + b) = 0 → x = 0 або x = -b/a</div>
-                        </div>
-                        <div class="theory-card">
-                            <div class="formula-main">ax² = 0</div>
-                            <div class="formula-example">x = 0 (один корінь)</div>
+                            <div class="formula-note">x(ax + b) = 0 → x = 0 або x = -b/a</div>
                         </div>
                     </div>
 
-                    <div class="theory-category">
+                    <div class="formula-category">
                         <h3>2️⃣ Дискримінант</h3>
                         <div class="theory-card">
                             <div class="formula-main">D = b² - 4ac</div>
-                            <div class="formula-example">
-                                D > 0 → два корені<br>
-                                D = 0 → один корінь<br>
-                                D < 0 → коренів немає
-                            </div>
+                            <div class="formula-note">D > 0 → два корені | D = 0 → один | D < 0 → немає</div>
                         </div>
                         <div class="theory-card">
                             <div class="formula-main">x = (-b ± √D) / 2a</div>
-                            <div class="formula-example">Формула коренів квадратного рівняння</div>
+                            <div class="formula-note">Формула коренів</div>
                         </div>
                     </div>
 
-                    <div class="theory-category">
+                    <div class="formula-category">
                         <h3>3️⃣ Теорема Вієта</h3>
                         <div class="theory-card">
                             <div class="formula-main">x₁ + x₂ = -b/a</div>
-                            <div class="formula-example">Сума коренів</div>
+                            <div class="formula-note">Сума коренів</div>
                         </div>
                         <div class="theory-card">
                             <div class="formula-main">x₁ · x₂ = c/a</div>
-                            <div class="formula-example">Добуток коренів</div>
-                        </div>
-                        <div class="theory-card vieta-special">
-                            <div class="formula-note">Для зведеного рівняння x² + px + q = 0:</div>
-                            <div class="formula-main">x₁ + x₂ = -p, x₁ · x₂ = q</div>
+                            <div class="formula-note">Добуток коренів</div>
                         </div>
                     </div>
 
-                    <div class="theory-category">
+                    <div class="formula-category">
                         <h3>4️⃣ Розклад на множники</h3>
                         <div class="theory-card">
                             <div class="formula-main">ax² + bx + c = a(x - x₁)(x - x₂)</div>
-                            <div class="formula-example">Приклад: x² - 5x + 6 = (x - 2)(x - 3)</div>
+                            <div class="formula-note">Приклад: x² - 5x + 6 = (x - 2)(x - 3)</div>
                         </div>
                     </div>
 
@@ -288,6 +309,31 @@
         </main>
     </div>
 
+    <!-- AI Helper Modal -->
+    <div id="aiHelperModal" class="ai-modal hidden">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">
+                    <span>🤖</span>
+                    <span>Допомога ШІ</span>
+                </div>
+                <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="ai-loading-spinner"></div>
+                    <span>Думаю...</span>
+                </div>
+                <div class="ai-response" id="aiResponse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared components -->
+    <script src="../shared/components/ai-helper.js"></script>
+    <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
     <script src="app.js"></script>
 </body>
 </html>

@@ -1,123 +1,176 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Степені</title>
+    <title>Степені | Math Quest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-    <link rel="stylesheet" href="../shared/styles.css">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
     <script src="../shared/theme.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Start Screen -->
-        <div id="startScreen" class="screen active">
-            <a href="../index.html" class="back-link">← На головну</a>
-            <h1>⚡ Степені</h1>
-            <p class="subtitle">Властивості степенів для чисел і виразів</p>
-
-            <div class="theory-box">
-                <h3>📖 Основні правила</h3>
-                <div class="rules-grid">
-                    <div class="rule">aⁿ × aᵐ = aⁿ⁺ᵐ</div>
-                    <div class="rule">aⁿ ÷ aᵐ = aⁿ⁻ᵐ</div>
-                    <div class="rule">(aⁿ)ᵐ = aⁿᵐ</div>
-                    <div class="rule">(ab)ⁿ = aⁿbⁿ</div>
-                    <div class="rule">a⁰ = 1</div>
-                    <div class="rule">a⁻ⁿ = 1/aⁿ</div>
+    <div class="app-container">
+        <!-- Unified Header -->
+        <header class="trainer-header">
+            <div class="header-left">
+                <a href="../index.html" class="back-btn">← Меню</a>
+            </div>
+            <div class="header-center">
+                <h1 class="trainer-title">Степені</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streak">0</span>
                 </div>
             </div>
+        </header>
 
-            <div class="level-select">
-                <h3>Обери рівень:</h3>
-                <button class="btn btn-level" data-level="1">
-                    <span class="level-icon">🌱</span>
-                    <div class="level-info">
-                        <span class="level-name">Легкий</span>
-                        <span class="level-desc">Числові степені, прості правила</span>
-                    </div>
-                </button>
-                <button class="btn btn-level" data-level="2">
-                    <span class="level-icon">🌿</span>
-                    <div class="level-info">
-                        <span class="level-name">Середній</span>
-                        <span class="level-desc">Від'ємні показники, вирази</span>
-                    </div>
-                </button>
-                <button class="btn btn-level" data-level="3">
-                    <span class="level-icon">🌳</span>
-                    <div class="level-info">
-                        <span class="level-name">Складний</span>
-                        <span class="level-desc">Дробові показники, складні вирази</span>
-                    </div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Game Screen -->
-        <div id="gameScreen" class="screen">
-            <a href="../index.html" class="back-link">← На головну</a>
-            <div class="header">
-                <div class="stats">
-                    <span class="stat">✅ <span id="correct">0</span></span>
-                    <span class="stat">❌ <span id="wrong">0</span></span>
-                    <span class="stat">🔥 <span id="streak">0</span></span>
-                </div>
-                <div class="level-badge">Рівень <span id="currentLevel">1</span></div>
-            </div>
-
+        <!-- Progress Bar (hidden on start) -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
             <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
             </div>
-
-            <div class="question-card">
-                <div class="question-type" id="questionType"></div>
-                <div class="question-text" id="questionText"></div>
-                <div class="rule-hint" id="ruleHint"></div>
+            <div class="progress-text">
+                <span id="correct">0</span> / <span id="totalQuestions">10</span> правильно
             </div>
-
-            <div class="answers" id="answers"></div>
-
-            <button class="btn btn-hint" id="hintBtn">💡 Підказка від ШІ</button>
-            <div class="hint-container" id="hintContainer">
-                <div class="hint-loading" id="hintLoading">Думаю...</div>
-                <div class="hint-text" id="hintText"></div>
-            </div>
-
-            <div class="feedback" id="feedback"></div>
         </div>
 
-        <!-- Result Screen -->
-        <div id="resultScreen" class="screen">
-            <h2 id="resultTitle">🎉 Результат</h2>
-            <div class="result-stats">
-                <div class="result-stat">
-                    <span class="result-value" id="finalCorrect">0</span>
-                    <span class="result-label">Правильно</span>
-                </div>
-                <div class="result-stat">
-                    <span class="result-value" id="finalWrong">0</span>
-                    <span class="result-label">Помилок</span>
-                </div>
-                <div class="result-stat">
-                    <span class="result-value" id="finalAccuracy">0%</span>
-                    <span class="result-label">Точність</span>
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div id="startScreen" class="screen active">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">⚡</div>
+                    <h2 class="welcome-title">Степені</h2>
+                    <p class="welcome-description">Властивості степенів для чисел і виразів</p>
+
+                    <div class="theory-preview" style="margin-bottom: 1.5rem;">
+                        <div class="theory-card">
+                            <div class="formula-main">aⁿ × aᵐ = aⁿ⁺ᵐ</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">(aⁿ)ᵐ = aⁿᵐ</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">a⁻ⁿ = 1/aⁿ</div>
+                        </div>
+                    </div>
+
+                    <div class="level-grid">
+                        <button class="level-btn" data-level="1">
+                            <div class="level-number">🌱</div>
+                            <div class="level-name">Легкий</div>
+                        </button>
+                        <button class="level-btn" data-level="2">
+                            <div class="level-number">🌿</div>
+                            <div class="level-name">Середній</div>
+                        </button>
+                        <button class="level-btn" data-level="3">
+                            <div class="level-number">🌳</div>
+                            <div class="level-name">Складний</div>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="result-actions">
-                <button class="btn btn-primary" id="nextLevelBtn">⬆️ Наступний рівень</button>
-                <button class="btn btn-secondary" id="restartBtn">🔄 Ще раз</button>
-                <button class="btn btn-secondary" id="menuBtn">📚 Меню</button>
+
+            <!-- Game Screen -->
+            <div id="gameScreen" class="screen">
+                <div class="question-container">
+                    <div class="topic-badge" id="questionType">Множення степенів</div>
+                    <div class="question-number" id="questionNumber">Питання 1</div>
+                    <div class="question-text" id="questionText"></div>
+
+                    <div class="answers-container" id="answers"></div>
+
+                    <div class="feedback-container" id="feedback"></div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>Допомога ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Формула</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
+                    Далі →
+                </button>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="resultScreen" class="screen">
+                <div class="results-content">
+                    <div class="results-icon" id="resultIcon">🎉</div>
+                    <h2 class="results-title" id="resultTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="finalCorrect">0</div>
+                            <div class="stat-label">Правильно</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="finalWrong">0</div>
+                            <div class="stat-label">Помилок</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="finalAccuracy">0%</div>
+                            <div class="stat-label">Точність</div>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-large" id="nextLevelBtn">⬆️ Наступний рівень</button>
+                        <button class="btn btn-secondary" id="restartBtn">🔄 Ще раз</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Helper Modal -->
+    <div id="aiHelperModal" class="ai-modal hidden">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">
+                    <span>🤖</span>
+                    <span>Допомога ШІ</span>
+                </div>
+                <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="ai-loading-spinner"></div>
+                    <span>Думаю...</span>
+                </div>
+                <div class="ai-response" id="aiResponse"></div>
             </div>
         </div>
     </div>
 
     <script src="../shared/ai-hints.js"></script>
     <script src="../shared/progress.js"></script>
+    <script src="../shared/firebase.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

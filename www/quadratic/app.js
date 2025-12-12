@@ -784,6 +784,17 @@ document.addEventListener('DOMContentLoaded', () => {
         showScreen('resultsScreen');
     });
 
+    // Help panel buttons
+    document.getElementById('hintBtn')?.addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn')?.addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn')?.addEventListener('click', showFormulaHelp);
+
+    // AI modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
+    });
+
     // Render math when KaTeX is loaded
     if (typeof renderMathInElement !== 'undefined') {
         renderMath(document.body);
@@ -791,3 +802,71 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => renderMath(document.body), 100);
     }
 });
+
+// === Help Panel Functions ===
+function showHint() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    const topicHints = {
+        incomplete: 'Винеси x за дужки або перенеси c на іншу сторону та візьми корінь.',
+        discriminant: 'Обчисли D = b² - 4ac, потім використай формулу коренів.',
+        vieta: 'Сума коренів = -b/a, Добуток коренів = c/a',
+        factorization: 'Розклад: a(x - x₁)(x - x₂), де x₁, x₂ - корені',
+        findCoefficients: 'Використай теорему Вієта: b = -a(x₁+x₂), c = a·x₁·x₂'
+    };
+
+    const hint = topicHints[state.selectedTopic] || 'Пригадай формули для квадратних рівнянь.';
+
+    response.innerHTML = `
+        <p><strong>💡 Підказка:</strong></p>
+        <p>${hint}</p>
+    `;
+}
+
+function showAIHelp() {
+    showHint();
+}
+
+function showFormulaHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    response.innerHTML = `
+        <h3 style="color: var(--accent); margin-bottom: 1rem;">📐 Квадратні рівняння</h3>
+        <div style="margin-bottom: 1rem;">
+            <p><strong>ax² + bx + c = 0</strong></p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Загальний вигляд</p>
+        </div>
+        <div style="margin-bottom: 1rem;">
+            <p><strong>D = b² - 4ac</strong></p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Дискримінант</p>
+        </div>
+        <div style="margin-bottom: 1rem;">
+            <p><strong>x = (-b ± √D) / 2a</strong></p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Формула коренів</p>
+        </div>
+        <div style="margin-bottom: 1rem;">
+            <p><strong>x₁ + x₂ = -b/a</strong></p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Сума коренів (Вієта)</p>
+        </div>
+        <div>
+            <p><strong>x₁ · x₂ = c/a</strong></p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Добуток коренів (Вієта)</p>
+        </div>
+    `;
+}
+
+function closeAIModal() {
+    document.getElementById('aiHelperModal')?.classList.add('hidden');
+}

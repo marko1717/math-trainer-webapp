@@ -197,8 +197,8 @@ async function saveTrainerSession(trainerData) {
 
     // Session data
     const session = {
-        oderId: currentUser.uid,
-        oderemail: currentUser.email,
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
         trainerId: trainerData.trainerId,
         trainerName: trainerData.trainerName,
         score: trainerData.score,
@@ -346,24 +346,46 @@ async function getRecentSessions(limitCount = 10) {
     const { collection, query, where, orderBy, limit, getDocs } = window.firebaseDb;
 
     const sessionsRef = collection(db, 'sessions');
-    const q = query(
-        sessionsRef,
-        where('userId', '==', currentUser.uid),
-        orderBy('completedAt', 'desc'),
-        limit(limitCount)
-    );
 
-    const sessionsSnap = await getDocs(q);
+    let sessions = [];
 
-    const sessions = [];
-    sessionsSnap.forEach((doc) => {
-        const data = doc.data();
-        sessions.push({
-            id: doc.id,
-            ...data,
-            completedAt: data.completedAt?.toDate() || new Date()
+    try {
+        // Try with orderBy (requires composite index)
+        const q = query(
+            sessionsRef,
+            where('userId', '==', currentUser.uid),
+            orderBy('completedAt', 'desc'),
+            limit(limitCount)
+        );
+        const sessionsSnap = await getDocs(q);
+        sessionsSnap.forEach((doc) => {
+            const data = doc.data();
+            sessions.push({
+                id: doc.id,
+                ...data,
+                completedAt: data.completedAt?.toDate() || new Date()
+            });
         });
-    });
+    } catch (error) {
+        // Fallback: query without orderBy, sort on client
+        console.log('Index not ready, using fallback query');
+        const q = query(
+            sessionsRef,
+            where('userId', '==', currentUser.uid)
+        );
+        const sessionsSnap = await getDocs(q);
+        sessionsSnap.forEach((doc) => {
+            const data = doc.data();
+            sessions.push({
+                id: doc.id,
+                ...data,
+                completedAt: data.completedAt?.toDate() || new Date()
+            });
+        });
+        // Sort on client side
+        sessions.sort((a, b) => b.completedAt - a.completedAt);
+        sessions = sessions.slice(0, limitCount);
+    }
 
     return sessions;
 }

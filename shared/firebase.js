@@ -260,7 +260,7 @@ async function updateTrainerProgress(trainerData) {
 async function updateUserStatsAfterSession(trainerData) {
     if (!currentUser) return;
 
-    const { doc, getDoc, setDoc, serverTimestamp } = window.firebaseDb;
+    const { doc, getDoc, setDoc } = window.firebaseDb;
 
     const userRef = doc(db, 'users', currentUser.uid);
     const userSnap = await getDoc(userRef);
@@ -280,31 +280,33 @@ async function updateUserStatsAfterSession(trainerData) {
     const newTotalXP = (stats.totalXP || 0) + earnedXP;
     const newLevel = Math.floor(newTotalXP / 100) + 1;
 
-    // Calculate streak
-    const today = new Date().toDateString();
+    // Calculate streak (using ISO date string for comparison)
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     const lastActivity = stats.lastActivityDate;
     let newStreak = stats.streak || 0;
 
     if (lastActivity !== today) {
-        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
         if (lastActivity === yesterday) {
             newStreak += 1;
-        } else if (lastActivity !== today) {
+        } else {
+            // Either first activity ever or streak broken
             newStreak = 1;
         }
     }
 
-    await setDoc(userRef, {
-        stats: {
-            totalXP: newTotalXP,
-            level: newLevel,
-            streak: newStreak,
-            lastActivityDate: today,
-            totalTimeSpent: (stats.totalTimeSpent || 0) + (trainerData.timeSpent || 0),
-            trainersCompleted: (stats.trainersCompleted || 0) + 1
-        }
-    }, { merge: true });
+    const updatedStats = {
+        totalXP: newTotalXP,
+        level: newLevel,
+        streak: newStreak,
+        lastActivityDate: today,
+        totalTimeSpent: (stats.totalTimeSpent || 0) + (trainerData.timeSpent || 0),
+        trainersCompleted: (stats.trainersCompleted || 0) + 1
+    };
 
+    await setDoc(userRef, { stats: updatedStats }, { merge: true });
+
+    console.log('📊 Stats updated:', updatedStats);
     return { earnedXP, newLevel, newStreak };
 }
 
@@ -452,5 +454,25 @@ window.MathQuestFirebase = {
     // Sync
     syncOfflineSessions
 };
+
+// Auto-initialize Firebase and restore auth state
+(async function autoInit() {
+    try {
+        await initFirebase();
+
+        // Listen to auth state changes to restore currentUser
+        const { onAuthStateChanged } = window.firebaseAuth;
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                console.log('✅ User restored:', user.displayName || user.email);
+            } else {
+                console.log('ℹ️ No user logged in');
+            }
+        });
+    } catch (error) {
+        console.error('Auto-init error:', error);
+    }
+})();
 
 console.log('📦 MathQuestFirebase module loaded');

@@ -133,30 +133,30 @@ function drawTriangle(canvas, data) {
     // Draw side labels and values
     ctx.font = '13px Inter, sans-serif';
 
-    // Side a (opposite to A, BC - hypotenuse)
-    if (data.labels?.c !== undefined) {
-        const midBC = { x: (B.x + C.x) / 2 + 15, y: (B.y + C.y) / 2 };
-        ctx.fillStyle = data.highlight?.includes('c') ? accentColor : textColor;
-        ctx.fillText(data.labels.c, midBC.x, midBC.y);
-    }
-
-    // Side b (AC - vertical leg)
-    if (data.labels?.b !== undefined) {
-        const midAC = { x: A.x - 25, y: (A.y + C.y) / 2 };
-        ctx.fillStyle = data.highlight?.includes('b') ? accentColor : textColor;
-        ctx.fillText(data.labels.b, midAC.x, midAC.y);
-    }
-
-    // Side c (AB - horizontal leg)
-    if (data.labels?.a !== undefined) {
+    // Side a (AB - horizontal leg, bottom)
+    if (data.labels?.a !== undefined && data.labels.a !== '') {
         const midAB = { x: (A.x + B.x) / 2, y: A.y + 20 };
         ctx.fillStyle = data.highlight?.includes('a') ? accentColor : textColor;
         ctx.fillText(data.labels.a, midAB.x, midAB.y);
     }
 
-    // Draw angles
+    // Side b (AC - vertical leg, left)
+    if (data.labels?.b !== undefined && data.labels.b !== '') {
+        const midAC = { x: A.x - 25, y: (A.y + C.y) / 2 };
+        ctx.fillStyle = data.highlight?.includes('b') ? accentColor : textColor;
+        ctx.fillText(data.labels.b, midAC.x, midAC.y);
+    }
+
+    // Side c (BC - hypotenuse, diagonal)
+    if (data.labels?.c !== undefined && data.labels.c !== '') {
+        const midBC = { x: (B.x + C.x) / 2 + 15, y: (B.y + C.y) / 2 };
+        ctx.fillStyle = data.highlight?.includes('c') ? accentColor : textColor;
+        ctx.fillText(data.labels.c, midBC.x, midBC.y);
+    }
+
+    // Draw angles (only show one angle to avoid clutter)
     if (data.angles) {
-        // Angle at B
+        // Prefer to show angle at B (bottom-right corner)
         if (data.angles.B) {
             ctx.fillStyle = data.highlight?.includes('B') ? accentColor : mutedColor;
             const angleB = Math.atan2(C.y - B.y, C.x - B.x);
@@ -165,9 +165,8 @@ function drawTriangle(canvas, data) {
             ctx.stroke();
             ctx.fillText(data.angles.B, B.x - 35, B.y - 15);
         }
-
-        // Angle at C
-        if (data.angles.C) {
+        // Only show angle at C if B is not shown
+        else if (data.angles.C) {
             ctx.fillStyle = data.highlight?.includes('C') ? accentColor : mutedColor;
             const angleC = Math.atan2(A.y - C.y, A.x - C.x);
             ctx.beginPath();
@@ -266,7 +265,7 @@ function generateAngle30() {
             hint: `Катет навпроти 30° = половина гіпотенузи`,
             drawing: {
                 labels: { a: `${a}`, b: '?', c: '?' },
-                angles: { B: '30°', C: '60°' },
+                angles: { B: '30°' },
                 highlight: ['c', 'B'],
                 triangleType: '30-60-90'
             }
@@ -281,7 +280,7 @@ function generateAngle30() {
             hint: `Катет навпроти 30° = половина гіпотенузи`,
             drawing: {
                 labels: { a: '?', b: '', c: `${hyp}` },
-                angles: { B: '30°', C: '60°' },
+                angles: { B: '30°' },
                 highlight: ['a', 'B'],
                 triangleType: '30-60-90'
             }
@@ -296,7 +295,7 @@ function generateAngle30() {
             hint: `В трикутнику 30-60-90: катети відносяться як 1 : √3`,
             drawing: {
                 labels: { a: `${a}`, b: '?', c: '' },
-                angles: { B: '30°', C: '60°' },
+                angles: { C: '60°' },
                 highlight: ['b', 'C'],
                 triangleType: '30-60-90'
             }
@@ -321,7 +320,7 @@ function generateAngle45() {
             hint: `В рівнобедреному прямокутному трикутнику: c = a√2`,
             drawing: {
                 labels: { a: `${a}`, b: `${a}`, c: '?' },
-                angles: { B: '45°', C: '45°' },
+                angles: { B: '45°' },
                 highlight: ['c'],
                 triangleType: '45-45-90'
             }
@@ -336,7 +335,7 @@ function generateAngle45() {
             hint: `Катет = гіпотенуза / √2`,
             drawing: {
                 labels: { a: '?', b: '?', c: `${a}√2` },
-                angles: { B: '45°', C: '45°' },
+                angles: { B: '45°' },
                 highlight: ['a', 'b'],
                 triangleType: '45-45-90'
             }
@@ -360,7 +359,7 @@ function generateAngle60() {
         hint: `В 30-60-90: гіпотенуза = 2 × (катет навпроти 30°)`,
         drawing: {
             labels: { a: '', b: `${a}√3`, c: '?' },
-            angles: { B: '30°', C: '60°' },
+            angles: { C: '60°' },
             highlight: ['c'],
             triangleType: '30-60-90'
         }
@@ -435,7 +434,7 @@ function generateTrigFind() {
         hint: `Пригадай таблицю значень тригонометричних функцій`,
         drawing: {
             labels: { a: 'a', b: 'b', c: 'c' },
-            angles: { B: `${90 - angle}°`, C: `${angle}°` },
+            angles: { C: `${angle}°` },
             highlight: ['C'],
             triangleType: angle === 45 ? '45-45-90' : '30-60-90'
         }

@@ -1,5 +1,7 @@
-// Parity Functions Trainer
-// Types: even, odd, neither
+/* ===================================
+   MATH QUEST - PARITY TRAINER
+   Full unified version with Help Panel & Firebase
+   =================================== */
 
 const tg = window.Telegram?.WebApp;
 if (tg) {
@@ -13,17 +15,19 @@ let state = {
     correct: 0,
     wrong: 0,
     streak: 0,
+    maxStreak: 0,
     questionsAnswered: 0,
     totalQuestions: 10,
     currentQuestion: null,
-    hintUsed: false
+    hintUsed: false,
+    startTime: null
 };
 
 // DOM Elements
 const screens = {
     start: document.getElementById('startScreen'),
-    game: document.getElementById('gameScreen'),
-    result: document.getElementById('resultScreen'),
+    quiz: document.getElementById('quizScreen'),
+    results: document.getElementById('resultsScreen'),
     theory: document.getElementById('theoryScreen')
 };
 
@@ -39,8 +43,7 @@ const FUNCTIONS = {
         { formula: 'x^2 - 4', display: 'x² − 4', name: 'парабола − 4' },
         { formula: '1/(x^2)', display: '1/x²', name: 'обернена квадр.' },
         { formula: 'x^4 - x^2', display: 'x⁴ − x²', name: 'різниця степенів' },
-        { formula: 'cos(2x)', display: 'cos 2x', name: 'косинус 2x' },
-        { formula: 'x^2 * cos(x)', display: 'x² · cos x', name: 'добуток' }
+        { formula: 'cos(2x)', display: 'cos 2x', name: 'косинус 2x' }
     ],
     odd: [
         { formula: 'x', display: 'x', name: 'пряма' },
@@ -70,123 +73,81 @@ const FUNCTIONS = {
 
 // Properties for level 3
 const PROPERTIES = [
-    {
-        question: 'Сума двох парних функцій є:',
-        answer: 'even',
-        explanation: 'f(-x) + g(-x) = f(x) + g(x) → парна'
-    },
-    {
-        question: 'Сума двох непарних функцій є:',
-        answer: 'odd',
-        explanation: 'f(-x) + g(-x) = -f(x) - g(x) = -(f(x) + g(x)) → непарна'
-    },
-    {
-        question: 'Добуток двох парних функцій є:',
-        answer: 'even',
-        explanation: 'f(-x) · g(-x) = f(x) · g(x) → парна'
-    },
-    {
-        question: 'Добуток двох непарних функцій є:',
-        answer: 'even',
-        explanation: '(-f(x)) · (-g(x)) = f(x) · g(x) → парна!'
-    },
-    {
-        question: 'Добуток парної та непарної функції є:',
-        answer: 'odd',
-        explanation: 'f(-x) · g(-x) = f(x) · (-g(x)) = -f(x)g(x) → непарна'
-    },
-    {
-        question: 'Якщо f(x) парна, то f(x²) є:',
-        answer: 'even',
-        explanation: 'f((-x)²) = f(x²) → парна'
-    },
-    {
-        question: 'Якщо f(x) непарна, то [f(x)]² є:',
-        answer: 'even',
-        explanation: '[f(-x)]² = [-f(x)]² = [f(x)]² → парна'
-    },
-    {
-        question: 'Сума парної та непарної (не тотожний 0) є:',
-        answer: 'neither',
-        explanation: 'f(-x) + g(-x) = f(x) - g(x) ≠ ±(f(x) + g(x))'
-    }
+    { question: 'Сума двох парних функцій є:', answer: 'even', explanation: 'f(-x) + g(-x) = f(x) + g(x) → парна' },
+    { question: 'Сума двох непарних функцій є:', answer: 'odd', explanation: 'f(-x) + g(-x) = -f(x) - g(x) = -(f(x) + g(x)) → непарна' },
+    { question: 'Добуток двох парних функцій є:', answer: 'even', explanation: 'f(-x) · g(-x) = f(x) · g(x) → парна' },
+    { question: 'Добуток двох непарних функцій є:', answer: 'even', explanation: '(-f(x)) · (-g(x)) = f(x) · g(x) → парна!' },
+    { question: 'Добуток парної та непарної функції є:', answer: 'odd', explanation: 'f(-x) · g(-x) = f(x) · (-g(x)) = -f(x)g(x) → непарна' },
+    { question: 'Якщо f(x) парна, то f(x²) є:', answer: 'even', explanation: 'f((-x)²) = f(x²) → парна' },
+    { question: 'Якщо f(x) непарна, то [f(x)]² є:', answer: 'even', explanation: '[f(-x)]² = [-f(x)]² = [f(x)]² → парна' }
+];
+
+// Composites for level 3
+const COMPOSITES = [
+    { display: 'sin(x²)', answer: 'even', hint: 'sin((-x)²) = sin(x²) — аргумент парний' },
+    { display: 'x · cos(x)', answer: 'odd', hint: '(-x)·cos(-x) = -x·cos(x)' },
+    { display: 'x² · sin(x)', answer: 'odd', hint: '(-x)²·sin(-x) = x²·(-sin(x)) = -x²·sin(x)' },
+    { display: 'cos(x³)', answer: 'even', hint: 'cos((-x)³) = cos(-x³) = cos(x³)' },
+    { display: 'sin(x) · cos(x)', answer: 'odd', hint: 'sin(-x)·cos(-x) = -sin(x)·cos(x)' },
+    { display: 'x + sin(x)', answer: 'odd', hint: '-x + sin(-x) = -(x + sin(x))' },
+    { display: 'x² + cos(x)', answer: 'even', hint: '(-x)² + cos(-x) = x² + cos(x)' },
+    { display: '|x| · x', answer: 'odd', hint: '|-x|·(-x) = |x|·(-x) = -|x|·x' }
 ];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    initTheory();
     setupEventListeners();
 });
 
-function initTheory() {
-    // Render definitions with KaTeX
-    katex.render('f(-x) = f(x)', document.getElementById('evenDef'));
-    katex.render('f(-x) = -f(x)', document.getElementById('oddDef'));
-
-    // Fill theory lists
-    const evenList = document.getElementById('evenList');
-    const oddList = document.getElementById('oddList');
-    const neitherList = document.getElementById('neitherList');
-
-    FUNCTIONS.even.slice(0, 6).forEach(f => {
-        const li = document.createElement('li');
-        li.textContent = `f(x) = ${f.display}`;
-        evenList.appendChild(li);
-    });
-
-    FUNCTIONS.odd.slice(0, 6).forEach(f => {
-        const li = document.createElement('li');
-        li.textContent = `f(x) = ${f.display}`;
-        oddList.appendChild(li);
-    });
-
-    FUNCTIONS.neither.slice(0, 6).forEach(f => {
-        const li = document.createElement('li');
-        li.textContent = `f(x) = ${f.display}`;
-        neitherList.appendChild(li);
-    });
-
-    // Properties
-    const propList = document.getElementById('propertiesList');
-    propList.innerHTML = `
-        <p>• парна + парна = парна</p>
-        <p>• непарна + непарна = непарна</p>
-        <p>• парна × парна = парна</p>
-        <p>• непарна × непарна = парна!</p>
-        <p>• парна × непарна = непарна</p>
-    `;
-}
-
 function setupEventListeners() {
     // Level buttons
-    document.querySelectorAll('.btn-level').forEach(btn => {
+    document.querySelectorAll('.level-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             state.level = parseInt(btn.dataset.level);
             startGame();
         });
     });
 
-    // Hint button
-    document.getElementById('hintBtn').addEventListener('click', showHint);
+    // Next button
+    document.getElementById('nextBtn')?.addEventListener('click', nextQuestion);
+
+    // Help Panel buttons
+    document.getElementById('hintBtn')?.addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn')?.addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn')?.addEventListener('click', showFormulaHelp);
+
+    // AI Modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
+    });
 
     // Result buttons
-    document.getElementById('restartBtn').addEventListener('click', () => {
+    document.getElementById('nextLevelBtn')?.addEventListener('click', () => {
+        if (state.level < 3) state.level++;
         startGame();
     });
-
-    document.getElementById('menuBtn').addEventListener('click', () => {
-        showScreen('start');
-    });
-
-    // Theory back button
-    document.getElementById('backFromTheory').addEventListener('click', () => {
-        showScreen('start');
-    });
+    document.getElementById('restartBtn')?.addEventListener('click', startGame);
+    document.getElementById('theoryBtn')?.addEventListener('click', () => showScreen('theory'));
+    document.getElementById('backToQuizBtn')?.addEventListener('click', () => showScreen('results'));
 }
 
-function showScreen(screenName) {
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[screenName].classList.add('active');
+function showScreen(name) {
+    Object.values(screens).forEach(s => s?.classList.remove('active'));
+    screens[name]?.classList.add('active');
+
+    // Show/hide progress container
+    const progressContainer = document.getElementById('progressContainer');
+    if (progressContainer) {
+        progressContainer.style.display = (name === 'quiz') ? 'block' : 'none';
+    }
+}
+
+function updateDifficultyIndicator() {
+    const dots = document.querySelectorAll('.difficulty-dot');
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i < state.level);
+    });
 }
 
 function startGame() {
@@ -195,18 +156,19 @@ function startGame() {
         correct: 0,
         wrong: 0,
         streak: 0,
+        maxStreak: 0,
         questionsAnswered: 0,
-        currentQuestion: null,
-        hintUsed: false
+        hintUsed: false,
+        startTime: Date.now()
     };
 
-    document.getElementById('correct').textContent = '0';
-    document.getElementById('wrong').textContent = '0';
-    document.getElementById('streak').textContent = '0';
-    document.getElementById('currentLevel').textContent = state.level;
+    document.getElementById('correctCount').textContent = '0';
+    document.getElementById('streakNumber').textContent = '0';
     document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('totalCount').textContent = state.totalQuestions;
 
-    showScreen('game');
+    updateDifficultyIndicator();
+    showScreen('quiz');
     nextQuestion();
 }
 
@@ -217,9 +179,22 @@ function nextQuestion() {
     }
 
     state.hintUsed = false;
-    document.getElementById('hintBtn').disabled = false;
-    document.getElementById('hintContainer').style.display = 'none';
-    document.getElementById('feedback').classList.remove('show');
+
+    // Reset UI
+    const feedback = document.getElementById('feedbackContainer');
+    if (feedback) {
+        feedback.style.display = 'none';
+        document.getElementById('feedbackIcon').textContent = '';
+        document.getElementById('feedbackText').textContent = '';
+        document.getElementById('feedbackExplanation').textContent = '';
+    }
+
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.style.display = 'none';
+
+    // Hide graph by default
+    const graphContainer = document.getElementById('graphContainer');
+    if (graphContainer) graphContainer.style.display = 'none';
 
     const questionType = getQuestionType();
     state.currentQuestion = generateQuestion(questionType);
@@ -229,8 +204,8 @@ function nextQuestion() {
 
 function getQuestionType() {
     const types = {
-        1: ['identify', 'typical'],
-        2: ['identify', 'graph', 'typical'],
+        1: ['identify', 'identify', 'identify'],
+        2: ['identify', 'graph', 'graph'],
         3: ['identify', 'graph', 'property', 'composite']
     };
 
@@ -240,18 +215,11 @@ function getQuestionType() {
 
 function generateQuestion(type) {
     switch (type) {
-        case 'identify':
-            return generateIdentifyQuestion();
-        case 'typical':
-            return generateTypicalQuestion();
-        case 'graph':
-            return generateGraphQuestion();
-        case 'property':
-            return generatePropertyQuestion();
-        case 'composite':
-            return generateCompositeQuestion();
-        default:
-            return generateIdentifyQuestion();
+        case 'identify': return generateIdentifyQuestion();
+        case 'graph': return generateGraphQuestion();
+        case 'property': return generatePropertyQuestion();
+        case 'composite': return generateCompositeQuestion();
+        default: return generateIdentifyQuestion();
     }
 }
 
@@ -271,57 +239,22 @@ function generateIdentifyQuestion() {
     };
 }
 
-function generateTypicalQuestion() {
-    const questions = [
-        { q: 'Яка з цих функцій є парною?', correct: 'even' },
-        { q: 'Яка з цих функцій є непарною?', correct: 'odd' },
-        { q: 'Яка з цих функцій не є ні парною, ні непарною?', correct: 'neither' }
-    ];
-
-    const question = questions[Math.floor(Math.random() * questions.length)];
-    const options = [];
-
-    // Add correct answer
-    const correctFunc = FUNCTIONS[question.correct][Math.floor(Math.random() * FUNCTIONS[question.correct].length)];
-    options.push({ ...correctFunc, type: question.correct });
-
-    // Add other types
-    const otherTypes = ['even', 'odd', 'neither'].filter(t => t !== question.correct);
-    otherTypes.forEach(t => {
-        const func = FUNCTIONS[t][Math.floor(Math.random() * FUNCTIONS[t].length)];
-        options.push({ ...func, type: t });
-    });
-
-    // Shuffle
-    shuffleArray(options);
-
-    return {
-        type: 'choice',
-        questionType: 'Обери правильну',
-        questionHtml: question.q,
-        options: options,
-        answer: question.correct,
-        hint: `Згадай: парна f(-x)=f(x), непарна f(-x)=-f(x)`
-    };
-}
-
 function generateGraphQuestion() {
     const types = ['even', 'odd'];
     const type = types[Math.floor(Math.random() * types.length)];
 
-    // Select function for graph
     const graphFunctions = {
         even: [
-            { formula: 'x^2', display: 'x²', points: x => x * x },
-            { formula: '|x|', display: '|x|', points: x => Math.abs(x) },
-            { formula: 'cos(x)', display: 'cos x', points: x => Math.cos(x) },
-            { formula: 'x^4', display: 'x⁴', points: x => Math.pow(x, 4) }
+            { display: 'x²', points: x => x * x },
+            { display: '|x|', points: x => Math.abs(x) },
+            { display: 'cos x', points: x => Math.cos(x) },
+            { display: 'x⁴', points: x => Math.pow(x, 4) }
         ],
         odd: [
-            { formula: 'x', display: 'x', points: x => x },
-            { formula: 'x^3', display: 'x³', points: x => Math.pow(x, 3) },
-            { formula: 'sin(x)', display: 'sin x', points: x => Math.sin(x) },
-            { formula: '1/x', display: '1/x', points: x => x === 0 ? null : 1/x }
+            { display: 'x', points: x => x },
+            { display: 'x³', points: x => Math.pow(x, 3) },
+            { display: 'sin x', points: x => Math.sin(x) },
+            { display: '1/x', points: x => x === 0 ? null : 1/x }
         ]
     };
 
@@ -336,8 +269,8 @@ function generateGraphQuestion() {
         answer: type,
         showGraph: true,
         hint: type === 'even'
-            ? 'Парна: симетрична відносно осі OY (вертикальна симетрія)'
-            : 'Непарна: симетрична відносно початку координат (центральна симетрія)'
+            ? 'Парна: симетрична відносно осі OY'
+            : 'Непарна: симетрична відносно початку координат'
     };
 }
 
@@ -354,50 +287,7 @@ function generatePropertyQuestion() {
 }
 
 function generateCompositeQuestion() {
-    const composites = [
-        {
-            display: 'sin(x²)',
-            answer: 'even',
-            hint: 'sin((-x)²) = sin(x²) — аргумент парний, результат парний'
-        },
-        {
-            display: 'x · cos(x)',
-            answer: 'odd',
-            hint: '(-x)·cos(-x) = -x·cos(x) — добуток непарної та парної'
-        },
-        {
-            display: 'x² · sin(x)',
-            answer: 'odd',
-            hint: '(-x)²·sin(-x) = x²·(-sin(x)) = -x²·sin(x) — добуток парної та непарної'
-        },
-        {
-            display: 'cos(x³)',
-            answer: 'even',
-            hint: 'cos((-x)³) = cos(-x³) = cos(x³) — косинус парний!'
-        },
-        {
-            display: 'sin(x) · cos(x)',
-            answer: 'odd',
-            hint: 'sin(-x)·cos(-x) = -sin(x)·cos(x) — непарна × парна = непарна'
-        },
-        {
-            display: 'x + sin(x)',
-            answer: 'odd',
-            hint: '-x + sin(-x) = -x - sin(x) = -(x + sin(x)) — сума непарних'
-        },
-        {
-            display: 'x² + cos(x)',
-            answer: 'even',
-            hint: '(-x)² + cos(-x) = x² + cos(x) — сума парних'
-        },
-        {
-            display: '|x| · x',
-            answer: 'odd',
-            hint: '|-x|·(-x) = |x|·(-x) = -|x|·x — парна × непарна = непарна'
-        }
-    ];
-
-    const comp = composites[Math.floor(Math.random() * composites.length)];
+    const comp = COMPOSITES[Math.floor(Math.random() * COMPOSITES.length)];
 
     return {
         type: 'composite',
@@ -410,7 +300,7 @@ function generateCompositeQuestion() {
 
 function getHintForFunction(func, type) {
     const hints = {
-        even: `Підстав -x: f(-x) = ${func.display.replace(/x/g, '(-x)')} = ${func.display} = f(x) ✓`,
+        even: `Підстав -x: f(-x) = ${func.display.replace(/x/g, '(-x)')} = f(x) ✓`,
         odd: `Підстав -x: f(-x) = ${func.display.replace(/x/g, '(-x)')} = -f(x) ✓`,
         neither: `Підстав -x та порівняй з f(x) і -f(x) — не співпадає з жодним`
     };
@@ -420,8 +310,9 @@ function getHintForFunction(func, type) {
 function displayQuestion() {
     const q = state.currentQuestion;
 
-    document.getElementById('questionType').textContent = q.questionType;
-    document.getElementById('question').innerHTML = q.questionHtml;
+    document.getElementById('topicBadge').textContent = q.questionType;
+    document.getElementById('questionNumber').textContent = `Питання ${state.questionsAnswered + 1}`;
+    document.getElementById('questionText').innerHTML = q.questionHtml;
 
     // Handle graph display
     const graphContainer = document.getElementById('graphContainer');
@@ -432,36 +323,30 @@ function displayQuestion() {
         graphContainer.style.display = 'none';
     }
 
-    // Display answers
-    const answersDiv = document.getElementById('answers');
+    // Display answer buttons
+    const answersDiv = document.getElementById('answersContainer');
     answersDiv.innerHTML = '';
-    answersDiv.classList.add('three-options');
 
-    if (q.type === 'choice') {
-        // Multiple choice with function options
-        q.options.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'btn-answer';
-            btn.innerHTML = `f(x) = ${opt.display}`;
-            btn.onclick = () => checkAnswer(opt.type);
-            answersDiv.appendChild(btn);
-        });
-    } else {
-        // Standard parity choice
-        const options = [
-            { value: 'even', label: '↔️ Парна', class: 'even' },
-            { value: 'odd', label: '↩️ Непарна', class: 'odd' },
-            { value: 'neither', label: '❌ Ні парна, ні непарна', class: 'neither' }
-        ];
+    // For graph questions, only show even/odd
+    const options = q.type === 'graph'
+        ? [
+            { value: 'even', label: '↔️ Парна' },
+            { value: 'odd', label: '↩️ Непарна' }
+          ]
+        : [
+            { value: 'even', label: '↔️ Парна' },
+            { value: 'odd', label: '↩️ Непарна' },
+            { value: 'neither', label: '❌ Жодна' }
+          ];
 
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = `btn-answer ${opt.class}`;
-            btn.innerHTML = opt.label;
-            btn.onclick = () => checkAnswer(opt.value);
-            answersDiv.appendChild(btn);
-        });
-    }
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.innerHTML = opt.label;
+        btn.dataset.value = opt.value;
+        btn.onclick = () => checkAnswer(opt.value);
+        answersDiv.appendChild(btn);
+    });
 }
 
 function drawGraph(func) {
@@ -470,19 +355,25 @@ function drawGraph(func) {
     const width = canvas.width;
     const height = canvas.height;
 
+    // Get theme colors
+    const computedStyle = getComputedStyle(document.documentElement);
+    const bgColor = computedStyle.getPropertyValue('--bg-secondary').trim() || '#ffffff';
+    const gridColor = computedStyle.getPropertyValue('--border').trim() || '#e5e7eb';
+    const axisColor = computedStyle.getPropertyValue('--text-secondary').trim() || '#6b7280';
+    const graphColor = computedStyle.getPropertyValue('--primary').trim() || '#7c3aed';
+
     // Clear
-    ctx.fillStyle = '#1f2847';
+    ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, width, height);
 
-    // Grid
     const centerX = width / 2;
     const centerY = height / 2;
     const scale = 30;
 
-    ctx.strokeStyle = '#2d3a5e';
+    // Grid
+    ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1;
 
-    // Vertical grid lines
     for (let x = centerX % scale; x < width; x += scale) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -490,7 +381,6 @@ function drawGraph(func) {
         ctx.stroke();
     }
 
-    // Horizontal grid lines
     for (let y = centerY % scale; y < height; y += scale) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -499,30 +389,27 @@ function drawGraph(func) {
     }
 
     // Axes
-    ctx.strokeStyle = '#4a5a8a';
+    ctx.strokeStyle = axisColor;
     ctx.lineWidth = 2;
 
-    // X axis
     ctx.beginPath();
     ctx.moveTo(0, centerY);
     ctx.lineTo(width, centerY);
     ctx.stroke();
 
-    // Y axis
     ctx.beginPath();
     ctx.moveTo(centerX, 0);
     ctx.lineTo(centerX, height);
     ctx.stroke();
 
     // Arrow heads
-    ctx.fillStyle = '#4a5a8a';
-    // X arrow
+    ctx.fillStyle = axisColor;
     ctx.beginPath();
     ctx.moveTo(width - 10, centerY - 5);
     ctx.lineTo(width, centerY);
     ctx.lineTo(width - 10, centerY + 5);
     ctx.fill();
-    // Y arrow
+
     ctx.beginPath();
     ctx.moveTo(centerX - 5, 10);
     ctx.lineTo(centerX, 0);
@@ -530,14 +417,14 @@ function drawGraph(func) {
     ctx.fill();
 
     // Labels
-    ctx.fillStyle = '#8a9ab8';
-    ctx.font = '14px sans-serif';
+    ctx.fillStyle = axisColor;
+    ctx.font = '14px Inter, sans-serif';
     ctx.fillText('x', width - 15, centerY - 10);
     ctx.fillText('y', centerX + 10, 15);
     ctx.fillText('O', centerX + 5, centerY + 15);
 
     // Draw function
-    ctx.strokeStyle = '#6c5ce7';
+    ctx.strokeStyle = graphColor;
     ctx.lineWidth = 3;
     ctx.beginPath();
 
@@ -566,44 +453,19 @@ function drawGraph(func) {
         }
     }
     ctx.stroke();
-
-    // Draw symmetry helpers (subtle)
-    ctx.setLineDash([5, 5]);
-    ctx.strokeStyle = 'rgba(108, 92, 231, 0.3)';
-    ctx.lineWidth = 1;
-
-    // Vertical line of symmetry hint for even
-    ctx.beginPath();
-    ctx.moveTo(centerX, 0);
-    ctx.lineTo(centerX, height);
-    ctx.stroke();
-
-    ctx.setLineDash([]);
 }
 
 function checkAnswer(answer) {
     const q = state.currentQuestion;
     const isCorrect = answer === q.answer;
 
-    // Disable all buttons
-    document.querySelectorAll('.btn-answer').forEach(btn => {
+    // Disable all buttons and highlight
+    document.querySelectorAll('.answer-btn').forEach(btn => {
         btn.disabled = true;
-
-        // Highlight correct/wrong for choice type
-        if (q.type === 'choice') {
-            const opt = q.options.find(o => btn.textContent.includes(o.display));
-            if (opt && opt.type === q.answer) {
-                btn.classList.add('correct');
-            } else if (btn.textContent.includes(answer) || opt?.type === answer) {
-                if (!isCorrect) btn.classList.add('wrong');
-            }
-        } else {
-            // Standard parity buttons
-            if (btn.classList.contains(q.answer)) {
-                btn.classList.add('correct');
-            } else if (btn.classList.contains(answer) && !isCorrect) {
-                btn.classList.add('wrong');
-            }
+        if (btn.dataset.value === q.answer) {
+            btn.classList.add('correct');
+        } else if (btn.dataset.value === answer && !isCorrect) {
+            btn.classList.add('wrong');
         }
     });
 
@@ -611,109 +473,208 @@ function checkAnswer(answer) {
     if (isCorrect) {
         state.correct++;
         state.streak++;
-        document.getElementById('correct').textContent = state.correct;
-        document.getElementById('streak').textContent = state.streak;
+        if (state.streak > state.maxStreak) state.maxStreak = state.streak;
     } else {
         state.wrong++;
         state.streak = 0;
-        document.getElementById('wrong').textContent = state.wrong;
-        document.getElementById('streak').textContent = state.streak;
     }
 
-    state.questionsAnswered++;
+    document.getElementById('correctCount').textContent = state.correct;
+    document.getElementById('streakNumber').textContent = state.streak;
 
-    // Update progress
+    state.questionsAnswered++;
     const progress = (state.questionsAnswered / state.totalQuestions) * 100;
     document.getElementById('progressFill').style.width = `${progress}%`;
 
     // Show feedback
     showFeedback(isCorrect, q);
 
-    // Next question after delay
-    setTimeout(nextQuestion, isCorrect ? 1200 : 2000);
+    // Show next button
+    document.getElementById('nextBtn').style.display = 'block';
 }
 
 function showFeedback(isCorrect, question) {
-    const feedback = document.getElementById('feedback');
+    const container = document.getElementById('feedbackContainer');
+    const icon = document.getElementById('feedbackIcon');
+    const text = document.getElementById('feedbackText');
+    const explanation = document.getElementById('feedbackExplanation');
+
+    container.style.display = 'block';
 
     if (isCorrect) {
-        const messages = ['Правильно! 🎉', 'Чудово! ✨', 'Так тримати! 💪', 'Вірно! ✅'];
-        feedback.textContent = messages[Math.floor(Math.random() * messages.length)];
-        feedback.className = 'feedback show correct';
+        const messages = ['Правильно!', 'Чудово!', 'Так тримати!', 'Вірно!'];
+        icon.textContent = '✅';
+        text.textContent = messages[Math.floor(Math.random() * messages.length)];
+        text.style.color = 'var(--success)';
+        explanation.textContent = '';
     } else {
         const typeNames = { even: 'парна', odd: 'непарна', neither: 'ні парна, ні непарна' };
-        feedback.textContent = `Правильна відповідь: ${typeNames[question.answer]}`;
-        feedback.className = 'feedback show wrong';
+        icon.textContent = '❌';
+        text.textContent = `Правильна відповідь: ${typeNames[question.answer]}`;
+        text.style.color = 'var(--error)';
+        explanation.textContent = question.hint || '';
     }
 }
 
-async function showHint() {
+// ========== HELP PANEL FUNCTIONS ==========
+
+function showHint() {
     if (state.hintUsed) return;
     state.hintUsed = true;
 
-    const hintBtn = document.getElementById('hintBtn');
-    const hintContainer = document.getElementById('hintContainer');
-    const hintText = document.getElementById('hintText');
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
 
-    hintBtn.disabled = true;
-    hintText.textContent = 'Думаю...';
-    hintContainer.style.display = 'block';
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
 
-    // Use local hint first
-    if (state.currentQuestion.hint) {
-        hintText.textContent = state.currentQuestion.hint;
-        return;
-    }
-
-    // Try AI hint for complex questions
-    try {
-        const response = await fetch('https://marko17.pythonanywhere.com/api/hint', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                topic: 'parity',
-                question: state.currentQuestion.questionHtml,
-                level: state.level
-            })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            hintText.textContent = data.hint;
-        } else {
-            hintText.textContent = state.currentQuestion.hint || 'Перевір визначення парної/непарної функції';
-        }
-    } catch (e) {
-        hintText.textContent = state.currentQuestion.hint || 'Підстав -x замість x і порівняй з f(x)';
-    }
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+        response.innerHTML = `
+            <div class="ai-hint-content">
+                <h4>💡 Підказка</h4>
+                <p>${state.currentQuestion.hint}</p>
+            </div>
+        `;
+    }, 500);
 }
 
-function showResults() {
+function showAIHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        const q = state.currentQuestion;
+        let explanation = '';
+
+        if (q.type === 'graph') {
+            explanation = `<p><strong>Як визначити за графіком:</strong></p>
+                <p>• <strong>Парна функція:</strong> графік симетричний відносно осі OY (вертикальна симетрія)</p>
+                <p>• <strong>Непарна функція:</strong> графік симетричний відносно початку координат (точка O)</p>`;
+        } else {
+            explanation = `<p><strong>Як перевірити парність:</strong></p>
+                <p>1. Підстав (-x) замість x у формулу</p>
+                <p>2. Спрости вираз f(-x)</p>
+                <p>3. Порівняй:</p>
+                <ul style="margin-left: 1rem;">
+                    <li>Якщо f(-x) = f(x) → <strong>парна</strong></li>
+                    <li>Якщо f(-x) = -f(x) → <strong>непарна</strong></li>
+                    <li>Інакше → <strong>ні парна, ні непарна</strong></li>
+                </ul>`;
+        }
+
+        response.innerHTML = `
+            <div class="ai-help-content">
+                <h4>🤖 Допомога</h4>
+                ${explanation}
+            </div>
+        `;
+    }, 600);
+}
+
+function showFormulaHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    response.innerHTML = `
+        <div class="ai-formula-content">
+            <h4>📐 Формули парності</h4>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">f(-x) = f(x)</div>
+                <div class="formula-note">Парна функція</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">f(-x) = -f(x)</div>
+                <div class="formula-note">Непарна функція</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">Парні: x², x⁴, |x|, cos x</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">Непарні: x, x³, sin x, tg x, 1/x</div>
+            </div>
+        </div>
+    `;
+}
+
+function closeAIModal() {
+    document.getElementById('aiHelperModal').classList.add('hidden');
+}
+
+// ========== RESULTS ==========
+
+async function showResults() {
     const accuracy = state.correct + state.wrong > 0
         ? Math.round((state.correct / (state.correct + state.wrong)) * 100)
         : 0;
 
-    document.getElementById('finalCorrect').textContent = state.correct;
-    document.getElementById('finalWrong').textContent = state.wrong;
-    document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
+    const timeSpent = Math.round((Date.now() - state.startTime) / 1000);
 
-    const title = document.getElementById('resultTitle');
+    document.getElementById('resultCorrect').textContent = state.correct;
+    document.getElementById('resultAccuracy').textContent = `${accuracy}%`;
+    document.getElementById('resultLevel').textContent = state.level;
+
+    const title = document.getElementById('resultsTitle');
+    const icon = document.getElementById('resultsIcon');
+
     if (accuracy >= 90) {
-        title.textContent = '🏆 Бездоганно!';
+        title.textContent = 'Бездоганно!';
+        icon.textContent = '🏆';
     } else if (accuracy >= 70) {
-        title.textContent = '🎉 Чудово!';
+        title.textContent = 'Чудова робота!';
+        icon.textContent = '🎉';
     } else if (accuracy >= 50) {
-        title.textContent = '👍 Непогано!';
+        title.textContent = 'Непогано!';
+        icon.textContent = '👍';
     } else {
-        title.textContent = '📚 Потрібно повторити';
+        title.textContent = 'Потрібно повторити';
+        icon.textContent = '📚';
     }
 
-    showScreen('result');
+    // Hide next level button on level 3
+    const nextLevelBtn = document.getElementById('nextLevelBtn');
+    if (nextLevelBtn) {
+        nextLevelBtn.style.display = state.level < 3 ? 'block' : 'none';
+    }
+
+    // Save to Firebase
+    await saveToFirebase(accuracy, timeSpent);
+
+    showScreen('results');
 }
 
-function shuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+async function saveToFirebase(accuracy, timeSpent) {
+    if (window.MathQuestFirebase) {
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'parity',
+                trainerName: 'Парність функцій',
+                score: state.correct,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                accuracy: accuracy,
+                maxStreak: state.maxStreak,
+                timeSpent: timeSpent
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
     }
 }

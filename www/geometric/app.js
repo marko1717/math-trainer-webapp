@@ -1,4 +1,8 @@
-// Telegram WebApp
+/* ===================================
+   MATH QUEST - GEOMETRIC PROGRESSION TRAINER
+   Full unified version with Help Panel & Firebase
+   =================================== */
+
 const tg = window.Telegram?.WebApp;
 if (tg) {
     tg.ready();
@@ -6,64 +10,153 @@ if (tg) {
 }
 
 // State
-let currentTopic = 'mixed';
-let currentQuestion = null;
-let correctCount = 0;
-let streak = 0;
-let bestStreak = 0;
-let level = 1;
-let questionsAnswered = 0;
+let state = {
+    topic: 'mixed',
+    level: 1,
+    correct: 0,
+    wrong: 0,
+    streak: 0,
+    maxStreak: 0,
+    questionsAnswered: 0,
+    totalQuestions: 10,
+    currentQuestion: null,
+    hintUsed: false,
+    startTime: null
+};
 
-// Topics
-const topics = {
+// Topic names
+const TOPICS = {
     ratio: 'Знаменник q',
     nth_term: 'n-й член',
     sum: 'Сума Sₙ',
-    mean: 'Середнє геометричне',
+    mean: 'Середнє геом.',
     missing: 'Пропущений член',
     mixed: 'Мікс'
 };
 
-// Show sections
-function showTheory() {
-    hideAllSections();
-    document.getElementById('theory-section').classList.remove('hidden');
+// DOM Elements
+const screens = {
+    start: document.getElementById('startScreen'),
+    topic: document.getElementById('topicScreen'),
+    quiz: document.getElementById('quizScreen'),
+    results: document.getElementById('resultsScreen'),
+    theory: document.getElementById('theoryScreen')
+};
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Start button
+    document.getElementById('startBtn')?.addEventListener('click', () => showScreen('topic'));
+    document.getElementById('backToStartBtn')?.addEventListener('click', () => showScreen('start'));
+
+    // Topic buttons
+    document.querySelectorAll('.topic-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.topic = btn.dataset.topic;
+            startGame();
+        });
+    });
+
+    // Answer input
+    const input = document.getElementById('answerInput');
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+    }
+
+    // Submit & Next buttons
+    document.getElementById('submitBtn')?.addEventListener('click', checkAnswer);
+    document.getElementById('nextBtn')?.addEventListener('click', nextQuestion);
+
+    // Help Panel buttons
+    document.getElementById('hintBtn')?.addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn')?.addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn')?.addEventListener('click', showFormulaHelp);
+
+    // AI Modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
+    });
+
+    // Result buttons
+    document.getElementById('restartBtn')?.addEventListener('click', startGame);
+    document.getElementById('changeTopicBtn')?.addEventListener('click', () => showScreen('topic'));
+    document.getElementById('theoryBtn')?.addEventListener('click', () => showScreen('theory'));
+    document.getElementById('backFromTheoryBtn')?.addEventListener('click', () => showScreen('results'));
 }
 
-function showTopics() {
-    hideAllSections();
-    document.getElementById('topic-section').classList.remove('hidden');
+function showScreen(name) {
+    Object.values(screens).forEach(s => s?.classList.remove('active'));
+    screens[name]?.classList.add('active');
+
+    const progressContainer = document.getElementById('progressContainer');
+    if (progressContainer) {
+        progressContainer.style.display = (name === 'quiz') ? 'block' : 'none';
+    }
 }
 
-function startPractice() {
-    showTopics();
+function updateDifficultyIndicator() {
+    const dots = document.querySelectorAll('.difficulty-dot');
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i < state.level);
+    });
 }
 
-function selectTopic(topic) {
-    currentTopic = topic;
-    document.getElementById('topic-name').textContent = topics[topic];
-    hideAllSections();
-    document.getElementById('practice-section').classList.remove('hidden');
-    generateQuestion();
-}
-
-function hideAllSections() {
-    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-}
-
-// Generate question based on topic and level
-function generateQuestion() {
-    const topic = currentTopic === 'mixed' ? getRandomTopic() : currentTopic;
-
-    const generators = {
-        ratio: generateRatioQuestion,
-        nth_term: generateNthTermQuestion,
-        sum: generateSumQuestion,
-        mean: generateMeanQuestion,
-        missing: generateMissingQuestion
+function startGame() {
+    state = {
+        ...state,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        maxStreak: 0,
+        questionsAnswered: 0,
+        hintUsed: false,
+        startTime: Date.now()
     };
 
-    currentQuestion = generators[topic]();
+    document.getElementById('correctCount').textContent = '0';
+    document.getElementById('streakNumber').textContent = '0';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('totalCount').textContent = state.totalQuestions;
+
+    updateDifficultyIndicator();
+    showScreen('quiz');
+    nextQuestion();
+}
+
+function nextQuestion() {
+    if (state.questionsAnswered >= state.totalQuestions) {
+        showResults();
+        return;
+    }
+
+    state.hintUsed = false;
+
+    const feedbackContainer = document.getElementById('feedbackContainer');
+    if (feedbackContainer) feedbackContainer.style.display = 'none';
+
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.style.display = 'none';
+
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) submitBtn.disabled = false;
+
+    const input = document.getElementById('answerInput');
+    if (input) {
+        input.value = '';
+        input.disabled = false;
+        input.focus();
+    }
+
+    const topic = state.topic === 'mixed' ? getRandomTopic() : state.topic;
+    state.currentQuestion = generateQuestion(topic);
+
     displayQuestion();
 }
 
@@ -72,13 +165,23 @@ function getRandomTopic() {
     return topics[Math.floor(Math.random() * topics.length)];
 }
 
-// Question generators
+function generateQuestion(topic) {
+    const generators = {
+        ratio: generateRatioQuestion,
+        nth_term: generateNthTermQuestion,
+        sum: generateSumQuestion,
+        mean: generateMeanQuestion,
+        missing: generateMissingQuestion
+    };
+    return generators[topic]();
+}
+
+// Question Generators
 function generateRatioQuestion() {
-    // Використовуємо цілі знаменники для простоти
     const possibleQ = [2, 3, 4, 5, -2, -3];
     const q = possibleQ[Math.floor(Math.random() * possibleQ.length)];
     const b1 = randomInt(1, 5) * (Math.random() > 0.5 ? 1 : -1);
-    const n = randomInt(3, 4 + level);
+    const n = randomInt(3, 4 + state.level);
 
     const sequence = [];
     let current = b1;
@@ -89,12 +192,12 @@ function generateRatioQuestion() {
 
     return {
         type: 'ratio',
+        topicName: 'Знаменник q',
         text: 'Знайдіть знаменник геометричної прогресії:',
         sequence: sequence.join(', ') + ', ...',
         answer: q,
-        hint: 'Знаменник q = b₂ / b₁',
-        formula: 'q = bₙ₊₁ / bₙ',
-        explanation: `Знаменник прогресії — це відношення сусідніх членів.\nq = ${sequence[1]} / ${sequence[0]} = ${q}`
+        hint: `q = b₂ / b₁ = ${sequence[1]} / ${sequence[0]} = ${q}`,
+        formula: 'q = bₙ₊₁ / bₙ'
     };
 }
 
@@ -102,17 +205,17 @@ function generateNthTermQuestion() {
     const b1 = randomInt(1, 5);
     const possibleQ = [2, 3, -2];
     const q = possibleQ[Math.floor(Math.random() * possibleQ.length)];
-    const n = randomInt(3, 5 + level);
+    const n = randomInt(3, 5 + state.level);
     const answer = b1 * Math.pow(q, n - 1);
 
     return {
         type: 'nth_term',
+        topicName: 'n-й член',
         text: `Знайдіть b${subscript(n)}, якщо b₁ = ${b1}, q = ${q}`,
         sequence: null,
         answer: answer,
-        hint: `Підставте у формулу: b${subscript(n)} = b₁ · q^(n−1)`,
-        formula: 'bₙ = b₁ · qⁿ⁻¹',
-        explanation: `b${subscript(n)} = ${b1} · ${q}^${n-1} = ${b1} · ${Math.pow(q, n-1)} = ${answer}`
+        hint: `b${subscript(n)} = ${b1} · ${q}^${n-1} = ${b1} · ${Math.pow(q, n-1)} = ${answer}`,
+        formula: 'bₙ = b₁ · qⁿ⁻¹'
     };
 }
 
@@ -120,19 +223,19 @@ function generateSumQuestion() {
     const b1 = randomInt(1, 4);
     const possibleQ = [2, 3];
     const q = possibleQ[Math.floor(Math.random() * possibleQ.length)];
-    const n = randomInt(3, 5 + Math.floor(level / 2));
+    const n = randomInt(3, 5 + Math.floor(state.level / 2));
 
     const qn = Math.pow(q, n);
     const answer = b1 * (qn - 1) / (q - 1);
 
     return {
         type: 'sum',
-        text: `Знайдіть суму перших ${n} членів прогресії, якщо b₁ = ${b1}, q = ${q}`,
+        topicName: 'Сума Sₙ',
+        text: `Знайдіть S${subscript(n)}, якщо b₁ = ${b1}, q = ${q}`,
         sequence: null,
         answer: answer,
-        hint: 'Використайте формулу суми',
-        formula: 'Sₙ = b₁ · (qⁿ − 1) / (q − 1)',
-        explanation: `S${subscript(n)} = ${b1} · (${q}^${n} − 1) / (${q} − 1)\n= ${b1} · (${qn} − 1) / ${q - 1}\n= ${b1} · ${qn - 1} / ${q - 1} = ${answer}`
+        hint: `S${subscript(n)} = ${b1} · (${q}^${n} − 1) / (${q} − 1) = ${b1} · ${qn - 1} / ${q - 1} = ${answer}`,
+        formula: 'Sₙ = b₁ · (qⁿ − 1) / (q − 1)'
     };
 }
 
@@ -142,30 +245,28 @@ function generateMeanQuestion() {
 
     const b_prev = b1;
     const b_next = b1 * q * q;
-    const answer = b1 * q; // середній член
+    const answer = b1 * q;
 
     if (Math.random() > 0.5) {
-        // Знайти середній член
         return {
             type: 'mean',
-            text: `Знайдіть член геометричної прогресії між ${b_prev} і ${b_next}`,
+            topicName: 'Середнє геом.',
+            text: `Знайдіть член прогресії між ${b_prev} і ${b_next}`,
             sequence: `${b_prev}, ?, ${b_next}`,
             answer: answer,
-            hint: 'Середнє геометричне = √(добуток сусідніх)',
-            formula: 'bₙ = √(bₙ₋₁ · bₙ₊₁)',
-            explanation: `Середнє геометричне: √(${b_prev} · ${b_next}) = √${b_prev * b_next} = ${answer}`
+            hint: `Середнє геометричне: √(${b_prev} · ${b_next}) = √${b_prev * b_next} = ${answer}`,
+            formula: 'bₙ = √(bₙ₋₁ · bₙ₊₁)'
         };
     } else {
-        // Знайти знаменник за трьома членами
         const middle = answer;
         return {
             type: 'mean',
+            topicName: 'Середнє геом.',
             text: `В прогресії: ${b_prev}, ${middle}, ?. Знайдіть третій член.`,
             sequence: `${b_prev}, ${middle}, ?`,
             answer: b_next,
-            hint: 'Знаменник q = b₂ / b₁',
-            formula: 'q = b₂ / b₁, потім b₃ = b₂ · q',
-            explanation: `q = ${middle} / ${b_prev} = ${q}\nb₃ = ${middle} · ${q} = ${b_next}`
+            hint: `q = ${middle} / ${b_prev} = ${q}\nb₃ = ${middle} · ${q} = ${b_next}`,
+            formula: 'q = b₂ / b₁, b₃ = b₂ · q'
         };
     }
 }
@@ -174,7 +275,7 @@ function generateMissingQuestion() {
     const b1 = randomInt(1, 4);
     const q = randomInt(2, 3);
     const length = randomInt(4, 5);
-    const missingIndex = randomInt(1, length - 2); // не перший і не останній
+    const missingIndex = randomInt(1, length - 2);
 
     const sequence = [];
     let current = b1;
@@ -188,136 +289,266 @@ function generateMissingQuestion() {
 
     return {
         type: 'missing',
+        topicName: 'Пропущений член',
         text: 'Знайдіть пропущений член прогресії:',
         sequence: displaySeq.join(', '),
         answer: answer,
-        hint: 'Знайдіть знаменник q за сусідніми членами',
-        formula: 'q = bₙ₊₁ / bₙ',
-        explanation: `q = ${sequence[missingIndex + 1] || sequence[missingIndex] * q} / ${sequence[missingIndex - 1] || b1} = ${q}\nПропущений член = ${sequence[missingIndex - 1]} · ${q} = ${answer}`
+        hint: `q = ${sequence[1]} / ${sequence[0]} = ${q}\nПропущений = ${sequence[missingIndex - 1]} · ${q} = ${answer}`,
+        formula: 'q = bₙ₊₁ / bₙ'
     };
 }
 
-// Display question
 function displayQuestion() {
-    document.getElementById('question-text').textContent = currentQuestion.text;
+    const q = state.currentQuestion;
 
-    const seqDisplay = document.getElementById('sequence-display');
-    if (currentQuestion.sequence) {
-        seqDisplay.textContent = currentQuestion.sequence;
-        seqDisplay.classList.remove('hidden');
+    document.getElementById('topicBadge').textContent = q.topicName;
+    document.getElementById('questionNumber').textContent = `Питання ${state.questionsAnswered + 1}`;
+    document.getElementById('questionText').textContent = q.text;
+
+    const seqDisplay = document.getElementById('sequenceDisplay');
+    if (q.sequence) {
+        seqDisplay.textContent = q.sequence;
+        seqDisplay.style.display = 'block';
     } else {
-        seqDisplay.classList.add('hidden');
+        seqDisplay.style.display = 'none';
     }
-
-    document.getElementById('answer-input').value = '';
-    document.getElementById('feedback').classList.add('hidden');
-    document.getElementById('hint-box').classList.add('hidden');
-    document.getElementById('level-badge').textContent = `Рівень ${level}`;
-
-    // Focus on input
-    setTimeout(() => document.getElementById('answer-input').focus(), 100);
 }
 
-// Check answer
 function checkAnswer() {
-    const userAnswer = parseFloat(document.getElementById('answer-input').value.replace(',', '.'));
-    const feedback = document.getElementById('feedback');
+    const input = document.getElementById('answerInput');
+    const userAnswer = parseFloat(input.value.replace(',', '.'));
 
     if (isNaN(userAnswer)) {
-        feedback.textContent = '⚠️ Введіть число';
-        feedback.className = 'feedback incorrect';
-        feedback.classList.remove('hidden');
+        input.style.borderColor = 'var(--error)';
+        setTimeout(() => input.style.borderColor = 'var(--border)', 500);
         return;
     }
 
-    const isCorrect = Math.abs(userAnswer - currentQuestion.answer) < 0.01;
+    const q = state.currentQuestion;
+    const isCorrect = Math.abs(userAnswer - q.answer) < 0.01;
+
+    input.disabled = true;
+    document.getElementById('submitBtn').disabled = true;
 
     if (isCorrect) {
-        correctCount++;
-        streak++;
-        if (streak > bestStreak) bestStreak = streak;
-        questionsAnswered++;
+        state.correct++;
+        state.streak++;
+        if (state.streak > state.maxStreak) state.maxStreak = state.streak;
 
-        // Level up
-        if (streak >= 5 && level < 3) {
-            level++;
-        }
-
-        feedback.innerHTML = `✅ Правильно! Відповідь: ${currentQuestion.answer}`;
-        feedback.className = 'feedback correct';
-
-        // Haptic feedback
-        if (tg?.HapticFeedback) {
-            tg.HapticFeedback.notificationOccurred('success');
+        if (state.streak >= 5 && state.level < 3) {
+            state.level++;
+            updateDifficultyIndicator();
         }
     } else {
-        streak = 0;
-        if (level > 1 && questionsAnswered > 3) level--;
-
-        feedback.innerHTML = `❌ Неправильно. Правильна відповідь: ${currentQuestion.answer}`;
-        feedback.className = 'feedback incorrect';
-
-        if (tg?.HapticFeedback) {
-            tg.HapticFeedback.notificationOccurred('error');
-        }
+        state.wrong++;
+        state.streak = 0;
     }
 
-    feedback.classList.remove('hidden');
-    updateStats();
+    document.getElementById('correctCount').textContent = state.correct;
+    document.getElementById('streakNumber').textContent = state.streak;
+
+    state.questionsAnswered++;
+    const progress = (state.questionsAnswered / state.totalQuestions) * 100;
+    document.getElementById('progressFill').style.width = `${progress}%`;
+
+    showFeedback(isCorrect, q);
+    document.getElementById('nextBtn').style.display = 'block';
 }
 
-// Hints
+function showFeedback(isCorrect, question) {
+    const container = document.getElementById('feedbackContainer');
+    const icon = document.getElementById('feedbackIcon');
+    const text = document.getElementById('feedbackText');
+    const explanation = document.getElementById('feedbackExplanation');
+
+    container.style.display = 'block';
+
+    if (isCorrect) {
+        const messages = ['Правильно!', 'Чудово!', 'Так тримати!', 'Вірно!'];
+        icon.textContent = '✅';
+        text.textContent = messages[Math.floor(Math.random() * messages.length)];
+        text.style.color = 'var(--success)';
+        explanation.textContent = `Відповідь: ${question.answer}`;
+    } else {
+        icon.textContent = '❌';
+        text.textContent = `Правильна відповідь: ${question.answer}`;
+        text.style.color = 'var(--error)';
+        explanation.textContent = '';
+    }
+}
+
+// ========== HELP PANEL FUNCTIONS ==========
+
 function showHint() {
-    const hintBox = document.getElementById('hint-box');
-    hintBox.innerHTML = `<h4>💡 Підказка</h4><p>${currentQuestion.hint}</p>`;
-    hintBox.className = 'hint-box';
-    hintBox.classList.remove('hidden');
+    if (state.hintUsed) return;
+    state.hintUsed = true;
+
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+        response.innerHTML = `
+            <div class="ai-hint-content">
+                <h4>💡 Підказка</h4>
+                <p style="white-space: pre-line;">${state.currentQuestion.hint}</p>
+            </div>
+        `;
+    }, 500);
 }
 
-function showFormula() {
-    const hintBox = document.getElementById('hint-box');
-    hintBox.innerHTML = `<h4>📐 Формула</h4><div class="formula" style="margin: 10px 0;">${currentQuestion.formula}</div>`;
-    hintBox.className = 'hint-box';
-    hintBox.classList.remove('hidden');
-}
+function showAIHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
 
-async function getAIHelp() {
-    const hintBox = document.getElementById('hint-box');
-    hintBox.innerHTML = `<h4>🤖 ШІ думає...</h4><div class="loading"></div>`;
-    hintBox.className = 'hint-box ai-hint';
-    hintBox.classList.remove('hidden');
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
 
-    try {
-        // Use cached AI hints if available
-        if (typeof getAIHint === 'function') {
-            const result = await getAIHint(
-                'geometric_progression',
-                currentQuestion.text + (currentQuestion.sequence ? ' ' + currentQuestion.sequence : ''),
-                level,
-                { type: currentQuestion.type }
-            );
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
 
-            hintBox.innerHTML = `<h4>🤖 Пояснення ШІ</h4><p>${result.hint}</p>`;
-        } else {
-            // Fallback to local explanation
-            hintBox.innerHTML = `<h4>🤖 Пояснення</h4><p>${currentQuestion.explanation}</p>`;
+        const q = state.currentQuestion;
+        let explanation = '';
+
+        switch (q.type) {
+            case 'ratio':
+                explanation = `<p><strong>Як знайти знаменник q:</strong></p>
+                    <p>Знаменник — це відношення сусідніх членів.</p>
+                    <p><em>q = b₂ / b₁ = b₃ / b₂ = ...</em></p>`;
+                break;
+            case 'nth_term':
+                explanation = `<p><strong>Як знайти n-й член:</strong></p>
+                    <p>1. Використай формулу bₙ = b₁ · qⁿ⁻¹</p>
+                    <p>2. Обчисли qⁿ⁻¹, потім помнож на b₁</p>`;
+                break;
+            case 'sum':
+                explanation = `<p><strong>Як знайти суму:</strong></p>
+                    <p>Використай формулу:</p>
+                    <p><em>Sₙ = b₁ · (qⁿ - 1) / (q - 1)</em></p>`;
+                break;
+            case 'mean':
+                explanation = `<p><strong>Середнє геометричне:</strong></p>
+                    <p>Кожен член — корінь квадратний з добутку сусідніх.</p>
+                    <p><em>bₙ = √(bₙ₋₁ · bₙ₊₁)</em></p>`;
+                break;
+            case 'missing':
+                explanation = `<p><strong>Як знайти пропущений член:</strong></p>
+                    <p>1. Знайди q за сусідніми членами</p>
+                    <p>2. Помнож або поділи відомий член на q</p>`;
+                break;
         }
-    } catch (e) {
-        hintBox.innerHTML = `<h4>📝 Розв'язок</h4><p>${currentQuestion.explanation}</p>`;
+
+        response.innerHTML = `
+            <div class="ai-help-content">
+                <h4>🤖 Допомога</h4>
+                ${explanation}
+            </div>
+        `;
+    }, 600);
+}
+
+function showFormulaHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    response.innerHTML = `
+        <div class="ai-formula-content">
+            <h4>📐 Формули геометричної прогресії</h4>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">bₙ = b₁ · qⁿ⁻¹</div>
+                <div class="formula-note">n-й член прогресії</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">q = bₙ₊₁ / bₙ</div>
+                <div class="formula-note">Знаменник прогресії</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">Sₙ = b₁(qⁿ - 1)/(q - 1)</div>
+                <div class="formula-note">Сума n членів (q ≠ 1)</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">S = b₁/(1 - q)</div>
+                <div class="formula-note">Нескінченна сума (|q| &lt; 1)</div>
+            </div>
+        </div>
+    `;
+}
+
+function closeAIModal() {
+    document.getElementById('aiHelperModal').classList.add('hidden');
+}
+
+// ========== RESULTS ==========
+
+async function showResults() {
+    const accuracy = state.correct + state.wrong > 0
+        ? Math.round((state.correct / (state.correct + state.wrong)) * 100)
+        : 0;
+
+    const timeSpent = Math.round((Date.now() - state.startTime) / 1000);
+
+    document.getElementById('resultCorrect').textContent = state.correct;
+    document.getElementById('resultAccuracy').textContent = `${accuracy}%`;
+    document.getElementById('resultLevel').textContent = state.level;
+
+    const title = document.getElementById('resultsTitle');
+    const icon = document.getElementById('resultsIcon');
+
+    if (accuracy >= 90) {
+        title.textContent = 'Бездоганно!';
+        icon.textContent = '🏆';
+    } else if (accuracy >= 70) {
+        title.textContent = 'Чудова робота!';
+        icon.textContent = '🎉';
+    } else if (accuracy >= 50) {
+        title.textContent = 'Непогано!';
+        icon.textContent = '👍';
+    } else {
+        title.textContent = 'Потрібно повторити';
+        icon.textContent = '📚';
+    }
+
+    await saveToFirebase(accuracy, timeSpent);
+    showScreen('results');
+}
+
+async function saveToFirebase(accuracy, timeSpent) {
+    if (window.MathQuestFirebase) {
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'geometric',
+                trainerName: 'Геометрична прогресія',
+                score: state.correct,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                accuracy: accuracy,
+                maxStreak: state.maxStreak,
+                timeSpent: timeSpent,
+                topic: state.topic
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
     }
 }
 
-// Navigation
-function nextQuestion() {
-    generateQuestion();
-}
+// ========== HELPERS ==========
 
-function updateStats() {
-    document.getElementById('correct').textContent = correctCount;
-    document.getElementById('streak').textContent = streak;
-}
-
-// Helpers
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -326,13 +557,3 @@ function subscript(n) {
     const subscripts = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'];
     return String(n).split('').map(d => subscripts[parseInt(d)]).join('');
 }
-
-// Enter key to submit
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !document.getElementById('practice-section').classList.contains('hidden')) {
-        checkAnswer();
-    }
-});
-
-// Initialize
-updateStats();

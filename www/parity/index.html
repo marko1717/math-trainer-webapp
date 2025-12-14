@@ -1,139 +1,270 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Парні та непарні функції</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Парність функцій | Math Quest</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Shared styles -->
     <link rel="stylesheet" href="../shared/styles/base.css">
     <link rel="stylesheet" href="../shared/styles/components.css">
-    <link rel="stylesheet" href="../shared/styles.css">
+
+    <!-- Local styles -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
     <script src="../shared/theme.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Start Screen -->
-        <div id="startScreen" class="screen active">
-            <a href="../index.html" class="back-link">← На головну</a>
-            <h1>📊 Парність функцій</h1>
-            <p class="subtitle">Вивчи парні та непарні функції</p>
-
-            <div class="theory-preview">
-                <h3>📖 Означення</h3>
-                <div class="definition">
-                    <p><strong>Парна функція:</strong></p>
-                    <p class="formula" id="evenDef"></p>
-                    <p class="hint-text">Графік симетричний відносно осі OY</p>
-                </div>
-                <div class="definition">
-                    <p><strong>Непарна функція:</strong></p>
-                    <p class="formula" id="oddDef"></p>
-                    <p class="hint-text">Графік симетричний відносно початку координат</p>
+    <div class="app-container">
+        <!-- Unified Header -->
+        <header class="trainer-header">
+            <div class="header-left">
+                <a href="../index.html" class="back-btn">← Меню</a>
+            </div>
+            <div class="header-center">
+                <h1 class="trainer-title">Парність функцій</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter" id="streakCounter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streakNumber">0</span>
                 </div>
             </div>
+        </header>
 
-            <div class="level-select">
-                <h3>Обери рівень:</h3>
-                <button class="btn btn-level" data-level="1">
-                    <span class="level-icon">🌱</span>
-                    <span class="level-text">Легкий</span>
-                    <span class="level-desc">Типові функції</span>
-                </button>
-                <button class="btn btn-level" data-level="2">
-                    <span class="level-icon">🌿</span>
-                    <span class="level-text">Середній</span>
-                    <span class="level-desc">Формули та графіки</span>
-                </button>
-                <button class="btn btn-level" data-level="3">
-                    <span class="level-icon">🌳</span>
-                    <span class="level-text">Складний</span>
-                    <span class="level-desc">Композиції та суми</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Game Screen -->
-        <div id="gameScreen" class="screen">
-            <div class="header">
-                <div class="stats">
-                    <span class="stat">✅ <span id="correct">0</span></span>
-                    <span class="stat">❌ <span id="wrong">0</span></span>
-                    <span class="stat">🔥 <span id="streak">0</span></span>
-                </div>
-                <div class="level-indicator">Рівень <span id="currentLevel">1</span></div>
-            </div>
-
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
             <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
             </div>
-
-            <!-- Graph Container -->
-            <div class="graph-container" id="graphContainer" style="display: none;">
-                <canvas id="graphCanvas" width="300" height="250"></canvas>
-            </div>
-
-            <div class="question-area">
-                <p class="question-type" id="questionType"></p>
-                <div class="question" id="question"></div>
-            </div>
-
-            <div class="answers" id="answers"></div>
-
-            <button class="btn btn-hint" id="hintBtn">💡 Підказка</button>
-            <div class="hint-container" id="hintContainer" style="display: none;">
-                <div class="hint-text" id="hintText"></div>
-            </div>
-
-            <div class="feedback" id="feedback"></div>
-        </div>
-
-        <!-- Result Screen -->
-        <div id="resultScreen" class="screen">
-            <h2 id="resultTitle">🎉 Чудово!</h2>
-            <div class="result-stats">
-                <div class="result-stat">
-                    <span class="result-value" id="finalCorrect">0</span>
-                    <span class="result-label">Правильно</span>
-                </div>
-                <div class="result-stat">
-                    <span class="result-value" id="finalWrong">0</span>
-                    <span class="result-label">Помилок</span>
-                </div>
-                <div class="result-stat">
-                    <span class="result-value" id="finalAccuracy">0%</span>
-                    <span class="result-label">Точність</span>
-                </div>
-            </div>
-            <div class="result-actions">
-                <button class="btn btn-primary" id="restartBtn">🔄 Ще раз</button>
-                <button class="btn btn-secondary" id="menuBtn">📚 Меню</button>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">10</span> правильно
             </div>
         </div>
 
-        <!-- Theory Reference -->
-        <div id="theoryScreen" class="screen">
-            <h2>📖 Довідник</h2>
-            <div class="theory-content">
-                <h3>Парні функції (симетрія ↔️)</h3>
-                <ul class="function-list" id="evenList"></ul>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📊</div>
+                    <h2 class="welcome-title">Парність функцій</h2>
+                    <p class="welcome-description">
+                        Вивчи парні та непарні функції
+                    </p>
 
-                <h3>Непарні функції (симетрія ↩️)</h3>
-                <ul class="function-list" id="oddList"></ul>
+                    <div class="theory-preview">
+                        <div class="theory-card">
+                            <div class="formula-main">f(-x) = f(x)</div>
+                            <div class="formula-note">Парна функція</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">f(-x) = -f(x)</div>
+                            <div class="formula-note">Непарна функція</div>
+                        </div>
+                    </div>
 
-                <h3>Ні парні, ні непарні</h3>
-                <ul class="function-list" id="neitherList"></ul>
-
-                <h3>Властивості</h3>
-                <div class="properties" id="propertiesList"></div>
+                    <div class="level-grid">
+                        <button class="level-btn" data-level="1">
+                            <div class="level-number">🌱</div>
+                            <div class="level-name">Легкий</div>
+                            <div class="level-desc">Типові функції</div>
+                        </button>
+                        <button class="level-btn" data-level="2">
+                            <div class="level-number">🌿</div>
+                            <div class="level-name">Середній</div>
+                            <div class="level-desc">Графіки</div>
+                        </button>
+                        <button class="level-btn" data-level="3">
+                            <div class="level-number">🌳</div>
+                            <div class="level-name">Складний</div>
+                            <div class="level-desc">Композиції</div>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-primary" id="backFromTheory">⬅️ Назад</button>
+
+            <!-- Quiz Screen -->
+            <div class="screen" id="quizScreen">
+                <div class="question-container">
+                    <div class="difficulty-indicator" id="difficultyIndicator">
+                        <span class="difficulty-dot active"></span>
+                        <span class="difficulty-dot"></span>
+                        <span class="difficulty-dot"></span>
+                    </div>
+
+                    <div class="topic-badge" id="topicBadge">Визнач тип</div>
+
+                    <div class="question-number" id="questionNumber">Питання 1</div>
+                    <div class="question-text" id="questionText">
+                        f(x) = x²
+                    </div>
+
+                    <!-- Graph Container -->
+                    <div class="graph-container" id="graphContainer" style="display: none;">
+                        <canvas id="graphCanvas" width="300" height="250"></canvas>
+                    </div>
+
+                    <div class="answers-container" id="answersContainer">
+                        <!-- Answers will be inserted here -->
+                    </div>
+
+                    <div class="feedback-container" id="feedbackContainer">
+                        <div class="feedback-icon" id="feedbackIcon"></div>
+                        <div class="feedback-text" id="feedbackText"></div>
+                        <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel" id="helpPanel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>Допомога ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Формула</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
+                    Далі →
+                </button>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-content">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultCorrect">0</div>
+                            <div class="stat-label">Правильних</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultAccuracy">0%</div>
+                            <div class="stat-label">Точність</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultLevel">1</div>
+                            <div class="stat-label">Рівень</div>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-large" id="nextLevelBtn">
+                            ⬆️ Наступний рівень
+                        </button>
+                        <button class="btn btn-secondary" id="restartBtn">
+                            🔄 Ще раз
+                        </button>
+                        <button class="btn btn-secondary" id="theoryBtn">
+                            📖 Теорія
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theory Reference Screen -->
+            <div class="screen" id="theoryScreen">
+                <div class="formulas-content">
+                    <h2>Парність функцій</h2>
+
+                    <div class="formula-category">
+                        <h3>📌 Означення</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">Парна: f(-x) = f(x)</div>
+                            <div class="formula-note">Симетрична відносно осі OY</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">Непарна: f(-x) = -f(x)</div>
+                            <div class="formula-note">Симетрична відносно початку координат</div>
+                        </div>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>↔️ Парні функції</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">x², x⁴, |x|, cos x</div>
+                        </div>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>↩️ Непарні функції</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">x, x³, sin x, tg x, 1/x</div>
+                        </div>
+                    </div>
+
+                    <div class="formula-category">
+                        <h3>📐 Властивості</h3>
+                        <div class="theory-card">
+                            <div class="formula-main">парна + парна = парна</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">непарна + непарна = непарна</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">парна × парна = парна</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">непарна × непарна = парна!</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">парна × непарна = непарна</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="backToQuizBtn">
+                        ← Повернутись
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Helper Modal -->
+    <div id="aiHelperModal" class="ai-modal hidden">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">
+                    <span>🤖</span>
+                    <span>Допомога ШІ</span>
+                </div>
+                <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="ai-loading-spinner"></div>
+                    <span>Думаю...</span>
+                </div>
+                <div class="ai-response" id="aiResponse"></div>
+            </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Shared components -->
+    <script src="../shared/components/ai-helper.js"></script>
     <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
+    <script src="app.js"></script>
 </body>
 </html>

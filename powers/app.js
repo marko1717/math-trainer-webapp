@@ -55,7 +55,26 @@ const screens = {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    renderKaTeXFormulas();
 });
+
+// Render KaTeX formulas in topic buttons
+function renderKaTeXFormulas() {
+    document.querySelectorAll('.katex-formula').forEach(el => {
+        const formula = el.dataset.formula;
+        if (formula && window.katex) {
+            try {
+                katex.render(formula, el, {
+                    throwOnError: false,
+                    displayMode: false
+                });
+            } catch (e) {
+                console.error('KaTeX error:', e);
+                el.textContent = formula;
+            }
+        }
+    });
+}
 
 function setupEventListeners() {
     // Topic selection buttons

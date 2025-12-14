@@ -26,7 +26,7 @@ async function initFirebase() {
     try {
         // Dynamic import for Firebase modules
         const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-        const { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+        const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
         const { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, limit, getDocs, addDoc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
 
         app = initializeApp(firebaseConfig);
@@ -36,6 +36,8 @@ async function initFirebase() {
         // Store methods for external use
         window.firebaseAuth = {
             signInWithPopup,
+            signInWithRedirect,
+            getRedirectResult,
             signOut,
             GoogleAuthProvider,
             onAuthStateChanged
@@ -71,18 +73,30 @@ async function initFirebase() {
 // Sign in with Google
 async function signInWithGoogle() {
     await initFirebase();
-    const { signInWithPopup, GoogleAuthProvider } = window.firebaseAuth;
+    const { signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } = window.firebaseAuth;
 
     try {
         const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        currentUser = result.user;
 
-        // Create/update user profile in Firestore
-        await createOrUpdateUserProfile(currentUser);
+        // Check if we're in a WebView (iOS/Android app) or standalone browser
+        const isWebView = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent) ||
+                          /wv|WebView/i.test(navigator.userAgent) ||
+                          window.Capacitor !== undefined;
 
-        console.log('✅ Signed in:', currentUser.displayName);
-        return currentUser;
+        if (isWebView) {
+            // Use redirect for WebView (popup doesn't work)
+            console.log('📱 Using redirect auth for WebView');
+            await signInWithRedirect(auth, provider);
+            // The page will reload, result handled by getRedirectResult below
+            return null;
+        } else {
+            // Use popup for regular browser
+            const result = await signInWithPopup(auth, provider);
+            currentUser = result.user;
+            await createOrUpdateUserProfile(currentUser);
+            console.log('✅ Signed in:', currentUser.displayName);
+            return currentUser;
+        }
     } catch (error) {
         console.error('❌ Sign in error:', error);
         throw error;
@@ -460,8 +474,23 @@ window.MathQuestFirebase = {
     try {
         await initFirebase();
 
+        // Handle redirect result (for WebView auth)
+        const { getRedirectResult, onAuthStateChanged } = window.firebaseAuth;
+        try {
+            const result = await getRedirectResult(auth);
+            if (result && result.user) {
+                currentUser = result.user;
+                await createOrUpdateUserProfile(currentUser);
+                console.log('✅ Redirect sign-in successful:', currentUser.displayName);
+
+                // Dispatch event for UI to update
+                window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user: currentUser } }));
+            }
+        } catch (redirectError) {
+            console.log('No redirect result or error:', redirectError.message);
+        }
+
         // Listen to auth state changes to restore currentUser
-        const { onAuthStateChanged } = window.firebaseAuth;
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -469,6 +498,8 @@ window.MathQuestFirebase = {
             } else {
                 console.log('ℹ️ No user logged in');
             }
+            // Dispatch event for UI to update
+            window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
         });
     } catch (error) {
         console.error('Auto-init error:', error);

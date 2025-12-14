@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Типові графіки | Math Quest</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <script src="../shared/theme.js"></script>
+
+    <style>
+        .graphs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .graph-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .graph-card:hover, .graph-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .graph-card canvas {
+            width: 100%;
+            height: 120px;
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            margin-bottom: 8px;
+        }
+
+        .graph-formula {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .graph-name {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .section-title {
+            padding: 12px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        /* Properties Panel */
+        .properties-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 2px solid var(--border);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: 16px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 60vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+        }
+
+        .properties-panel.show {
+            transform: translateY(0);
+        }
+
+        .properties-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .properties-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .property-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .property-item:last-child {
+            border-bottom: none;
+        }
+
+        .property-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .property-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .formula-large {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 99;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 400px) {
+            .graphs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .main-content {
+            padding-bottom: 60px;
+        }
+
+        .tap-hint {
+            text-align: center;
+            padding: 8px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="trainer-header">
+            <div class="header-left">
+                <a href="../index.html" class="back-btn">← Меню</a>
+            </div>
+            <div class="header-center">
+                <h1 class="trainer-title">Типові графіки</h1>
+            </div>
+            <div class="header-right"></div>
+        </header>
+
+        <main class="main-content">
+            <div class="tap-hint">👆 Натисни на графік для властивостей</div>
+
+            <div class="section-title">📊 Елементарні функції</div>
+
+            <div class="graphs-grid">
+                <div class="graph-card" data-func="parabola">
+                    <canvas id="parabola"></canvas>
+                    <div class="graph-formula">y = x²</div>
+                    <div class="graph-name">Парабола</div>
+                </div>
+
+                <div class="graph-card" data-func="cubic">
+                    <canvas id="cubic"></canvas>
+                    <div class="graph-formula">y = x³</div>
+                    <div class="graph-name">Кубічна парабола</div>
+                </div>
+
+                <div class="graph-card" data-func="sqrt">
+                    <canvas id="sqrt"></canvas>
+                    <div class="graph-formula">y = √x</div>
+                    <div class="graph-name">Корінь</div>
+                </div>
+
+                <div class="graph-card" data-func="abs">
+                    <canvas id="abs"></canvas>
+                    <div class="graph-formula">y = |x|</div>
+                    <div class="graph-name">Модуль</div>
+                </div>
+
+                <div class="graph-card" data-func="hyperbola">
+                    <canvas id="hyperbola"></canvas>
+                    <div class="graph-formula">y = 1/x</div>
+                    <div class="graph-name">Гіпербола</div>
+                </div>
+
+                <div class="graph-card" data-func="linear">
+                    <canvas id="linear"></canvas>
+                    <div class="graph-formula">y = x</div>
+                    <div class="graph-name">Лінійна</div>
+                </div>
+            </div>
+
+            <div class="section-title">📐 Тригонометричні</div>
+
+            <div class="graphs-grid">
+                <div class="graph-card" data-func="sin">
+                    <canvas id="sin"></canvas>
+                    <div class="graph-formula">y = sin x</div>
+                    <div class="graph-name">Синусоїда</div>
+                </div>
+
+                <div class="graph-card" data-func="cos">
+                    <canvas id="cos"></canvas>
+                    <div class="graph-formula">y = cos x</div>
+                    <div class="graph-name">Косинусоїда</div>
+                </div>
+            </div>
+
+            <div class="section-title">📈 Показникові та логарифмічні</div>
+
+            <div class="graphs-grid">
+                <div class="graph-card" data-func="exp">
+                    <canvas id="exp"></canvas>
+                    <div class="graph-formula">y = 2ˣ</div>
+                    <div class="graph-name">Показникова</div>
+                </div>
+
+                <div class="graph-card" data-func="log">
+                    <canvas id="log"></canvas>
+                    <div class="graph-formula">y = log₂x</div>
+                    <div class="graph-name">Логарифмічна</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Properties Panel -->
+    <div class="properties-panel" id="propertiesPanel">
+        <div class="properties-header">
+            <span class="properties-title" id="propTitle">y = x²</span>
+            <button class="close-btn" id="closeBtn">×</button>
+        </div>
+
+        <div class="formula-large" id="propFormula"></div>
+
+        <div class="properties-list">
+            <div class="property-item">
+                <span class="property-label">Область визначення D(f)</span>
+                <span class="property-value" id="propDomain">(-∞; +∞)</span>
+            </div>
+            <div class="property-item">
+                <span class="property-label">Область значень E(f)</span>
+                <span class="property-value" id="propRange">[0; +∞)</span>
+            </div>
+            <div class="property-item">
+                <span class="property-label">Парність</span>
+                <span class="property-value" id="propParity">Парна</span>
+            </div>
+            <div class="property-item">
+                <span class="property-label">Нулі функції</span>
+                <span class="property-value" id="propZeros">x = 0</span>
+            </div>
+            <div class="property-item">
+                <span class="property-label">Перетин з OY</span>
+                <span class="property-value" id="propYIntercept">y = 0</span>
+            </div>
+            <div class="property-item">
+                <span class="property-label">Зростання ↗</span>
+                <span class="property-value" id="propIncreasing">[0; +∞)</span>
+            </div>
+            <div class="property-item">
+                <span class="property-label">Спадання ↘</span>
+                <span class="property-value" id="propDecreasing">(-∞; 0]</span>
+            </div>
+            <div class="property-item">
+                <span class="property-label">Екстремуми</span>
+                <span class="property-value" id="propExtrema">min: (0; 0)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function properties data
+        const FUNCTIONS = {
+            parabola: {
+                name: 'Парабола',
+                formula: 'y = x^2',
+                domain: '(-∞; +∞)',
+                range: '[0; +∞)',
+                parity: 'Парна',
+                zeros: 'x = 0',
+                yIntercept: 'y = 0',
+                increasing: '[0; +∞)',
+                decreasing: '(-∞; 0]',
+                extrema: 'min: (0; 0)'
+            },
+            cubic: {
+                name: 'Кубічна парабола',
+                formula: 'y = x^3',
+                domain: '(-∞; +∞)',
+                range: '(-∞; +∞)',
+                parity: 'Непарна',
+                zeros: 'x = 0',
+                yIntercept: 'y = 0',
+                increasing: '(-∞; +∞)',
+                decreasing: '—',
+                extrema: 'Немає'
+            },
+            sqrt: {
+                name: 'Корінь',
+                formula: 'y = \\sqrt{x}',
+                domain: '[0; +∞)',
+                range: '[0; +∞)',
+                parity: 'Ні парна, ні непарна',
+                zeros: 'x = 0',
+                yIntercept: 'y = 0',
+                increasing: '[0; +∞)',
+                decreasing: '—',
+                extrema: 'min: (0; 0)'
+            },
+            abs: {
+                name: 'Модуль',
+                formula: 'y = |x|',
+                domain: '(-∞; +∞)',
+                range: '[0; +∞)',
+                parity: 'Парна',
+                zeros: 'x = 0',
+                yIntercept: 'y = 0',
+                increasing: '[0; +∞)',
+                decreasing: '(-∞; 0]',
+                extrema: 'min: (0; 0)'
+            },
+            hyperbola: {
+                name: 'Гіпербола',
+                formula: 'y = \\frac{1}{x}',
+                domain: '(-∞; 0) ∪ (0; +∞)',
+                range: '(-∞; 0) ∪ (0; +∞)',
+                parity: 'Непарна',
+                zeros: 'Немає',
+                yIntercept: 'Немає',
+                increasing: '—',
+                decreasing: '(-∞; 0), (0; +∞)',
+                extrema: 'Немає'
+            },
+            linear: {
+                name: 'Лінійна',
+                formula: 'y = x',
+                domain: '(-∞; +∞)',
+                range: '(-∞; +∞)',
+                parity: 'Непарна',
+                zeros: 'x = 0',
+                yIntercept: 'y = 0',
+                increasing: '(-∞; +∞)',
+                decreasing: '—',
+                extrema: 'Немає'
+            },
+            sin: {
+                name: 'Синусоїда',
+                formula: 'y = \\sin x',
+                domain: '(-∞; +∞)',
+                range: '[-1; 1]',
+                parity: 'Непарна',
+                zeros: 'x = πn, n ∈ Z',
+                yIntercept: 'y = 0',
+                increasing: '[-π/2+2πn; π/2+2πn]',
+                decreasing: '[π/2+2πn; 3π/2+2πn]',
+                extrema: 'max: π/2+2πn, min: -π/2+2πn'
+            },
+            cos: {
+                name: 'Косинусоїда',
+                formula: 'y = \\cos x',
+                domain: '(-∞; +∞)',
+                range: '[-1; 1]',
+                parity: 'Парна',
+                zeros: 'x = π/2 + πn, n ∈ Z',
+                yIntercept: 'y = 1',
+                increasing: '[-π+2πn; 2πn]',
+                decreasing: '[2πn; π+2πn]',
+                extrema: 'max: 2πn, min: π+2πn'
+            },
+            exp: {
+                name: 'Показникова',
+                formula: 'y = 2^x',
+                domain: '(-∞; +∞)',
+                range: '(0; +∞)',
+                parity: 'Ні парна, ні непарна',
+                zeros: 'Немає',
+                yIntercept: 'y = 1',
+                increasing: '(-∞; +∞)',
+                decreasing: '—',
+                extrema: 'Немає'
+            },
+            log: {
+                name: 'Логарифмічна',
+                formula: 'y = \\log_2 x',
+                domain: '(0; +∞)',
+                range: '(-∞; +∞)',
+                parity: 'Ні парна, ні непарна',
+                zeros: 'x = 1',
+                yIntercept: 'Немає',
+                increasing: '(0; +∞)',
+                decreasing: '—',
+                extrema: 'Немає'
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            drawAllGraphs();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.querySelectorAll('.graph-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const funcName = card.dataset.func;
+                    showProperties(funcName);
+                });
+            });
+
+            document.getElementById('closeBtn').addEventListener('click', hideProperties);
+            document.getElementById('overlay').addEventListener('click', hideProperties);
+        }
+
+        function showProperties(funcName) {
+            const func = FUNCTIONS[funcName];
+            if (!func) return;
+
+            document.getElementById('propTitle').textContent = func.name;
+
+            const formulaEl = document.getElementById('propFormula');
+            if (window.katex) {
+                katex.render(func.formula, formulaEl, { throwOnError: false, displayMode: true });
+            } else {
+                formulaEl.textContent = func.formula;
+            }
+
+            document.getElementById('propDomain').textContent = func.domain;
+            document.getElementById('propRange').textContent = func.range;
+            document.getElementById('propParity').textContent = func.parity;
+            document.getElementById('propZeros').textContent = func.zeros;
+            document.getElementById('propYIntercept').textContent = func.yIntercept;
+            document.getElementById('propIncreasing').textContent = func.increasing;
+            document.getElementById('propDecreasing').textContent = func.decreasing;
+            document.getElementById('propExtrema').textContent = func.extrema;
+
+            document.getElementById('propertiesPanel').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+
+            document.querySelectorAll('.graph-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-func="${funcName}"]`)?.classList.add('active');
+        }
+
+        function hideProperties() {
+            document.getElementById('propertiesPanel').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+            document.querySelectorAll('.graph-card').forEach(c => c.classList.remove('active'));
+        }
+
+        function drawAllGraphs() {
+            drawGraph('parabola', x => x * x, -3, 3, -1, 9);
+            drawGraph('cubic', x => x * x * x, -2, 2, -8, 8);
+            drawGraph('sqrt', x => x >= 0 ? Math.sqrt(x) : null, -0.5, 6, -0.5, 3);
+            drawGraph('abs', x => Math.abs(x), -4, 4, -0.5, 4);
+            drawGraph('hyperbola', x => x !== 0 ? 1/x : null, -4, 4, -4, 4, true);
+            drawGraph('linear', x => x, -4, 4, -4, 4);
+            drawGraph('sin', x => Math.sin(x), -Math.PI * 1.5, Math.PI * 1.5, -1.5, 1.5);
+            drawGraph('cos', x => Math.cos(x), -Math.PI * 1.5, Math.PI * 1.5, -1.5, 1.5);
+            drawGraph('exp', x => Math.pow(2, x), -3, 3, -0.5, 8);
+            drawGraph('log', x => x > 0 ? Math.log2(x) : null, -0.5, 8, -3, 3);
+        }
+
+        function drawGraph(canvasId, func, xMin, xMax, yMin, yMax, hasAsymptote = false) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const style = getComputedStyle(document.body);
+            const gridColor = style.getPropertyValue('--border').trim() || '#e5e7eb';
+            const axisColor = style.getPropertyValue('--text-muted').trim() || '#6b7280';
+            const graphColor = style.getPropertyValue('--accent').trim() || '#4f46e5';
+
+            const toCanvasX = x => ((x - xMin) / (xMax - xMin)) * w;
+            const toCanvasY = y => h - ((y - yMin) / (yMax - yMin)) * h;
+
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 0.5;
+
+            for (let x = Math.ceil(xMin); x <= xMax; x++) {
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(x), 0);
+                ctx.lineTo(toCanvasX(x), h);
+                ctx.stroke();
+            }
+
+            for (let y = Math.ceil(yMin); y <= yMax; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, toCanvasY(y));
+                ctx.lineTo(w, toCanvasY(y));
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = axisColor;
+            ctx.lineWidth = 1.5;
+
+            if (yMin <= 0 && yMax >= 0) {
+                ctx.beginPath();
+                ctx.moveTo(0, toCanvasY(0));
+                ctx.lineTo(w, toCanvasY(0));
+                ctx.stroke();
+            }
+
+            if (xMin <= 0 && xMax >= 0) {
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(0), 0);
+                ctx.lineTo(toCanvasX(0), h);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = graphColor;
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const step = (xMax - xMin) / 200;
+            let drawing = false;
+            let lastY = null;
+
+            ctx.beginPath();
+
+            for (let x = xMin; x <= xMax; x += step) {
+                const y = func(x);
+
+                if (y === null || !isFinite(y) || y < yMin - 10 || y > yMax + 10) {
+                    if (drawing) {
+                        ctx.stroke();
+                        ctx.beginPath();
+                        drawing = false;
+                    }
+                    lastY = null;
+                    continue;
+                }
+
+                if (hasAsymptote && lastY !== null && Math.abs(y - lastY) > (yMax - yMin) / 2) {
+                    ctx.stroke();
+                    ctx.beginPath();
+                    drawing = false;
+                }
+
+                const canvasX = toCanvasX(x);
+                const canvasY = toCanvasY(y);
+
+                if (!drawing) {
+                    ctx.moveTo(canvasX, canvasY);
+                    drawing = true;
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+
+                lastY = y;
+            }
+
+            if (drawing) {
+                ctx.stroke();
+            }
+        }
+
+        window.addEventListener('resize', drawAllGraphs);
+    </script>
+</body>
+</html>

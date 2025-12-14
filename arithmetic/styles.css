@@ -313,9 +313,14 @@ body.retro-mode .level-badge {
     font-family: inherit;
     border: 2px solid var(--border);
     border-radius: 8px;
-    background: var(--bg-dark);
-    color: var(--text);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     text-align: center;
+}
+
+.answer-input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
 }
 
 body.retro-mode .answer-input {

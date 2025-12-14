@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Вірю / Не вірю | Math Quest</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="trainer-header">
+            <div class="header-left">
+                <a href="../index.html" class="back-btn">← Меню</a>
+            </div>
+            <div class="header-center">
+                <h1 class="trainer-title">Вірю / Не вірю</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter" id="streakCounter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streakNumber">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">10</span> правильно
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📐</div>
+                    <h2 class="welcome-title">Вірю / Не вірю</h2>
+                    <p class="welcome-description">
+                        Перевір свої знання геометрії! Визнач, чи правдиве твердження.
+                    </p>
+
+                    <div class="game-info">
+                        <div class="info-card">
+                            <span class="info-icon">📝</span>
+                            <span class="info-text">74 твердження</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-icon">🎯</span>
+                            <span class="info-text">Правда чи ні?</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-icon">💡</span>
+                            <span class="info-text">Пояснення</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <label class="setting-label">Кількість питань:</label>
+                        <div class="question-count-selector">
+                            <button class="count-btn active" data-count="10">10</button>
+                            <button class="count-btn" data-count="20">20</button>
+                            <button class="count-btn" data-count="30">30</button>
+                            <button class="count-btn" data-count="74">Всі</button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-large" id="startBtn">
+                        Почати гру
+                    </button>
+
+                    <div class="stats-preview" id="statsPreview">
+                        <div class="stat-mini">
+                            <span class="stat-label">Найкращий:</span>
+                            <span class="stat-value" id="bestScore">0%</span>
+                        </div>
+                        <div class="stat-mini">
+                            <span class="stat-label">Зіграно:</span>
+                            <span class="stat-value" id="gamesPlayed">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Screen -->
+            <div class="screen" id="gameScreen">
+                <div class="question-container">
+                    <div class="question-number" id="questionNumber">Твердження 1 / 10</div>
+
+                    <div class="statement-card" id="statementCard">
+                        <div class="statement-text" id="statementText">
+                            Завантаження...
+                        </div>
+                    </div>
+
+                    <div class="answer-buttons" id="answerButtons">
+                        <button class="answer-btn true-btn" id="trueBtn">
+                            <span class="btn-icon">✅</span>
+                            <span class="btn-text">Вірю</span>
+                        </button>
+                        <button class="answer-btn false-btn" id="falseBtn">
+                            <span class="btn-icon">❌</span>
+                            <span class="btn-text">Не вірю</span>
+                        </button>
+                    </div>
+
+                    <div class="feedback-container hidden" id="feedbackContainer">
+                        <div class="feedback-result" id="feedbackResult">
+                            <span class="feedback-icon" id="feedbackIcon">✅</span>
+                            <span class="feedback-text" id="feedbackText">Правильно!</span>
+                        </div>
+                        <div class="explanation-box" id="explanationBox">
+                            <div class="explanation-title">💡 Пояснення:</div>
+                            <div class="explanation-text" id="explanationText"></div>
+                        </div>
+                        <button class="btn btn-primary btn-next" id="nextBtn">
+                            Далі →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-content">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultCorrect">0</div>
+                            <div class="stat-label">Правильних</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultAccuracy">0%</div>
+                            <div class="stat-label">Точність</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultStreak">0</div>
+                            <div class="stat-label">Серія</div>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-large" id="restartBtn">
+                            🔄 Ще раз
+                        </button>
+                        <button class="btn btn-secondary" id="reviewBtn">
+                            📋 Переглянути помилки
+                        </button>
+                        <a href="../index.html" class="btn btn-secondary">
+                            🏠 До меню
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Screen -->
+            <div class="screen" id="reviewScreen">
+                <div class="review-content">
+                    <h2 class="review-title">📋 Твої помилки</h2>
+                    <div class="mistakes-list" id="mistakesList"></div>
+                    <button class="btn btn-primary" id="backFromReviewBtn">
+                        ← Назад до результатів
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Shared components -->
+    <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,5 +1,7 @@
-// Percent Trainer
-// Learn percentages through proportions, decimals, and formulas
+/* ===================================
+   MATH QUEST - PERCENT TRAINER
+   Full unified version with Help Panel & Firebase
+   =================================== */
 
 const tg = window.Telegram?.WebApp;
 if (tg) {
@@ -17,7 +19,8 @@ let state = {
     questionsAnswered: 0,
     totalQuestions: 10,
     currentQuestion: null,
-    hintUsed: false
+    hintUsed: false,
+    startTime: null
 };
 
 // DOM Elements
@@ -47,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupEventListeners() {
     // Level buttons
-    document.querySelectorAll('.btn-level').forEach(btn => {
+    document.querySelectorAll('.level-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             state.level = parseInt(btn.dataset.level);
             startGame();
@@ -56,28 +59,46 @@ function setupEventListeners() {
 
     // Answer input
     const input = document.getElementById('answerInput');
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkAnswer();
-    });
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+    }
 
     // Submit button
-    document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+    document.getElementById('submitBtn')?.addEventListener('click', checkAnswer);
 
-    // Hint button
-    document.getElementById('hintBtn').addEventListener('click', showHint);
+    // Next button
+    document.getElementById('nextBtn')?.addEventListener('click', nextQuestion);
+
+    // Help Panel buttons
+    document.getElementById('hintBtn')?.addEventListener('click', showHint);
+    document.getElementById('aiHelpBtn')?.addEventListener('click', showAIHelp);
+    document.getElementById('formulaBtn')?.addEventListener('click', showFormulaHelp);
+
+    // AI Modal close
+    document.getElementById('aiCloseBtn')?.addEventListener('click', closeAIModal);
+    document.getElementById('aiHelperModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'aiHelperModal') closeAIModal();
+    });
 
     // Result buttons
-    document.getElementById('nextLevelBtn').addEventListener('click', () => {
+    document.getElementById('nextLevelBtn')?.addEventListener('click', () => {
         if (state.level < 3) state.level++;
         startGame();
     });
-    document.getElementById('restartBtn').addEventListener('click', startGame);
-    document.getElementById('menuBtn').addEventListener('click', () => showScreen('start'));
+    document.getElementById('restartBtn')?.addEventListener('click', startGame);
 }
 
 function showScreen(name) {
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[name].classList.add('active');
+    Object.values(screens).forEach(s => s?.classList.remove('active'));
+    screens[name]?.classList.add('active');
+
+    // Show/hide progress container
+    const progressContainer = document.getElementById('progressContainer');
+    if (progressContainer) {
+        progressContainer.style.display = (name === 'game') ? 'block' : 'none';
+    }
 }
 
 function startGame() {
@@ -88,14 +109,14 @@ function startGame() {
         streak: 0,
         maxStreak: 0,
         questionsAnswered: 0,
-        hintUsed: false
+        hintUsed: false,
+        startTime: Date.now()
     };
 
     document.getElementById('correct').textContent = '0';
-    document.getElementById('wrong').textContent = '0';
     document.getElementById('streak').textContent = '0';
-    document.getElementById('currentLevel').textContent = state.level;
     document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('totalQuestions').textContent = state.totalQuestions;
 
     showScreen('game');
     nextQuestion();
@@ -108,15 +129,24 @@ function nextQuestion() {
     }
 
     state.hintUsed = false;
-    document.getElementById('hintBtn').disabled = false;
-    document.getElementById('hintContainer').classList.remove('show');
-    document.getElementById('feedback').classList.remove('show');
-    document.getElementById('submitBtn').disabled = false;
+
+    // Reset UI
+    const feedback = document.getElementById('feedback');
+    if (feedback) feedback.innerHTML = '';
+
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.style.display = 'none';
+
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) submitBtn.disabled = false;
 
     const input = document.getElementById('answerInput');
-    input.value = '';
-    input.classList.remove('correct', 'wrong');
-    input.focus();
+    if (input) {
+        input.value = '';
+        input.classList.remove('correct', 'wrong');
+        input.disabled = false;
+        input.focus();
+    }
 
     state.currentQuestion = generateQuestion();
     displayQuestion();
@@ -132,7 +162,6 @@ function generateQuestion() {
         case 'findWhole': return generateFindWhole();
         case 'increase': return generateIncrease();
         case 'decrease': return generateDecrease();
-        case 'compare': return generateCompare();
         default: return generateFindPart();
     }
 }
@@ -159,17 +188,9 @@ function generateFindPart() {
         type: 'findPart',
         questionType: 'Знайди частину',
         text: `Скільки буде ${p}% від ${A}?`,
-        methodHint: 'Формула: A × p ÷ 100',
         answer: answer,
         data: { p, A },
-        hint: `Щоб знайти ${p}% від ${A}:
-1. Переведи % у десятковий дріб: ${p}% = ${p/100}
-2. Помнож: ${A} × ${p/100} = ${answer}
-
-Або пропорцією:
-${A} — 100%
-x — ${p}%
-x = ${A} × ${p} ÷ 100 = ${answer}`
+        hint: `Щоб знайти ${p}% від ${A}:\n1. Переведи % у десятковий дріб: ${p}% = ${p/100}\n2. Помнож: ${A} × ${p/100} = ${answer}`
     };
 }
 
@@ -186,18 +207,10 @@ function generateFindPercent() {
         type: 'findPercent',
         questionType: 'Знайди відсоток',
         text: `${B} — це скільки відсотків від ${A}?`,
-        methodHint: 'Формула: (B ÷ A) × 100',
         answer: p,
         answerSuffix: '%',
         data: { A, B },
-        hint: `Щоб знайти скільки % складає ${B} від ${A}:
-1. Поділи частину на ціле: ${B} ÷ ${A} = ${B/A}
-2. Помнож на 100: ${B/A} × 100 = ${p}%
-
-Або пропорцією:
-${A} — 100%
-${B} — x%
-x = ${B} × 100 ÷ ${A} = ${p}%`
+        hint: `Щоб знайти скільки % складає ${B} від ${A}:\n1. Поділи частину на ціле: ${B} ÷ ${A} = ${B/A}\n2. Помнож на 100: ${B/A} × 100 = ${p}%`
     };
 }
 
@@ -214,15 +227,9 @@ function generateFindWhole() {
         type: 'findWhole',
         questionType: 'Знайди ціле',
         text: `${p}% числа дорівнює ${B}. Знайди це число.`,
-        methodHint: 'Формула: B × 100 ÷ p',
         answer: A,
         data: { p, B },
-        hint: `${p}% = ${B}, знайти 100%:
-1. Знайди 1%: ${B} ÷ ${p} = ${B/p}
-2. Знайди 100%: ${B/p} × 100 = ${A}
-
-Або формулою:
-Число = ${B} × 100 ÷ ${p} = ${A}`
+        hint: `${p}% = ${B}, знайти 100%:\n1. Знайди 1%: ${B} ÷ ${p} = ${B/p}\n2. Знайди 100%: ${B/p} × 100 = ${A}`
     };
 }
 
@@ -239,14 +246,9 @@ function generateIncrease() {
         type: 'increase',
         questionType: 'Збільшення',
         text: `Збільш ${A} на ${p}%`,
-        methodHint: 'Формула: A × (1 + p/100)',
         answer: answer,
         data: { p, A },
-        hint: `Збільшити ${A} на ${p}%:
-1. Знайди ${p}% від ${A}: ${A} × ${p/100} = ${A * p/100}
-2. Додай до початкового: ${A} + ${A * p/100} = ${answer}
-
-Або одразу: ${A} × ${1 + p/100} = ${answer}`
+        hint: `Збільшити ${A} на ${p}%:\n1. Знайди ${p}% від ${A}: ${A} × ${p/100} = ${A * p/100}\n2. Додай до початкового: ${A} + ${A * p/100} = ${answer}`
     };
 }
 
@@ -263,14 +265,9 @@ function generateDecrease() {
         type: 'decrease',
         questionType: 'Зменшення',
         text: `Зменш ${A} на ${p}%`,
-        methodHint: 'Формула: A × (1 - p/100)',
         answer: answer,
         data: { p, A },
-        hint: `Зменшити ${A} на ${p}%:
-1. Знайди ${p}% від ${A}: ${A} × ${p/100} = ${A * p/100}
-2. Відніми від початкового: ${A} - ${A * p/100} = ${answer}
-
-Або одразу: ${A} × ${1 - p/100} = ${answer}`
+        hint: `Зменшити ${A} на ${p}%:\n1. Знайди ${p}% від ${A}: ${A} × ${p/100} = ${A * p/100}\n2. Відніми від початкового: ${A} - ${A * p/100} = ${answer}`
     };
 }
 
@@ -278,7 +275,7 @@ function displayQuestion() {
     const q = state.currentQuestion;
     document.getElementById('questionType').textContent = q.questionType;
     document.getElementById('questionText').textContent = q.text;
-    document.getElementById('methodHint').textContent = q.methodHint;
+    document.getElementById('questionNumber').textContent = `Питання ${state.questionsAnswered + 1}`;
 }
 
 function checkAnswer() {
@@ -294,6 +291,8 @@ function checkAnswer() {
     const q = state.currentQuestion;
     const isCorrect = Math.abs(userAnswer - q.answer) < 0.01;
 
+    // Disable input and submit
+    input.disabled = true;
     document.getElementById('submitBtn').disabled = true;
 
     if (isCorrect) {
@@ -310,14 +309,14 @@ function checkAnswer() {
     }
 
     document.getElementById('correct').textContent = state.correct;
-    document.getElementById('wrong').textContent = state.wrong;
     document.getElementById('streak').textContent = state.streak;
 
     state.questionsAnswered++;
     const progress = (state.questionsAnswered / state.totalQuestions) * 100;
     document.getElementById('progressFill').style.width = `${progress}%`;
 
-    setTimeout(nextQuestion, isCorrect ? 1200 : 2500);
+    // Show next button
+    document.getElementById('nextBtn').style.display = 'block';
 }
 
 function showFeedback(isCorrect, correctAnswer = null, suffix = '') {
@@ -325,74 +324,193 @@ function showFeedback(isCorrect, correctAnswer = null, suffix = '') {
 
     if (isCorrect) {
         const messages = ['Правильно! 🎉', 'Молодець! ✨', 'Вірно! ✅', 'Чудово! 💪'];
-        feedback.textContent = messages[Math.floor(Math.random() * messages.length)];
-        feedback.className = 'feedback show correct';
+        feedback.innerHTML = `<div class="feedback-correct">${messages[Math.floor(Math.random() * messages.length)]}</div>`;
     } else {
-        feedback.textContent = `Відповідь: ${correctAnswer}${suffix || ''}`;
-        feedback.className = 'feedback show wrong';
+        feedback.innerHTML = `<div class="feedback-wrong">Відповідь: ${correctAnswer}${suffix || ''}</div>`;
     }
 }
 
-async function showHint() {
+// ========== HELP PANEL FUNCTIONS ==========
+
+function showHint() {
     if (state.hintUsed) return;
     state.hintUsed = true;
 
-    const hintBtn = document.getElementById('hintBtn');
-    const hintContainer = document.getElementById('hintContainer');
-    const hintLoading = document.getElementById('hintLoading');
-    const hintText = document.getElementById('hintText');
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
 
-    hintBtn.disabled = true;
-    hintContainer.classList.add('show');
-    hintLoading.classList.remove('hidden');
-    hintText.textContent = '';
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
 
-    // Try AI hint, fall back to local
-    if (window.AIHints) {
-        const result = await window.AIHints.getHint(
-            'percent',
-            state.currentQuestion.text,
-            state.level,
-            { type: state.currentQuestion.type, data: state.currentQuestion.data }
-        );
-        hintLoading.classList.add('hidden');
-        hintText.textContent = result.hint;
-    } else {
-        // Fallback to local hint
-        hintLoading.classList.add('hidden');
-        hintText.textContent = state.currentQuestion.hint;
-    }
+    // Simulate loading then show hint
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+        response.innerHTML = `
+            <div class="ai-hint-content">
+                <h4>💡 Підказка</h4>
+                <p style="white-space: pre-line;">${state.currentQuestion.hint}</p>
+            </div>
+        `;
+    }, 500);
 }
 
-function showResults() {
+function showAIHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'flex';
+    response.style.display = 'none';
+
+    // Show contextual help
+    setTimeout(() => {
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        const q = state.currentQuestion;
+        let explanation = '';
+
+        switch (q.type) {
+            case 'findPart':
+                explanation = `<p><strong>Як знайти відсоток від числа:</strong></p>
+                    <p>1. Перетвори відсоток у десятковий дріб (поділи на 100)</p>
+                    <p>2. Помнож число на цей дріб</p>
+                    <p><em>Формула: A × p ÷ 100</em></p>`;
+                break;
+            case 'findPercent':
+                explanation = `<p><strong>Як знайти відсоткове відношення:</strong></p>
+                    <p>1. Поділи частину на ціле</p>
+                    <p>2. Помнож результат на 100</p>
+                    <p><em>Формула: (B ÷ A) × 100%</em></p>`;
+                break;
+            case 'findWhole':
+                explanation = `<p><strong>Як знайти число за його відсотком:</strong></p>
+                    <p>1. Визнач скільки це 1%</p>
+                    <p>2. Помнож на 100</p>
+                    <p><em>Формула: B × 100 ÷ p</em></p>`;
+                break;
+            case 'increase':
+                explanation = `<p><strong>Як збільшити число на відсоток:</strong></p>
+                    <p>1. Знайди скільки це відсотків</p>
+                    <p>2. Додай до початкового числа</p>
+                    <p><em>Формула: A × (1 + p/100)</em></p>`;
+                break;
+            case 'decrease':
+                explanation = `<p><strong>Як зменшити число на відсоток:</strong></p>
+                    <p>1. Знайди скільки це відсотків</p>
+                    <p>2. Відніми від початкового числа</p>
+                    <p><em>Формула: A × (1 - p/100)</em></p>`;
+                break;
+        }
+
+        response.innerHTML = `
+            <div class="ai-help-content">
+                <h4>🤖 Допомога</h4>
+                ${explanation}
+            </div>
+        `;
+    }, 600);
+}
+
+function showFormulaHelp() {
+    const modal = document.getElementById('aiHelperModal');
+    const loading = document.getElementById('aiLoading');
+    const response = document.getElementById('aiResponse');
+
+    modal.classList.remove('hidden');
+    loading.style.display = 'none';
+    response.style.display = 'block';
+
+    response.innerHTML = `
+        <div class="ai-formula-content">
+            <h4>📐 Формули відсотків</h4>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">p% від A = A × p ÷ 100</div>
+                <div class="formula-note">Знайти частину</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">p = (B ÷ A) × 100%</div>
+                <div class="formula-note">Знайти відсоток</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">A = B × 100 ÷ p</div>
+                <div class="formula-note">Знайти ціле число</div>
+            </div>
+            <div class="theory-card" style="margin-bottom: 1rem;">
+                <div class="formula-main">Збільшення: A × (1 + p/100)</div>
+                <div class="formula-note">Зменшення: A × (1 - p/100)</div>
+            </div>
+        </div>
+    `;
+}
+
+function closeAIModal() {
+    const modal = document.getElementById('aiHelperModal');
+    modal.classList.add('hidden');
+}
+
+// ========== RESULTS ==========
+
+async function showResults() {
     const accuracy = state.correct + state.wrong > 0
         ? Math.round((state.correct / (state.correct + state.wrong)) * 100)
         : 0;
+
+    const timeSpent = Math.round((Date.now() - state.startTime) / 1000);
 
     document.getElementById('finalCorrect').textContent = state.correct;
     document.getElementById('finalWrong').textContent = state.wrong;
     document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
 
     const title = document.getElementById('resultTitle');
-    if (accuracy >= 90) title.textContent = '🏆 Бездоганно!';
-    else if (accuracy >= 70) title.textContent = '🎉 Чудово!';
-    else if (accuracy >= 50) title.textContent = '👍 Непогано!';
-    else title.textContent = '📚 Потрібно повторити';
+    const icon = document.getElementById('resultIcon');
 
-    // Hide next level button on level 3
-    document.getElementById('nextLevelBtn').style.display = state.level < 3 ? 'block' : 'none';
-
-    // Save progress
-    if (window.Progress) {
-        window.Progress.saveSession('percent', {
-            level: state.level,
-            correct: state.correct,
-            wrong: state.wrong,
-            streak: state.maxStreak,
-            accuracy,
-            completed: accuracy >= 70
-        });
+    if (accuracy >= 90) {
+        title.textContent = 'Бездоганно!';
+        icon.textContent = '🏆';
+    } else if (accuracy >= 70) {
+        title.textContent = 'Чудова робота!';
+        icon.textContent = '🎉';
+    } else if (accuracy >= 50) {
+        title.textContent = 'Непогано!';
+        icon.textContent = '👍';
+    } else {
+        title.textContent = 'Потрібно повторити';
+        icon.textContent = '📚';
     }
 
+    // Hide next level button on level 3
+    const nextLevelBtn = document.getElementById('nextLevelBtn');
+    if (nextLevelBtn) {
+        nextLevelBtn.style.display = state.level < 3 ? 'block' : 'none';
+    }
+
+    // Save to Firebase
+    await saveToFirebase(accuracy, timeSpent);
+
     showScreen('result');
+}
+
+async function saveToFirebase(accuracy, timeSpent) {
+    if (window.MathQuestFirebase) {
+        try {
+            await window.MathQuestFirebase.saveTrainerSession({
+                trainerId: 'percent',
+                trainerName: 'Відсотки',
+                score: state.correct,
+                totalQuestions: state.totalQuestions,
+                difficulty: state.level,
+                accuracy: accuracy,
+                maxStreak: state.maxStreak,
+                timeSpent: timeSpent
+            });
+            console.log('Session saved to Firebase');
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+        }
+    }
 }

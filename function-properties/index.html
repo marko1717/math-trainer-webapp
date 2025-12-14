@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Властивості функцій | Math Quest</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+
+    <style>
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+            min-height: 100vh;
+        }
+
+        .trainer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-md);
+            border: 2px solid var(--border);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: var(--font-sm);
+            text-decoration: none;
+        }
+
+        .trainer-title {
+            font-size: var(--font-lg);
+            color: var(--accent);
+        }
+
+        .streak-counter {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 600;
+        }
+
+        .progress-container {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: var(--spacing-sm);
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Welcome screen */
+        .welcome-screen {
+            text-align: center;
+            padding: var(--spacing-lg) 0;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .welcome-title {
+            font-size: var(--font-2xl);
+            color: var(--accent);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .welcome-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.6;
+        }
+
+        /* Topic selection */
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .topic-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-lg);
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .topic-btn:hover, .topic-btn.active {
+            border-color: var(--accent);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .topic-icon {
+            font-size: 2rem;
+        }
+
+        .topic-name {
+            font-size: var(--font-base);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Question container */
+        .question-container {
+            padding: var(--spacing-md) 0;
+        }
+
+        .question-number {
+            text-align: center;
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Function display */
+        .function-display {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .function-formula {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .function-graph {
+            width: 100%;
+            max-width: 200px;
+            height: 150px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border);
+        }
+
+        /* Question text */
+        .question-text {
+            font-size: var(--font-lg);
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-primary);
+        }
+
+        /* Answer options */
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: var(--font-base);
+        }
+
+        .answer-option:hover {
+            border-color: var(--accent);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .answer-option.selected {
+            border-color: var(--accent);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .answer-option.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .answer-option.incorrect {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .answer-option:disabled {
+            cursor: not-allowed;
+        }
+
+        .option-letter {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-dark);
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: var(--font-sm);
+            color: var(--text-primary);
+        }
+
+        .answer-option.correct .option-letter {
+            background: var(--success);
+            color: white;
+        }
+
+        .answer-option.incorrect .option-letter {
+            background: var(--error);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        /* Feedback */
+        .feedback-container {
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-top: var(--spacing-md);
+            text-align: center;
+        }
+
+        .feedback-container.correct {
+            background: rgba(16, 185, 129, 0.15);
+            border: 2px solid var(--success);
+        }
+
+        .feedback-container.incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            border: 2px solid var(--error);
+        }
+
+        .feedback-text {
+            font-size: var(--font-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .feedback-container.correct .feedback-text {
+            color: var(--success);
+        }
+
+        .feedback-container.incorrect .feedback-text {
+            color: var(--error);
+        }
+
+        .feedback-explanation {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Results */
+        .results-content {
+            text-align: center;
+            padding: var(--spacing-lg) 0;
+        }
+
+        .results-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .results-title {
+            font-size: var(--font-2xl);
+            color: var(--accent);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+        }
+
+        .stat-value {
+            font-size: var(--font-2xl);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+        }
+
+        .results-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        /* Next button */
+        .btn-next {
+            width: 100%;
+            margin-top: var(--spacing-md);
+        }
+
+        /* Screen management */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="trainer-header">
+            <a href="../index.html" class="back-btn">← Меню</a>
+            <h1 class="trainer-title">Властивості функцій</h1>
+            <div class="streak-counter">
+                <span>🔥</span>
+                <span id="streakNumber">0</span>
+            </div>
+        </header>
+
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">10</span> правильно
+            </div>
+        </div>
+
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📈</div>
+                    <h2 class="welcome-title">Властивості функцій</h2>
+                    <p class="welcome-description">
+                        Визнач область визначення, область значень, парність, нулі функції та інші властивості
+                    </p>
+
+                    <h3 style="margin-bottom: var(--spacing-md); color: var(--text-primary);">Оберіть тему:</h3>
+
+                    <div class="topic-grid">
+                        <button class="topic-btn" data-topic="domain">
+                            <span class="topic-icon">📍</span>
+                            <span class="topic-name">Область визначення</span>
+                        </button>
+                        <button class="topic-btn" data-topic="range">
+                            <span class="topic-icon">📊</span>
+                            <span class="topic-name">Область значень</span>
+                        </button>
+                        <button class="topic-btn" data-topic="parity">
+                            <span class="topic-icon">⚖️</span>
+                            <span class="topic-name">Парність</span>
+                        </button>
+                        <button class="topic-btn" data-topic="zeros">
+                            <span class="topic-icon">🎯</span>
+                            <span class="topic-name">Нулі функції</span>
+                        </button>
+                        <button class="topic-btn" data-topic="monotonicity">
+                            <span class="topic-icon">📈</span>
+                            <span class="topic-name">Монотонність</span>
+                        </button>
+                        <button class="topic-btn" data-topic="mixed" style="background: linear-gradient(135deg, var(--accent), var(--primary)); border-color: transparent;">
+                            <span class="topic-icon" style="filter: brightness(10);">🎲</span>
+                            <span class="topic-name" style="color: white;">Мікс</span>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-primary btn-large" id="startBtn">
+                        Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="screen" id="quizScreen">
+                <div class="question-container">
+                    <div class="question-number" id="questionNumber">Питання 1 / 10</div>
+
+                    <div class="function-display">
+                        <div class="function-formula" id="functionFormula">y = x²</div>
+                        <canvas class="function-graph" id="functionGraph"></canvas>
+                    </div>
+
+                    <div class="question-text" id="questionText">
+                        Визначте область визначення функції
+                    </div>
+
+                    <div class="answer-options" id="answerOptions">
+                        <!-- Options will be generated by JS -->
+                    </div>
+
+                    <div class="feedback-container hidden" id="feedbackContainer">
+                        <div class="feedback-text" id="feedbackText">Правильно!</div>
+                        <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+
+                    <button class="btn btn-primary btn-next hidden" id="nextBtn">
+                        Далі →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-content">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultCorrect">0</div>
+                            <div class="stat-label">Правильних</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultAccuracy">0%</div>
+                            <div class="stat-label">Точність</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="resultStreak">0</div>
+                            <div class="stat-label">Макс. серія</div>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary btn-large" id="restartBtn">
+                            🔄 Ще раз
+                        </button>
+                        <button class="btn btn-secondary" id="changeTopicBtn">
+                            🎯 Інша тема
+                        </button>
+                        <a href="../index.html" class="btn btn-secondary">
+                            🏠 До меню
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../shared/firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

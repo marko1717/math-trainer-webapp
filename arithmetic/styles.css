@@ -302,20 +302,23 @@ body.retro-mode .level-badge {
 /* === Answer Section === */
 .answer-section {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 12px;
     margin: 16px 0;
 }
 
 .answer-input {
-    flex: 1;
-    padding: 14px 16px;
-    font-size: 1.1rem;
+    width: 100%;
+    min-width: 200px;
+    padding: 16px 20px;
+    font-size: 1.2rem;
     font-family: inherit;
     border: 2px solid var(--border);
-    border-radius: 8px;
+    border-radius: 12px;
     background: var(--bg-secondary);
     color: var(--text-primary);
     text-align: center;
+    box-sizing: border-box;
 }
 
 .answer-input::placeholder {

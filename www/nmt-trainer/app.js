@@ -305,8 +305,8 @@ function startQuizzes() {
             type: q.type === 'short' ? 'short' : 'quiz',
             photo: q.photo,
             correct: q.correct,
-            solution_photo: null,
-            hashtag: q.hashtag || ''
+            solution_photo: q.solution_photo || null,
+            hashtag: q.tag || q.hashtag || ''
         }))
     };
     startTest(quizTest);
@@ -399,9 +399,24 @@ function renderTaskNav() {
 function updateTaskNav() {
     const buttons = taskNav.querySelectorAll('.task-nav-btn');
     buttons.forEach((btn, index) => {
-        btn.classList.remove('current');
+        // Reset classes
+        btn.classList.remove('current', 'answered', 'wrong', 'partial');
+
+        // Current task
         if (index === currentTaskIndex) {
             btn.classList.add('current');
+        }
+
+        // Answer status colors
+        if (userAnswers[index] !== null) {
+            const answer = userAnswers[index];
+            if (answer.isCorrect) {
+                btn.classList.add('answered'); // green
+            } else if (answer.partialScore > 0) {
+                btn.classList.add('partial'); // yellow
+            } else {
+                btn.classList.add('wrong'); // red
+            }
         }
     });
 }
@@ -463,8 +478,9 @@ function showTask() {
         }
     }
 
-    // Show/hide hint button (training mode only)
-    if (mode === 'training' && !answered) {
+    // Show/hide hint button (training mode or quizzes section)
+    const isQuizzesSection = currentTest && currentTest.id === 'quizzes';
+    if ((mode === 'training' || isQuizzesSection) && !answered) {
         hintBtn.classList.remove('hidden');
     } else {
         hintBtn.classList.add('hidden');
@@ -872,10 +888,40 @@ function displayHint(hint) {
 }
 
 function generateMockHint(task) {
-    // Generate helpful hints based on task type
+    // Generate helpful hints based on task tag or task number
     const taskNum = task.task_num || currentTaskIndex + 1;
+    const tag = (task.tag || '').toLowerCase();
 
-    const hints = {
+    // Hints by tag (for quizzes)
+    const tagHints = {
+        'відсотки': 'Щоб знайти відсоток від числа: число × відсоток / 100. Щоб знайти на скільки % змінилось: (нове - старе) / старе × 100%.',
+        'пропорція': 'Використай властивість пропорції: a/b = c/d ⟹ a·d = b·c. Також перевір одиниці вимірювання.',
+        'системи': 'Методи: підстановки (вирази одну змінну через іншу) або додавання (помнож рівняння щоб скоротити змінну).',
+        'алгебра': 'Спробуй розкласти на множники або застосувати формули скороченого множення.',
+        'первісна': 'Первісна F(x): F\'(x) = f(x). Не забудь константу C. ∫xⁿdx = xⁿ⁺¹/(n+1) + C.',
+        'похідна': 'Основні правила: (xⁿ)\' = n·xⁿ⁻¹, (sin x)\' = cos x, (eˣ)\' = eˣ. Не забудь правило ланцюжка.',
+        'тригонометр': 'sin²x + cos²x = 1. Формули зведення: sin(π-x) = sin x, cos(π-x) = -cos x.',
+        'логарифм': 'log_a(bc) = log_a(b) + log_a(c), log_a(b/c) = log_a(b) - log_a(c), log_a(bⁿ) = n·log_a(b).',
+        'показник': 'aᵐ·aⁿ = aᵐ⁺ⁿ, aᵐ/aⁿ = aᵐ⁻ⁿ, (aᵐ)ⁿ = aᵐⁿ. Приведи до однієї основи.',
+        'геометр': 'Перевір теореми: Піфагора, синусів, косинусів. Властивості подібних фігур.',
+        'планіметр': 'Площа трикутника: S = ½ah = ½ab·sin(C). Теорема Піфагора: a² + b² = c².',
+        'стерео': 'Об\'єм призми: V = S_осн·h. Об\'єм піраміди: V = ⅓S_осн·h. Об\'єм кулі: V = 4/3πR³.',
+        'функц': 'Область визначення - де функція існує. Область значень - всі можливі y. Нулі - де f(x) = 0.',
+        'нерівн': 'Метод інтервалів: знайди нулі, розбий на проміжки, визнач знак на кожному.',
+        'комбінатор': 'Перестановки Pₙ = n! (порядок важливий). Комбінації Cₙᵏ = n!/(k!(n-k)!) (порядок не важливий).',
+        'ймовірн': 'P = m/n (сприятливі / всі). P(A∪B) = P(A) + P(B) - P(A∩B).',
+        'послідовн': 'Арифметична: aₙ = a₁ + (n-1)d, Sₙ = n(a₁+aₙ)/2. Геометрична: bₙ = b₁·qⁿ⁻¹.',
+    };
+
+    // Check tag first
+    for (const [key, hint] of Object.entries(tagHints)) {
+        if (tag.includes(key)) {
+            return hint;
+        }
+    }
+
+    // Fallback to task number hints (for NMT tests)
+    const numHints = {
         1: 'Спробуй спростити вираз, застосувавши формули скороченого множення.',
         2: 'Уважно прочитай умову та визнач, які величини дані і що потрібно знайти.',
         3: 'Перевір, чи можна розкласти вираз на множники.',
@@ -892,7 +938,7 @@ function generateMockHint(task) {
         14: 'Зведи до одного аргументу, використовуючи формули зведення.',
         15: 'Для показникових: приведи до однієї основи.',
         16: 'Для логарифмів: використай властивості log(ab) = log(a) + log(b).',
-        17: 'Похідна показує швидкість зміни функції. f\'(x) = 0 в точках екстремуму.',
+        17: 'Похідна показує швидкість зміни функції. f\'(x) = 0 в точках екстремуну.',
         18: 'Первісна - це функція F, така що F\'(x) = f(x).',
         19: 'Для комбінаторики: визнач, чи важливий порядок (перестановки vs комбінації).',
         20: 'Для многогранників: V = ⅓·S_осн·h (піраміда), V = S_осн·h (призма).',
@@ -900,7 +946,7 @@ function generateMockHint(task) {
         22: 'Для кулі: V = 4/3·πR³, S = 4πR².'
     };
 
-    return hints[taskNum] || 'Уважно прочитай умову та визнач тип задачі. Запиши, що дано і що потрібно знайти.';
+    return numHints[taskNum] || 'Уважно прочитай умову та визнач тип задачі. Запиши, що дано і що потрібно знайти.';
 }
 
 // ========== INIT ==========

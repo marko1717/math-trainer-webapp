@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>НМТ Тренажер</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/styles.css">
+    <style>
+        .test-select-screen, .task-screen, .result-screen, .solution-screen {
+            display: none;
+        }
+        .test-select-screen.active, .task-screen.active, .result-screen.active, .solution-screen.active {
+            display: block;
+        }
+
+        .test-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .test-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .test-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .test-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .test-card-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .test-card-tasks {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .test-card-arrow {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Timer */
+        .timer-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            color: var(--accent);
+        }
+
+        .timer.warning {
+            color: #ef4444;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Task image */
+        .task-image-container {
+            width: 100%;
+            margin: 16px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .task-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Answer options */
+        .answer-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .answer-btn {
+            min-width: 60px;
+            padding: 14px 24px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .answer-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-tertiary);
+        }
+
+        .answer-btn.selected {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .answer-btn.correct {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .answer-btn.wrong {
+            border-color: #ef4444;
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Match input for matching tasks */
+        .match-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .match-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .match-label {
+            min-width: 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .match-select {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Short answer input */
+        .short-answer-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            margin: 20px 0;
+        }
+
+        .short-answer-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Action buttons */
+        .action-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-solution {
+            padding: 16px 20px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* Result screen */
+        .result-summary {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .result-emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .result-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .result-time {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .result-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        /* Solution screen */
+        .solution-image-container {
+            width: 100%;
+            margin: 16px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .solution-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .solution-answer {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+
+        .solution-answer-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .solution-answer-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* Task type indicator */
+        .task-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 20px;
+            background: var(--accent);
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .task-type-badge.match {
+            background: #8b5cf6;
+        }
+
+        .task-type-badge.short {
+            background: #06b6d4;
+        }
+
+        /* Feedback message */
+        .feedback-message {
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 16px 0;
+            font-weight: 600;
+        }
+
+        .feedback-message.correct {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .feedback-message.wrong {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Test Selection Screen -->
+        <div class="test-select-screen active" id="testSelectScreen">
+            <div class="header">
+                <a href="../index.html" class="back-btn">←</a>
+                <h1>НМТ Тренажер</h1>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 8px;">Виберіть варіант</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">6 тестів • 132 завдання</p>
+
+                <div class="test-list" id="testList">
+                    <!-- Tests will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Screen -->
+        <div class="task-screen" id="taskScreen">
+            <div class="timer-bar">
+                <span class="timer" id="timer">00:00</span>
+                <span class="progress-text" id="progressText">1 / 22</span>
+            </div>
+
+            <div class="card">
+                <span class="task-type-badge" id="taskTypeBadge">Тест</span>
+
+                <div class="task-image-container">
+                    <img class="task-image" id="taskImage" src="" alt="Завдання">
+                </div>
+
+                <!-- Quiz options (A, Б, В, Г, Д) -->
+                <div class="answer-options" id="quizOptions">
+                    <button class="answer-btn" data-answer="А">А</button>
+                    <button class="answer-btn" data-answer="Б">Б</button>
+                    <button class="answer-btn" data-answer="В">В</button>
+                    <button class="answer-btn" data-answer="Г">Г</button>
+                    <button class="answer-btn" data-answer="Д">Д</button>
+                </div>
+
+                <!-- Match inputs -->
+                <div class="match-input-container" id="matchInputs" style="display: none;">
+                    <div class="match-row">
+                        <span class="match-label">1</span>
+                        <select class="match-select" data-row="1">
+                            <option value="">—</option>
+                            <option value="А">А</option>
+                            <option value="Б">Б</option>
+                            <option value="В">В</option>
+                            <option value="Г">Г</option>
+                            <option value="Д">Д</option>
+                        </select>
+                    </div>
+                    <div class="match-row">
+                        <span class="match-label">2</span>
+                        <select class="match-select" data-row="2">
+                            <option value="">—</option>
+                            <option value="А">А</option>
+                            <option value="Б">Б</option>
+                            <option value="В">В</option>
+                            <option value="Г">Г</option>
+                            <option value="Д">Д</option>
+                        </select>
+                    </div>
+                    <div class="match-row">
+                        <span class="match-label">3</span>
+                        <select class="match-select" data-row="3">
+                            <option value="">—</option>
+                            <option value="А">А</option>
+                            <option value="Б">Б</option>
+                            <option value="В">В</option>
+                            <option value="Г">Г</option>
+                            <option value="Д">Д</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Short answer input -->
+                <input type="text" class="short-answer-input" id="shortAnswerInput" style="display: none;" placeholder="Введіть відповідь">
+
+                <div class="feedback-message" id="feedbackMessage" style="display: none;"></div>
+
+                <div class="action-row">
+                    <button class="btn-submit" id="submitBtn">Відповісти</button>
+                    <button class="btn-solution" id="solutionBtn" style="display: none;">📖</button>
+                </div>
+
+                <div class="action-row" id="nextRow" style="display: none;">
+                    <button class="btn-submit" id="nextBtn">Далі →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solution Screen -->
+        <div class="solution-screen" id="solutionScreen">
+            <div class="header">
+                <button class="back-btn" id="closeSolutionBtn">←</button>
+                <h1>Розв'язок</h1>
+            </div>
+
+            <div class="card">
+                <div class="solution-answer">
+                    <div class="solution-answer-label">Правильна відповідь</div>
+                    <div class="solution-answer-value" id="solutionAnswer">Б</div>
+                </div>
+
+                <div class="solution-image-container" id="solutionImageContainer">
+                    <img class="solution-image" id="solutionImage" src="" alt="Розв'язок">
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="result-screen" id="resultScreen">
+            <div class="header">
+                <h1>Результат</h1>
+            </div>
+
+            <div class="card result-summary">
+                <div class="result-emoji" id="resultEmoji">🎉</div>
+                <div class="result-score" id="resultScore">18/22</div>
+                <div class="result-text" id="resultText">Чудовий результат!</div>
+                <div class="result-time" id="resultTime">Час: 15:32</div>
+
+                <div class="result-details">
+                    <div class="result-row">
+                        <span>Правильних</span>
+                        <span id="correctCount">18</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Неправильних</span>
+                        <span id="wrongCount">4</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Відсоток</span>
+                        <span id="percentScore">82%</span>
+                    </div>
+                </div>
+
+                <button class="btn-submit" id="restartBtn" style="width: 100%; margin-top: 20px;">
+                    Спробувати знову
+                </button>
+                <button class="btn-solution" id="backToTestsBtn" style="width: 100%; margin-top: 12px;">
+                    До списку тестів
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

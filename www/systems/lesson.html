@@ -799,15 +799,16 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.tooltip = document.getElementById('graphTooltip');
 
+                // Initialize BEFORE resize() to avoid undefined errors
+                this.lines = [];
+                this.solution = null;
+                this.animationProgress = 0;
+
                 this.resize();
                 window.addEventListener('resize', () => this.resize());
 
                 this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
                 this.canvas.addEventListener('mouseleave', () => this.hideTooltip());
-
-                this.lines = [];
-                this.solution = null;
-                this.animationProgress = 0;
             }
 
             resize() {

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Многочлени | Math Quest</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Unified Header -->
+        <header class="trainer-header">
+            <div class="header-left">
+                <a href="../index.html" class="back-btn">← Меню</a>
+            </div>
+            <div class="header-center">
+                <h1 class="trainer-title">Многочлени</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter" id="streakCounter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streakNumber">0</span>
+                </div>
+                <span class="level-badge" id="levelBadge">Рівень 1</span>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📊</div>
+                    <h2 class="welcome-title">Дії з многочленами</h2>
+                    <p class="welcome-description">
+                        Навчись додавати, віднімати та множити многочлени
+                    </p>
+                    <div class="formula-preview">
+                        <div class="theory-card">
+                            <div class="formula-main">Додавання: зводимо подібні</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">Віднімання: змінюємо знаки</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">Множення: кожен з кожним</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="startBtn">
+                        Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="screen" id="quizScreen">
+                <div class="difficulty-indicator" id="difficultyIndicator">
+                    <span class="difficulty-dot active"></span>
+                    <span class="difficulty-dot"></span>
+                    <span class="difficulty-dot"></span>
+                </div>
+
+                <div class="question-container">
+                    <div class="question-card">
+                        <div class="question-number" id="questionNumber">Питання 1</div>
+                        <div class="question-text" id="questionText">
+                            Спростіть: (2x + 3) + (x - 1)
+                        </div>
+                    </div>
+
+                    <div class="answers-container" id="answersContainer">
+                        <!-- Answers will be generated dynamically -->
+                    </div>
+
+                    <!-- Feedback Container -->
+                    <div class="feedback-container" id="feedbackContainer">
+                        <div class="feedback-icon" id="feedbackIcon">✅</div>
+                        <div class="feedback-text" id="feedbackText">Правильно!</div>
+                        <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+
+                    <button class="btn btn-primary next-btn" id="nextBtn" style="display: none;">
+                        Далі →
+                    </button>
+                </div>
+
+                <!-- Help Panel -->
+                <div class="help-panel">
+                    <button class="help-btn" id="hintBtn" title="Підказка">
+                        <span>💡</span>
+                    </button>
+                    <button class="help-btn" id="formulaBtn" title="Правила">
+                        <span>📐</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-container">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultCorrect">0</span>
+                            <span class="stat-label">Правильних</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultAccuracy">0%</span>
+                            <span class="stat-label">Точність</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultLevel">1</span>
+                            <span class="stat-label">Рівень</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-feedback-card">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-text" id="aiText">
+                            Аналізую твої результати...
+                        </div>
+                    </div>
+
+                    <div class="weak-topics" id="weakTopics" style="display: none;">
+                        <h4>Потрібно попрацювати над:</h4>
+                        <div class="weak-list" id="weakList"></div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary" id="restartBtn">Спробувати ще</button>
+                        <button class="btn btn-secondary" id="reviewBtn">Переглянути правила</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulas Screen -->
+            <div class="screen" id="formulasScreen">
+                <div class="formulas-container">
+                    <h2>Правила дій з многочленами</h2>
+
+                    <div class="formula-card">
+                        <h3>➕ Додавання многочленів</h3>
+                        <p>Зводимо подібні члени (з однаковими степенями змінних)</p>
+                        <div class="example">
+                            (3x² + 2x - 1) + (x² - x + 4) = 4x² + x + 3
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>➖ Віднімання многочленів</h3>
+                        <p>Змінюємо знаки у від'ємника, потім зводимо подібні</p>
+                        <div class="example">
+                            (3x² + 2x) - (x² - x) = 3x² + 2x - x² + x = 2x² + 3x
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>✖ Множення на одночлен</h3>
+                        <p>Множимо кожен член многочлена на одночлен</p>
+                        <div class="example">
+                            2x · (3x² - 2x + 1) = 6x³ - 4x² + 2x
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>✖ Множення многочленів</h3>
+                        <p>Кожен член першого множимо на кожен член другого</p>
+                        <div class="example">
+                            (x + 2)(x - 3) = x² - 3x + 2x - 6 = x² - x - 6
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" id="backToQuizBtn">← Назад</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- AI Helper Modal -->
+        <div class="ai-helper-modal hidden" id="aiHelperModal">
+            <div class="ai-helper-content">
+                <button class="ai-close-btn" id="aiCloseBtn">×</button>
+                <div class="ai-loading" id="aiLoading">
+                    <div class="spinner"></div>
+                    <p>Думаю...</p>
+                </div>
+                <div class="ai-response" id="aiResponse" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Системи рівнянь | Math Quest</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Unified Header -->
+        <header class="trainer-header">
+            <div class="header-left">
+                <a href="../index.html" class="back-btn">← Меню</a>
+            </div>
+            <div class="header-center">
+                <h1 class="trainer-title">Системи рівнянь</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter" id="streakCounter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streakNumber">0</span>
+                </div>
+                <span class="level-badge" id="levelBadge">Рівень 1</span>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">🔗</div>
+                    <h2 class="welcome-title">Системи лінійних рівнянь</h2>
+                    <p class="welcome-description">
+                        Методи підстановки та додавання з покроковими інструкціями
+                    </p>
+                    <div class="formula-preview">
+                        <div class="theory-card">
+                            <div class="formula-main">Метод підстановки</div>
+                            <div class="formula-sub">Виразити одну змінну через іншу</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">Метод додавання</div>
+                            <div class="formula-sub">Зрівняти коефіцієнти, скласти</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="startBtn">
+                        Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="screen" id="quizScreen">
+                <div class="difficulty-indicator" id="difficultyIndicator">
+                    <span class="difficulty-dot active"></span>
+                    <span class="difficulty-dot"></span>
+                    <span class="difficulty-dot"></span>
+                </div>
+
+                <div class="question-container">
+                    <div class="question-card">
+                        <div class="question-number" id="questionNumber">Питання 1</div>
+                        <div class="question-text" id="questionText">
+                            Розв'яжіть систему рівнянь
+                        </div>
+                        <div class="system-display" id="systemDisplay">
+                            <div class="equation">x + y = 5</div>
+                            <div class="equation">x - y = 1</div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-step solution -->
+                    <div class="steps-container" id="stepsContainer">
+                        <div class="step-card" id="step1">
+                            <div class="step-header">
+                                <span class="step-number">Крок 1</span>
+                                <span class="step-title" id="step1Title">Вибери метод</span>
+                            </div>
+                            <div class="step-content" id="step1Content"></div>
+                        </div>
+                    </div>
+
+                    <div class="answers-container" id="answersContainer">
+                        <!-- Answers will be generated dynamically -->
+                    </div>
+
+                    <!-- Feedback Container -->
+                    <div class="feedback-container" id="feedbackContainer">
+                        <div class="feedback-icon" id="feedbackIcon">✅</div>
+                        <div class="feedback-text" id="feedbackText">Правильно!</div>
+                        <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+
+                    <button class="btn btn-primary next-btn" id="nextBtn" style="display: none;">
+                        Далі →
+                    </button>
+                </div>
+
+                <!-- Help Panel -->
+                <div class="help-panel">
+                    <button class="help-btn" id="hintBtn" title="Підказка">
+                        <span>💡</span>
+                    </button>
+                    <button class="help-btn" id="formulaBtn" title="Методи">
+                        <span>📐</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-container">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultCorrect">0</span>
+                            <span class="stat-label">Правильних</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultAccuracy">0%</span>
+                            <span class="stat-label">Точність</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultLevel">1</span>
+                            <span class="stat-label">Рівень</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-feedback-card">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-text" id="aiText">
+                            Аналізую твої результати...
+                        </div>
+                    </div>
+
+                    <div class="weak-topics" id="weakTopics" style="display: none;">
+                        <h4>Потрібно попрацювати над:</h4>
+                        <div class="weak-list" id="weakList"></div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary" id="restartBtn">Спробувати ще</button>
+                        <button class="btn btn-secondary" id="reviewBtn">Переглянути методи</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulas Screen -->
+            <div class="screen" id="formulasScreen">
+                <div class="formulas-container">
+                    <h2>Методи розв'язування систем</h2>
+
+                    <div class="formula-card">
+                        <h3>🔄 Метод підстановки</h3>
+                        <p>1. Вирази одну змінну через іншу з першого рівняння</p>
+                        <p>2. Підстав вираз у друге рівняння</p>
+                        <p>3. Розв'яжи отримане рівняння</p>
+                        <p>4. Знайди другу змінну</p>
+                        <div class="example">
+                            x + y = 5 → y = 5 - x<br>
+                            2x - y = 1<br>
+                            2x - (5 - x) = 1<br>
+                            3x = 6 → x = 2<br>
+                            y = 5 - 2 = 3
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>➕ Метод додавання</h3>
+                        <p>1. Зрівняй коефіцієнти при одній змінній</p>
+                        <p>2. Склади або відніми рівняння</p>
+                        <p>3. Розв'яжи отримане рівняння</p>
+                        <p>4. Знайди другу змінну</p>
+                        <div class="example">
+                            x + y = 5<br>
+                            x - y = 1<br>
+                            ─────────<br>
+                            2x = 6 → x = 3<br>
+                            y = 5 - 3 = 2
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>💡 Коли який метод?</h3>
+                        <p><strong>Підстановка:</strong> коли легко виразити змінну (коеф. = 1 або -1)</p>
+                        <p><strong>Додавання:</strong> коли коефіцієнти рівні або протилежні</p>
+                    </div>
+
+                    <button class="btn btn-secondary" id="backToQuizBtn">← Назад</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- AI Helper Modal -->
+        <div class="ai-helper-modal hidden" id="aiHelperModal">
+            <div class="ai-helper-content">
+                <button class="ai-close-btn" id="aiCloseBtn">×</button>
+                <div class="ai-loading" id="aiLoading">
+                    <div class="spinner"></div>
+                    <p>Думаю...</p>
+                </div>
+                <div class="ai-response" id="aiResponse" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

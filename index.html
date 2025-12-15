@@ -707,7 +707,27 @@
 
         initThemeToggles();
         loadStats();
+
+        // Update profile name when user is logged in
+        window.addEventListener('authStateChanged', (e) => {
+            const user = e.detail?.user;
+            const profileName = document.getElementById('profileName');
+            const profileDesc = document.getElementById('profileDesc');
+
+            if (user && profileName) {
+                profileName.textContent = user.displayName || user.email || 'Профіль';
+                if (profileDesc) {
+                    profileDesc.textContent = 'Натисни для перегляду статистики';
+                }
+            } else if (profileName) {
+                profileName.textContent = 'Увійти';
+                if (profileDesc) {
+                    profileDesc.textContent = 'Збереження прогресу в хмарі';
+                }
+            }
+        });
     </script>
+    <script src="shared/firebase.js"></script>
     <script src="shared/onboarding.js"></script>
 </body>
 </html>

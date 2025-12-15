@@ -516,13 +516,28 @@
 
         <div class="section-title">⚔ ALGEBRA</div>
         <div class="trainer-grid">
+            <a href="polynomials/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">📊</span>
+                <span class="trainer-name">Многочлени</span>
+                <span class="trainer-desc">Дії з многочленами</span>
+            </a>
+            <a href="linear-equations/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">⚖️</span>
+                <span class="trainer-name">Рівняння</span>
+                <span class="trainer-desc">Лінійні рівняння</span>
+            </a>
+            <a href="systems/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">🔗</span>
+                <span class="trainer-name">Системи</span>
+                <span class="trainer-desc">Системи рівнянь</span>
+            </a>
             <a href="fsm/index.html" class="trainer-card pixel-box">
                 <span class="trainer-icon">📐</span>
                 <span class="trainer-name">ФСМ</span>
                 <span class="trainer-desc">Формули скороченого множення</span>
             </a>
             <a href="quadratic/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📊</span>
+                <span class="trainer-icon">📈</span>
                 <span class="trainer-name">Квадратні</span>
                 <span class="trainer-desc">Дискримінант, корені</span>
             </a>
@@ -585,8 +600,13 @@
 
         <div class="section-title">🔺 GEOMETRY</div>
         <div class="trainer-grid">
-            <a href="triangle/index.html" class="trainer-card pixel-box">
+            <a href="trigonometry/index.html" class="trainer-card pixel-box">
                 <span class="trainer-icon">📐</span>
+                <span class="trainer-name">Тригонометрія</span>
+                <span class="trainer-desc">Радіани, парність, таблиця</span>
+            </a>
+            <a href="triangle/index.html" class="trainer-card pixel-box">
+                <span class="trainer-icon">🔺</span>
                 <span class="trainer-name">Прямокутний △</span>
                 <span class="trainer-desc">Піфагор, тригонометрія</span>
             </a>
@@ -707,7 +727,27 @@
 
         initThemeToggles();
         loadStats();
+
+        // Update profile name when user is logged in
+        window.addEventListener('authStateChanged', (e) => {
+            const user = e.detail?.user;
+            const profileName = document.getElementById('profileName');
+            const profileDesc = document.getElementById('profileDesc');
+
+            if (user && profileName) {
+                profileName.textContent = user.displayName || user.email || 'Профіль';
+                if (profileDesc) {
+                    profileDesc.textContent = 'Натисни для перегляду статистики';
+                }
+            } else if (profileName) {
+                profileName.textContent = 'Увійти';
+                if (profileDesc) {
+                    profileDesc.textContent = 'Збереження прогресу в хмарі';
+                }
+            }
+        });
     </script>
+    <script src="shared/firebase.js"></script>
     <script src="shared/onboarding.js"></script>
 </body>
 </html>

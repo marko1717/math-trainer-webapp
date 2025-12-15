@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Тригонометрія | Math Quest</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Unified Header -->
+        <header class="trainer-header">
+            <div class="header-left">
+                <a href="../index.html" class="back-btn">← Меню</a>
+            </div>
+            <div class="header-center">
+                <h1 class="trainer-title">Тригонометрія</h1>
+            </div>
+            <div class="header-right">
+                <div class="streak-counter" id="streakCounter">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-number" id="streakNumber">0</span>
+                </div>
+                <span class="level-badge" id="levelBadge">Рівень 1</span>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">
+                <span id="correctCount">0</span> / <span id="totalCount">0</span> правильно
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Start Screen -->
+            <div class="screen active" id="startScreen">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">📐</div>
+                    <h2 class="welcome-title">Тригонометрія</h2>
+                    <p class="welcome-description">
+                        Градуси, радіани, парність, табличні значення
+                    </p>
+                    <div class="formula-preview">
+                        <div class="theory-card">
+                            <div class="formula-main">π рад = 180°</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">sin²α + cos²α = 1</div>
+                        </div>
+                        <div class="theory-card">
+                            <div class="formula-main">sin(-α) = -sin(α)</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="startBtn">
+                        Почати тренування
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="screen" id="quizScreen">
+                <div class="difficulty-indicator" id="difficultyIndicator">
+                    <span class="difficulty-dot active"></span>
+                    <span class="difficulty-dot"></span>
+                    <span class="difficulty-dot"></span>
+                </div>
+
+                <div class="question-container">
+                    <div class="question-card">
+                        <div class="question-number" id="questionNumber">Питання 1</div>
+                        <div class="question-text" id="questionText">
+                            Переведіть 180° в радіани
+                        </div>
+                    </div>
+
+                    <div class="answers-container" id="answersContainer">
+                        <!-- Answers will be generated dynamically -->
+                    </div>
+
+                    <!-- Feedback Container -->
+                    <div class="feedback-container" id="feedbackContainer">
+                        <div class="feedback-icon" id="feedbackIcon">✅</div>
+                        <div class="feedback-text" id="feedbackText">Правильно!</div>
+                        <div class="feedback-explanation" id="feedbackExplanation"></div>
+                    </div>
+
+                    <button class="btn btn-primary next-btn" id="nextBtn" style="display: none;">
+                        Далі →
+                    </button>
+                </div>
+
+                <!-- Help Panel -->
+                <div class="help-panel">
+                    <button class="help-btn" id="hintBtn" title="Підказка">
+                        <span>💡</span>
+                    </button>
+                    <button class="help-btn" id="formulaBtn" title="Формули">
+                        <span>📐</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="screen" id="resultsScreen">
+                <div class="results-container">
+                    <div class="results-icon" id="resultsIcon">🎉</div>
+                    <h2 class="results-title" id="resultsTitle">Чудова робота!</h2>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultCorrect">0</span>
+                            <span class="stat-label">Правильних</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultAccuracy">0%</span>
+                            <span class="stat-label">Точність</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="resultLevel">1</span>
+                            <span class="stat-label">Рівень</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-feedback-card">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-text" id="aiText">
+                            Аналізую твої результати...
+                        </div>
+                    </div>
+
+                    <div class="weak-topics" id="weakTopics" style="display: none;">
+                        <h4>Потрібно попрацювати над:</h4>
+                        <div class="weak-list" id="weakList"></div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary" id="restartBtn">Спробувати ще</button>
+                        <button class="btn btn-secondary" id="reviewBtn">Переглянути формули</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulas Screen -->
+            <div class="screen" id="formulasScreen">
+                <div class="formulas-container">
+                    <h2>Тригонометричні формули</h2>
+
+                    <div class="formula-card">
+                        <h3>🔄 Переведення градусів ↔ радіан</h3>
+                        <div class="example">
+                            π рад = 180°<br>
+                            1° = π/180 рад<br>
+                            1 рад = 180°/π ≈ 57.3°
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>📊 Табличні значення</h3>
+                        <table class="trig-table">
+                            <tr>
+                                <th>α</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th>
+                            </tr>
+                            <tr>
+                                <td>sin</td><td>0</td><td>1/2</td><td>√2/2</td><td>√3/2</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <td>cos</td><td>1</td><td>√3/2</td><td>√2/2</td><td>1/2</td><td>0</td>
+                            </tr>
+                            <tr>
+                                <td>tg</td><td>0</td><td>√3/3</td><td>1</td><td>√3</td><td>—</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>⚖️ Парність функцій</h3>
+                        <div class="example">
+                            sin(-α) = -sin(α) — непарна<br>
+                            cos(-α) = cos(α) — парна<br>
+                            tg(-α) = -tg(α) — непарна
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h3>📐 Основна тотожність</h3>
+                        <div class="example">
+                            sin²α + cos²α = 1<br>
+                            1 + tg²α = 1/cos²α<br>
+                            1 + ctg²α = 1/sin²α
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" id="backToQuizBtn">← Назад</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- AI Helper Modal -->
+        <div class="ai-helper-modal hidden" id="aiHelperModal">
+            <div class="ai-helper-content">
+                <button class="ai-close-btn" id="aiCloseBtn">×</button>
+                <div class="ai-loading" id="aiLoading">
+                    <div class="spinner"></div>
+                    <p>Думаю...</p>
+                </div>
+                <div class="ai-response" id="aiResponse" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

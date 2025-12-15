@@ -23,6 +23,7 @@ const TOPIC_RANGES = {
 
 // Task types by position (last 4 are short answer, some are matching)
 const SHORT_ANSWER_TASKS = [19, 20, 21, 22]; // Last 4 tasks
+const NUMBER_TYPES = ['short', 'number']; // Types that use number input
 
 // ========== STATE ==========
 
@@ -420,7 +421,7 @@ function showTask() {
 
     // Determine task type
     let taskType = task.type || 'quiz';
-    if (SHORT_ANSWER_TASKS.includes(taskNum) || taskType === 'short') {
+    if (SHORT_ANSWER_TASKS.includes(taskNum) || NUMBER_TYPES.includes(taskType)) {
         taskType = 'short';
     }
 
@@ -575,7 +576,7 @@ function checkAnswer() {
     const task = currentTest.tasks[currentTaskIndex];
     const taskNum = task.task_num || currentTaskIndex + 1;
     let taskType = task.type || 'quiz';
-    if (SHORT_ANSWER_TASKS.includes(taskNum) || taskType === 'short') {
+    if (SHORT_ANSWER_TASKS.includes(taskNum) || NUMBER_TYPES.includes(taskType)) {
         taskType = 'short';
     }
 
@@ -650,8 +651,9 @@ function getMatchingAnswer() {
 }
 
 function checkMatchingAnswer(userAnswer, correct) {
-    const userParts = userAnswer.split(' ');
-    const correctParts = correct.split(' ');
+    // Normalize: remove spaces and split into chars if no spaces
+    const userParts = userAnswer.includes(' ') ? userAnswer.split(' ') : userAnswer.split('');
+    const correctParts = correct.includes(' ') ? correct.split(' ') : correct.split('');
 
     let matchCount = 0;
     for (let i = 0; i < correctParts.length; i++) {

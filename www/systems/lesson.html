@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Інтерактивний урок | Системи рівнянь</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <style>
+        :root {
+            --handwriting-font: 'Caveat', cursive;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .lesson-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        .lesson-title {
+            font-size: 1.5rem;
+            color: var(--text);
+            text-align: center;
+            flex: 1;
+        }
+
+        .voice-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .voice-toggle.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Main layout - two columns on desktop */
+        .lesson-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .lesson-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Graph panel */
+        .graph-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            position: relative;
+        }
+
+        .graph-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #graphCanvas {
+            width: 100%;
+            height: 300px;
+            background: var(--bg);
+            border-radius: 12px;
+            cursor: crosshair;
+        }
+
+        .graph-legend {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-color.line1 { background: #6366f1; }
+        .legend-color.line2 { background: #f59e0b; }
+        .legend-color.solution {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* Math panel */
+        .math-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 2px solid var(--border);
+        }
+
+        .math-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* System input */
+        .system-input {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .equation-input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .equation-input-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .eq-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            min-width: 20px;
+        }
+
+        .coef-input {
+            width: 50px;
+            padding: 0.5rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--card-bg);
+            color: var(--text);
+        }
+
+        .coef-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .var-label {
+            font-size: 1rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .solve-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+        }
+
+        .solve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Solution steps */
+        .solution-steps {
+            margin-top: 1rem;
+        }
+
+        .step-box {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--border);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .step-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-box.active {
+            border-left-color: var(--accent);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .step-box.completed {
+            border-left-color: var(--success);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-num {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .step-box.completed .step-num {
+            background: var(--success);
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .step-content {
+            font-family: var(--handwriting-font);
+            font-size: 1.4rem;
+            color: var(--text);
+            line-height: 1.8;
+            padding-left: 2.5rem;
+        }
+
+        .step-content .highlight {
+            background: rgba(99, 102, 241, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .step-content .highlight-green {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .step-content .highlight-orange {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .step-content .crossed {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Handwriting animation */
+        .handwrite {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 1s steps(30) forwards;
+            width: 0;
+        }
+
+        .handwrite.complete {
+            width: auto;
+            animation: none;
+        }
+
+        @keyframes typing {
+            to { width: 100%; }
+        }
+
+        /* Result box */
+        .result-box {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s ease;
+        }
+
+        .result-box.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .result-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-text {
+            font-family: var(--handwriting-font);
+            font-size: 2rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .result-verify {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Narrator box */
+        .narrator-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            grid-column: 1 / -1;
+        }
+
+        .narrator-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .narrator-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .narrator-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .narrator-text {
+            font-size: 1.05rem;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 50px;
+        }
+
+        .narrator-text .typing-cursor::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Controls */
+        .controls-panel {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding: 1rem 0;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn.primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .control-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .control-btn.secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .control-btn.secondary:hover {
+            border-color: var(--accent);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Speed selector */
+        .speed-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--card-bg);
+            padding: 0.5rem;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+        }
+
+        .speed-btn {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .speed-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Progress bar */
+        .lesson-progress {
+            grid-column: 1 / -1;
+            margin-bottom: 1rem;
+        }
+
+        .progress-track {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #8b5cf6);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+
+        .progress-step {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .progress-step.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Interactive point on graph */
+        .graph-tooltip {
+            position: absolute;
+            background: var(--card-bg);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .graph-tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Method tabs */
+        .method-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .method-tab {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .method-tab.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .method-tab:hover:not(.active) {
+            border-color: var(--accent);
+        }
+
+        /* Speaking indicator */
+        .speaking-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            font-size: 0.85rem;
+        }
+
+        .speaking-indicator.active {
+            display: flex;
+        }
+
+        .sound-wave {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            height: 16px;
+        }
+
+        .sound-bar {
+            width: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+            animation: soundWave 0.5s ease-in-out infinite;
+        }
+
+        .sound-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+        .sound-bar:nth-child(2) { height: 14px; animation-delay: 0.1s; }
+        .sound-bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
+        .sound-bar:nth-child(4) { height: 16px; animation-delay: 0.3s; }
+        .sound-bar:nth-child(5) { height: 12px; animation-delay: 0.4s; }
+
+        @keyframes soundWave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .lesson-title {
+                font-size: 1.25rem;
+            }
+
+            .coef-input {
+                width: 45px;
+            }
+
+            .step-content {
+                font-size: 1.2rem;
+                padding-left: 2rem;
+            }
+        }
+    </style>
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="lesson-container">
+        <div class="lesson-header">
+            <a href="index.html" class="back-link">← Назад</a>
+            <h1 class="lesson-title">📐 Системи лінійних рівнянь</h1>
+            <button class="voice-toggle" id="voiceToggle">
+                <span>🔊</span>
+                <span>Голос</span>
+            </button>
+        </div>
+
+        <div class="lesson-content">
+            <!-- Progress -->
+            <div class="lesson-progress">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-steps" id="progressSteps">
+                    <div class="progress-step">1</div>
+                    <div class="progress-step">2</div>
+                    <div class="progress-step">3</div>
+                    <div class="progress-step">4</div>
+                    <div class="progress-step">5</div>
+                </div>
+            </div>
+
+            <!-- Narrator -->
+            <div class="narrator-box">
+                <div class="narrator-header">
+                    <div class="narrator-avatar">🧑‍🏫</div>
+                    <div class="narrator-name">Вчитель</div>
+                    <div class="speaking-indicator" id="speakingIndicator">
+                        <div class="sound-wave">
+                            <div class="sound-bar"></div>
+                            <div class="sound-bar"></div>
+                            <div class="sound-bar"></div>
+                            <div class="sound-bar"></div>
+                            <div class="sound-bar"></div>
+                        </div>
+                        <span>Говорить...</span>
+                    </div>
+                </div>
+                <div class="narrator-text" id="narratorText">
+                    Привіт! Сьогодні навчимося розв'язувати системи лінійних рівнянь. Натисни "Почати урок", щоб розпочати!
+                </div>
+            </div>
+
+            <!-- Graph Panel -->
+            <div class="graph-panel">
+                <div class="graph-title">📊 Графічна інтерпретація</div>
+                <canvas id="graphCanvas"></canvas>
+                <div class="graph-legend">
+                    <div class="legend-item">
+                        <div class="legend-color line1"></div>
+                        <span>Рівняння 1</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color line2"></div>
+                        <span>Рівняння 2</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color solution"></div>
+                        <span>Розв'язок</span>
+                    </div>
+                </div>
+                <div class="graph-tooltip" id="graphTooltip"></div>
+            </div>
+
+            <!-- Math Panel -->
+            <div class="math-panel">
+                <div class="math-title">✏️ Алгебраїчний розв'язок</div>
+
+                <!-- Method tabs -->
+                <div class="method-tabs">
+                    <div class="method-tab active" data-method="addition">➕ Додавання</div>
+                    <div class="method-tab" data-method="substitution">🔄 Підстановка</div>
+                </div>
+
+                <!-- System input -->
+                <div class="system-input">
+                    <div class="equation-input-row">
+                        <span class="eq-label">①</span>
+                        <input type="number" class="coef-input" id="a1" value="1">
+                        <span class="var-label">x +</span>
+                        <input type="number" class="coef-input" id="b1" value="1">
+                        <span class="var-label">y =</span>
+                        <input type="number" class="coef-input" id="c1" value="5">
+                    </div>
+                    <div class="equation-input-row">
+                        <span class="eq-label">②</span>
+                        <input type="number" class="coef-input" id="a2" value="1">
+                        <span class="var-label">x +</span>
+                        <input type="number" class="coef-input" id="b2" value="-1">
+                        <span class="var-label">y =</span>
+                        <input type="number" class="coef-input" id="c2" value="1">
+                    </div>
+                    <button class="solve-btn" id="solveBtn">🚀 Розв'язати з анімацією</button>
+                </div>
+
+                <!-- Solution steps -->
+                <div class="solution-steps" id="solutionSteps">
+                    <!-- Steps will be added dynamically -->
+                </div>
+
+                <!-- Result -->
+                <div class="result-box" id="resultBox">
+                    <div class="result-icon">✅</div>
+                    <div class="result-text" id="resultText">x = 3, y = 2</div>
+                    <div class="result-verify" id="resultVerify">Перевірка: 3 + 2 = 5 ✓, 3 - 2 = 1 ✓</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-panel">
+                <button class="control-btn secondary" id="prevBtn" disabled>
+                    <span>←</span> Назад
+                </button>
+                <button class="control-btn primary" id="playBtn">
+                    <span>▶</span> Почати урок
+                </button>
+                <button class="control-btn secondary" id="nextBtn">
+                    Далі <span>→</span>
+                </button>
+                <div class="speed-selector">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">⚡</span>
+                    <button class="speed-btn" data-speed="0.5">0.5x</button>
+                    <button class="speed-btn active" data-speed="1">1x</button>
+                    <button class="speed-btn" data-speed="1.5">1.5x</button>
+                    <button class="speed-btn" data-speed="2">2x</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ GRAPH CONTROLLER ============
+        class GraphController {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.tooltip = document.getElementById('graphTooltip');
+
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+
+                this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.canvas.addEventListener('mouseleave', () => this.hideTooltip());
+
+                this.lines = [];
+                this.solution = null;
+                this.animationProgress = 0;
+            }
+
+            resize() {
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width * 2;
+                this.canvas.height = rect.height * 2;
+                this.ctx.scale(2, 2);
+                this.width = rect.width;
+                this.height = rect.height;
+                this.centerX = this.width / 2;
+                this.centerY = this.height / 2;
+                this.scale = 30; // pixels per unit
+                this.draw();
+            }
+
+            clear() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+            }
+
+            drawGrid() {
+                this.ctx.strokeStyle = 'rgba(128, 128, 128, 0.2)';
+                this.ctx.lineWidth = 1;
+
+                // Vertical lines
+                for (let x = this.centerX % this.scale; x < this.width; x += this.scale) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x, this.height);
+                    this.ctx.stroke();
+                }
+
+                // Horizontal lines
+                for (let y = this.centerY % this.scale; y < this.height; y += this.scale) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.width, y);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawAxes() {
+                this.ctx.strokeStyle = 'rgba(128, 128, 128, 0.5)';
+                this.ctx.lineWidth = 2;
+
+                // X axis
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, this.centerY);
+                this.ctx.lineTo(this.width, this.centerY);
+                this.ctx.stroke();
+
+                // Y axis
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.centerX, 0);
+                this.ctx.lineTo(this.centerX, this.height);
+                this.ctx.stroke();
+
+                // Labels
+                this.ctx.fillStyle = 'rgba(128, 128, 128, 0.7)';
+                this.ctx.font = '12px Inter';
+                this.ctx.fillText('x', this.width - 15, this.centerY - 8);
+                this.ctx.fillText('y', this.centerX + 8, 15);
+                this.ctx.fillText('0', this.centerX + 5, this.centerY + 15);
+
+                // Numbers on axes
+                for (let i = -5; i <= 5; i++) {
+                    if (i !== 0) {
+                        const x = this.centerX + i * this.scale;
+                        const y = this.centerY - i * this.scale;
+
+                        this.ctx.fillText(i.toString(), x - 4, this.centerY + 15);
+                        this.ctx.fillText(i.toString(), this.centerX + 8, y + 4);
+                    }
+                }
+            }
+
+            toCanvas(x, y) {
+                return {
+                    x: this.centerX + x * this.scale,
+                    y: this.centerY - y * this.scale
+                };
+            }
+
+            toGraph(canvasX, canvasY) {
+                return {
+                    x: (canvasX - this.centerX) / this.scale,
+                    y: (this.centerY - canvasY) / this.scale
+                };
+            }
+
+            setEquations(a1, b1, c1, a2, b2, c2) {
+                this.lines = [
+                    { a: a1, b: b1, c: c1, color: '#6366f1', label: '①' },
+                    { a: a2, b: b2, c: c2, color: '#f59e0b', label: '②' }
+                ];
+
+                // Calculate solution
+                const det = a1 * b2 - a2 * b1;
+                if (det !== 0) {
+                    this.solution = {
+                        x: (c1 * b2 - c2 * b1) / det,
+                        y: (a1 * c2 - a2 * c1) / det
+                    };
+                } else {
+                    this.solution = null;
+                }
+            }
+
+            drawLine(a, b, c, color, progress = 1) {
+                if (b === 0 && a === 0) return;
+
+                this.ctx.strokeStyle = color;
+                this.ctx.lineWidth = 3;
+                this.ctx.lineCap = 'round';
+
+                const points = [];
+
+                if (b !== 0) {
+                    // y = (c - ax) / b
+                    for (let px = 0; px <= this.width; px += 2) {
+                        const x = (px - this.centerX) / this.scale;
+                        const y = (c - a * x) / b;
+                        points.push(this.toCanvas(x, y));
+                    }
+                } else {
+                    // Vertical line: x = c/a
+                    const x = c / a;
+                    const canvasX = this.centerX + x * this.scale;
+                    points.push({ x: canvasX, y: 0 });
+                    points.push({ x: canvasX, y: this.height });
+                }
+
+                const drawLength = Math.floor(points.length * progress);
+
+                this.ctx.beginPath();
+                for (let i = 0; i < drawLength; i++) {
+                    if (i === 0) {
+                        this.ctx.moveTo(points[i].x, points[i].y);
+                    } else {
+                        this.ctx.lineTo(points[i].x, points[i].y);
+                    }
+                }
+                this.ctx.stroke();
+            }
+
+            drawSolution(progress = 1) {
+                if (!this.solution) return;
+
+                const pos = this.toCanvas(this.solution.x, this.solution.y);
+                const radius = 8 * progress;
+
+                // Glow effect
+                const gradient = this.ctx.createRadialGradient(
+                    pos.x, pos.y, 0,
+                    pos.x, pos.y, radius * 2
+                );
+                gradient.addColorStop(0, 'rgba(16, 185, 129, 0.5)');
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+                this.ctx.fillStyle = gradient;
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, radius * 2, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Point
+                this.ctx.fillStyle = '#10b981';
+                this.ctx.beginPath();
+                this.ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Label
+                if (progress >= 1) {
+                    this.ctx.fillStyle = '#10b981';
+                    this.ctx.font = 'bold 14px Inter';
+                    const label = `(${this.solution.x.toFixed(1)}, ${this.solution.y.toFixed(1)})`;
+                    this.ctx.fillText(label, pos.x + 12, pos.y - 12);
+                }
+            }
+
+            draw(line1Progress = 1, line2Progress = 1, solutionProgress = 0) {
+                this.clear();
+                this.drawGrid();
+                this.drawAxes();
+
+                if (this.lines.length >= 1) {
+                    this.drawLine(this.lines[0].a, this.lines[0].b, this.lines[0].c, this.lines[0].color, line1Progress);
+                }
+                if (this.lines.length >= 2) {
+                    this.drawLine(this.lines[1].a, this.lines[1].b, this.lines[1].c, this.lines[1].color, line2Progress);
+                }
+                if (solutionProgress > 0) {
+                    this.drawSolution(solutionProgress);
+                }
+            }
+
+            animateLines(callback) {
+                let progress = 0;
+                const animate = () => {
+                    progress += 0.02;
+
+                    if (progress <= 1) {
+                        this.draw(progress, 0, 0);
+                        requestAnimationFrame(animate);
+                    } else if (progress <= 2) {
+                        this.draw(1, progress - 1, 0);
+                        requestAnimationFrame(animate);
+                    } else if (progress <= 3) {
+                        this.draw(1, 1, progress - 2);
+                        requestAnimationFrame(animate);
+                    } else {
+                        this.draw(1, 1, 1);
+                        if (callback) callback();
+                    }
+                };
+                animate();
+            }
+
+            handleMouseMove(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const graphPos = this.toGraph(x, y);
+
+                // Check if near solution
+                if (this.solution) {
+                    const solCanvas = this.toCanvas(this.solution.x, this.solution.y);
+                    const distance = Math.sqrt(
+                        Math.pow(x - solCanvas.x, 2) +
+                        Math.pow(y - solCanvas.y, 2)
+                    );
+
+                    if (distance < 20) {
+                        this.showTooltip(
+                            e.clientX, e.clientY,
+                            `Розв'язок: x = ${this.solution.x}, y = ${this.solution.y}`
+                        );
+                        return;
+                    }
+                }
+
+                this.showTooltip(
+                    e.clientX, e.clientY,
+                    `x = ${graphPos.x.toFixed(1)}, y = ${graphPos.y.toFixed(1)}`
+                );
+            }
+
+            showTooltip(x, y, text) {
+                this.tooltip.textContent = text;
+                this.tooltip.style.left = `${x - this.canvas.getBoundingClientRect().left + 10}px`;
+                this.tooltip.style.top = `${y - this.canvas.getBoundingClientRect().top - 30}px`;
+                this.tooltip.classList.add('visible');
+            }
+
+            hideTooltip() {
+                this.tooltip.classList.remove('visible');
+            }
+        }
+
+        // ============ VOICE CONTROLLER ============
+        class VoiceController {
+            constructor() {
+                this.enabled = false;
+                this.synth = window.speechSynthesis;
+                this.voice = null;
+                this.speaking = false;
+
+                // Find Ukrainian voice
+                this.loadVoices();
+                this.synth.addEventListener('voiceschanged', () => this.loadVoices());
+            }
+
+            loadVoices() {
+                const voices = this.synth.getVoices();
+                // Try to find Ukrainian voice, fallback to any Slavic or default
+                this.voice = voices.find(v => v.lang.includes('uk')) ||
+                             voices.find(v => v.lang.includes('ru')) ||
+                             voices.find(v => v.lang.includes('pl')) ||
+                             voices[0];
+            }
+
+            toggle() {
+                this.enabled = !this.enabled;
+                if (!this.enabled) {
+                    this.stop();
+                }
+                return this.enabled;
+            }
+
+            speak(text, callback) {
+                if (!this.enabled) {
+                    if (callback) setTimeout(callback, 100);
+                    return;
+                }
+
+                this.stop();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = this.voice;
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+
+                utterance.onstart = () => {
+                    this.speaking = true;
+                    document.getElementById('speakingIndicator').classList.add('active');
+                };
+
+                utterance.onend = () => {
+                    this.speaking = false;
+                    document.getElementById('speakingIndicator').classList.remove('active');
+                    if (callback) callback();
+                };
+
+                utterance.onerror = () => {
+                    this.speaking = false;
+                    document.getElementById('speakingIndicator').classList.remove('active');
+                    if (callback) callback();
+                };
+
+                this.synth.speak(utterance);
+            }
+
+            stop() {
+                this.synth.cancel();
+                this.speaking = false;
+                document.getElementById('speakingIndicator').classList.remove('active');
+            }
+        }
+
+        // ============ LESSON CONTROLLER ============
+        class LessonController {
+            constructor() {
+                this.graph = new GraphController('graphCanvas');
+                this.voice = new VoiceController();
+
+                this.currentStep = 0;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.method = 'addition';
+                this.animationTimeout = null;
+
+                this.initElements();
+                this.bindEvents();
+                this.updateEquations();
+            }
+
+            initElements() {
+                this.narratorText = document.getElementById('narratorText');
+                this.solutionSteps = document.getElementById('solutionSteps');
+                this.resultBox = document.getElementById('resultBox');
+                this.resultText = document.getElementById('resultText');
+                this.resultVerify = document.getElementById('resultVerify');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressSteps = document.getElementById('progressSteps');
+                this.playBtn = document.getElementById('playBtn');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.voiceToggle = document.getElementById('voiceToggle');
+            }
+
+            bindEvents() {
+                this.playBtn.addEventListener('click', () => this.togglePlay());
+                this.prevBtn.addEventListener('click', () => this.prevStep());
+                this.nextBtn.addEventListener('click', () => this.nextStep());
+
+                this.voiceToggle.addEventListener('click', () => {
+                    const enabled = this.voice.toggle();
+                    this.voiceToggle.classList.toggle('active', enabled);
+                });
+
+                document.querySelectorAll('.method-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        this.method = tab.dataset.method;
+                        this.reset();
+                    });
+                });
+
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.speed = parseFloat(btn.dataset.speed);
+                    });
+                });
+
+                document.getElementById('solveBtn').addEventListener('click', () => {
+                    this.updateEquations();
+                    this.reset();
+                    this.play();
+                });
+
+                // Update graph when inputs change
+                ['a1', 'b1', 'c1', 'a2', 'b2', 'c2'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => {
+                        this.updateEquations();
+                    });
+                });
+            }
+
+            updateEquations() {
+                const a1 = parseFloat(document.getElementById('a1').value) || 0;
+                const b1 = parseFloat(document.getElementById('b1').value) || 0;
+                const c1 = parseFloat(document.getElementById('c1').value) || 0;
+                const a2 = parseFloat(document.getElementById('a2').value) || 0;
+                const b2 = parseFloat(document.getElementById('b2').value) || 0;
+                const c2 = parseFloat(document.getElementById('c2').value) || 0;
+
+                this.coefficients = { a1, b1, c1, a2, b2, c2 };
+                this.graph.setEquations(a1, b1, c1, a2, b2, c2);
+                this.graph.draw(1, 1, 0);
+
+                this.generateSteps();
+            }
+
+            generateSteps() {
+                const { a1, b1, c1, a2, b2, c2 } = this.coefficients;
+
+                // Calculate solution
+                const det = a1 * b2 - a2 * b1;
+                if (det === 0) {
+                    this.steps = [{
+                        narration: 'Ця система не має єдиного розв\'язку. Спробуй інші коефіцієнти!',
+                        content: '',
+                        graphAction: () => this.graph.draw(1, 1, 0)
+                    }];
+                    return;
+                }
+
+                const x = (c1 * b2 - c2 * b1) / det;
+                const y = (a1 * c2 - a2 * c1) / det;
+
+                this.solution = { x, y };
+
+                const formatEq = (a, b, c) => {
+                    let s = '';
+                    if (a === 1) s = 'x';
+                    else if (a === -1) s = '-x';
+                    else if (a !== 0) s = `${a}x`;
+
+                    if (b !== 0) {
+                        if (s) {
+                            if (b === 1) s += ' + y';
+                            else if (b === -1) s += ' - y';
+                            else if (b > 0) s += ` + ${b}y`;
+                            else s += ` - ${Math.abs(b)}y`;
+                        } else {
+                            if (b === 1) s = 'y';
+                            else if (b === -1) s = '-y';
+                            else s = `${b}y`;
+                        }
+                    }
+                    return `${s} = ${c}`;
+                };
+
+                const eq1Str = formatEq(a1, b1, c1);
+                const eq2Str = formatEq(a2, b2, c2);
+
+                if (this.method === 'addition') {
+                    this.steps = [
+                        {
+                            narration: `Маємо систему: ${eq1Str} і ${eq2Str}. Спочатку побудуємо графіки цих рівнянь.`,
+                            title: 'Записуємо систему',
+                            content: `① ${eq1Str}\n② ${eq2Str}`,
+                            graphAction: () => this.graph.animateLines()
+                        },
+                        {
+                            narration: `Зверни увагу на коефіцієнти при y: ${b1} і ${b2}. Якщо вони протилежні, при складанні y зникне!`,
+                            title: 'Аналізуємо коефіцієнти',
+                            content: `При y: <span class="highlight">${b1}</span> і <span class="highlight">${b2}</span>`,
+                            graphAction: null
+                        },
+                        {
+                            narration: b1 + b2 === 0 ?
+                                'Коефіцієнти протилежні! Складаємо рівняння почленно.' :
+                                `Потрібно зрівняти коефіцієнти. Множимо рівняння.`,
+                            title: 'Складаємо рівняння',
+                            content: b1 + b2 === 0 ?
+                                `(${eq1Str}) + (${eq2Str})\n${a1 + a2}x = ${c1 + c2}` :
+                                `Множимо та складаємо...\n${a1 * Math.abs(b2) - a2 * Math.abs(b1)}x = ${c1 * Math.abs(b2) - c2 * Math.abs(b1)}`,
+                            graphAction: null
+                        },
+                        {
+                            narration: `Знаходимо x. Ділимо обидві частини і отримуємо x дорівнює ${x}.`,
+                            title: 'Знаходимо x',
+                            content: `<span class="highlight-green">x = ${x}</span>`,
+                            graphAction: null
+                        },
+                        {
+                            narration: `Підставляємо x дорівнює ${x} в перше рівняння і знаходимо y дорівнює ${y}. Розв\'язок знайдено!`,
+                            title: 'Знаходимо y',
+                            content: `${a1} · ${x} + ${b1}y = ${c1}\n${b1}y = ${c1 - a1 * x}\n<span class="highlight-green">y = ${y}</span>`,
+                            graphAction: () => this.graph.draw(1, 1, 1)
+                        }
+                    ];
+                } else {
+                    // Substitution method
+                    this.steps = [
+                        {
+                            narration: `Маємо систему: ${eq1Str} і ${eq2Str}. Використаємо метод підстановки.`,
+                            title: 'Записуємо систему',
+                            content: `① ${eq1Str}\n② ${eq2Str}`,
+                            graphAction: () => this.graph.animateLines()
+                        },
+                        {
+                            narration: a1 === 1 || a1 === -1 ?
+                                `З першого рівняння легко виразити x, бо коефіцієнт при x дорівнює ${a1}.` :
+                                `Виразимо x з рівняння, де коефіцієнт найпростіший.`,
+                            title: 'Виражаємо x',
+                            content: `x = <span class="highlight-orange">${c1} ${b1 >= 0 ? '-' : '+'} ${Math.abs(b1)}y</span>`,
+                            graphAction: null
+                        },
+                        {
+                            narration: `Підставляємо цей вираз замість x у друге рівняння.`,
+                            title: 'Підставляємо',
+                            content: `${a2}(${c1} ${b1 >= 0 ? '-' : '+'} ${Math.abs(b1)}y) ${b2 >= 0 ? '+' : '-'} ${Math.abs(b2)}y = ${c2}`,
+                            graphAction: null
+                        },
+                        {
+                            narration: `Розкриваємо дужки та зводимо подібні. Знаходимо y дорівнює ${y}.`,
+                            title: 'Знаходимо y',
+                            content: `${a2 * c1} ${(a2 * (-b1) + b2) >= 0 ? '+' : ''} ${a2 * (-b1) + b2}y = ${c2}\n<span class="highlight-green">y = ${y}</span>`,
+                            graphAction: null
+                        },
+                        {
+                            narration: `Підставляємо y назад і отримуємо x дорівнює ${x}. Система розв\'язана!`,
+                            title: 'Знаходимо x',
+                            content: `x = ${c1} ${b1 >= 0 ? '-' : '+'} ${Math.abs(b1)} · ${y}\n<span class="highlight-green">x = ${x}</span>`,
+                            graphAction: () => this.graph.draw(1, 1, 1)
+                        }
+                    ];
+                }
+            }
+
+            reset() {
+                this.currentStep = 0;
+                this.isPlaying = false;
+                clearTimeout(this.animationTimeout);
+
+                this.playBtn.innerHTML = '<span>▶</span> Почати урок';
+                this.prevBtn.disabled = true;
+                this.solutionSteps.innerHTML = '';
+                this.resultBox.classList.remove('visible');
+                this.narratorText.textContent = 'Натисни "Почати урок" або "Розв\'язати з анімацією"!';
+                this.graph.draw(1, 1, 0);
+                this.updateProgress();
+            }
+
+            togglePlay() {
+                if (this.isPlaying) {
+                    this.pause();
+                } else {
+                    this.play();
+                }
+            }
+
+            play() {
+                this.isPlaying = true;
+                this.playBtn.innerHTML = '<span>⏸</span> Пауза';
+                this.autoAdvance();
+            }
+
+            pause() {
+                this.isPlaying = false;
+                this.playBtn.innerHTML = '<span>▶</span> Продовжити';
+                clearTimeout(this.animationTimeout);
+                this.voice.stop();
+            }
+
+            autoAdvance() {
+                if (!this.isPlaying) return;
+
+                if (this.currentStep < this.steps.length) {
+                    this.showStep(this.currentStep);
+
+                    const step = this.steps[this.currentStep];
+                    const baseDelay = 4000 / this.speed;
+
+                    this.voice.speak(step.narration, () => {
+                        if (this.isPlaying) {
+                            this.currentStep++;
+
+                            if (this.currentStep >= this.steps.length) {
+                                this.showResult();
+                                this.pause();
+                                this.playBtn.innerHTML = '<span>🔄</span> Почати знову';
+                            } else {
+                                this.animationTimeout = setTimeout(() => this.autoAdvance(), 500);
+                            }
+                        }
+                    });
+
+                    if (!this.voice.enabled) {
+                        this.currentStep++;
+                        if (this.currentStep >= this.steps.length) {
+                            this.animationTimeout = setTimeout(() => {
+                                this.showResult();
+                                this.pause();
+                                this.playBtn.innerHTML = '<span>🔄</span> Почати знову';
+                            }, baseDelay);
+                        } else {
+                            this.animationTimeout = setTimeout(() => this.autoAdvance(), baseDelay);
+                        }
+                    }
+                }
+            }
+
+            showStep(index) {
+                const step = this.steps[index];
+                if (!step) return;
+
+                // Update narrator
+                this.narratorText.innerHTML = step.narration;
+
+                // Add step box
+                const existingSteps = this.solutionSteps.querySelectorAll('.step-box');
+                existingSteps.forEach(s => {
+                    s.classList.remove('active');
+                    s.classList.add('completed');
+                });
+
+                const stepBox = document.createElement('div');
+                stepBox.className = 'step-box';
+                stepBox.innerHTML = `
+                    <div class="step-header">
+                        <div class="step-num">${index + 1}</div>
+                        <div class="step-title">${step.title}</div>
+                    </div>
+                    <div class="step-content">${step.content.replace(/\n/g, '<br>')}</div>
+                `;
+                this.solutionSteps.appendChild(stepBox);
+
+                // Animate in
+                setTimeout(() => {
+                    stepBox.classList.add('visible', 'active');
+                }, 50);
+
+                // Graph action
+                if (step.graphAction) {
+                    step.graphAction();
+                }
+
+                this.updateProgress();
+                this.prevBtn.disabled = index === 0;
+            }
+
+            showResult() {
+                const { x, y } = this.solution;
+                const { a1, b1, c1, a2, b2, c2 } = this.coefficients;
+
+                this.resultText.textContent = `x = ${x}, y = ${y}`;
+
+                const check1 = a1 * x + b1 * y;
+                const check2 = a2 * x + b2 * y;
+                this.resultVerify.textContent = `Перевірка: ${a1}·${x} + ${b1}·${y} = ${check1} ✓, ${a2}·${x} + ${b2}·${y} = ${check2} ✓`;
+
+                this.resultBox.classList.add('visible');
+                this.graph.draw(1, 1, 1);
+
+                this.voice.speak(`Відповідь: x дорівнює ${x}, y дорівнює ${y}. Молодець!`);
+            }
+
+            nextStep() {
+                if (this.currentStep < this.steps.length) {
+                    this.showStep(this.currentStep);
+                    this.currentStep++;
+
+                    if (this.currentStep >= this.steps.length) {
+                        this.showResult();
+                    }
+                }
+            }
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    // Remove last step
+                    const steps = this.solutionSteps.querySelectorAll('.step-box');
+                    if (steps.length > 0) {
+                        steps[steps.length - 1].remove();
+                    }
+                    this.currentStep--;
+
+                    // Reactivate previous step
+                    const remaining = this.solutionSteps.querySelectorAll('.step-box');
+                    if (remaining.length > 0) {
+                        remaining[remaining.length - 1].classList.remove('completed');
+                        remaining[remaining.length - 1].classList.add('active');
+                    }
+
+                    this.resultBox.classList.remove('visible');
+                    this.updateProgress();
+                }
+            }
+
+            updateProgress() {
+                const progress = (this.currentStep / this.steps.length) * 100;
+                this.progressFill.style.width = `${progress}%`;
+
+                const stepDots = this.progressSteps.querySelectorAll('.progress-step');
+                stepDots.forEach((dot, i) => {
+                    dot.classList.remove('active', 'completed');
+                    if (i < this.currentStep) {
+                        dot.classList.add('completed');
+                    } else if (i === this.currentStep) {
+                        dot.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            new LessonController();
+        });
+    </script>
+</body>
+</html>

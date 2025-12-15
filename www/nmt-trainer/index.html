@@ -6,8 +6,82 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>НМТ Тренажер</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/styles.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --bg-tertiary: #e5e5ea;
+            --text-primary: #1c1c1e;
+            --text-secondary: #6e6e73;
+            --border: #d1d1d6;
+            --accent: #007aff;
+            --accent-light: #e3f2fd;
+            --success: #34c759;
+            --success-light: #e8f5e9;
+            --error: #ff3b30;
+            --error-light: #ffebee;
+            --warning: #ff9500;
+            --purple: #af52de;
+            --cyan: #32ade6;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: calc(16px + var(--safe-top)) 16px calc(16px + var(--safe-bottom));
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        /* Screens */
         .test-select-screen, .task-screen, .result-screen, .solution-screen {
             display: none;
         }
@@ -15,11 +89,40 @@
             display: block;
         }
 
+        /* Topic categories */
+        .topic-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .topic-tab {
+            flex-shrink: 0;
+            padding: 10px 16px;
+            border-radius: 20px;
+            background: var(--bg-tertiary);
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .topic-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Test list */
         .test-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 16px;
         }
 
         .test-card {
@@ -27,7 +130,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
-            background: var(--bg-secondary);
+            background: var(--bg-primary);
             border: 2px solid var(--border);
             border-radius: 12px;
             cursor: pointer;
@@ -37,20 +140,16 @@
         .test-card:hover {
             border-color: var(--accent);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .test-card-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .test-card-name {
+        .test-card-info h3 {
+            font-size: 1rem;
             font-weight: 600;
-            font-size: 1.1rem;
+            margin-bottom: 4px;
         }
 
-        .test-card-tasks {
+        .test-card-info p {
             font-size: 0.85rem;
             color: var(--text-secondary);
         }
@@ -60,7 +159,33 @@
             color: var(--text-secondary);
         }
 
-        /* Timer */
+        /* Mode toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .mode-btn.active {
+            border-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        /* Timer bar */
         .timer-bar {
             display: flex;
             align-items: center;
@@ -68,18 +193,18 @@
             padding: 12px 16px;
             background: var(--bg-secondary);
             border-radius: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .timer {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             font-family: monospace;
             color: var(--accent);
         }
 
         .timer.warning {
-            color: #ef4444;
+            color: var(--error);
             animation: pulse 1s infinite;
         }
 
@@ -93,13 +218,96 @@
             color: var(--text-secondary);
         }
 
+        /* Task navigation */
+        .task-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .task-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .task-nav-btn.current {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .task-nav-btn.answered {
+            border-color: var(--success);
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .task-nav-btn.wrong {
+            border-color: var(--error);
+            background: var(--error-light);
+            color: var(--error);
+        }
+
+        .task-nav-btn.partial {
+            border-color: var(--warning);
+            background: #fff3e0;
+            color: var(--warning);
+        }
+
+        /* Task type badge */
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .task-type-badge {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 20px;
+            background: var(--accent);
+            color: white;
+        }
+
+        .task-type-badge.match {
+            background: var(--purple);
+        }
+
+        .task-type-badge.short {
+            background: var(--cyan);
+        }
+
+        .topic-badge {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 20px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
         /* Task image */
         .task-image-container {
             width: 100%;
-            margin: 16px 0;
+            margin: 12px 0;
             border-radius: 12px;
             overflow: hidden;
             background: #fff;
+            border: 1px solid var(--border);
         }
 
         .task-image {
@@ -114,17 +322,17 @@
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
-            margin: 20px 0;
+            margin: 16px 0;
         }
 
         .answer-btn {
-            min-width: 60px;
-            padding: 14px 24px;
-            font-size: 1.2rem;
+            min-width: 56px;
+            padding: 14px 20px;
+            font-size: 1.1rem;
             font-weight: 600;
             border: 2px solid var(--border);
             border-radius: 12px;
-            background: var(--bg-secondary);
+            background: var(--bg-primary);
             color: var(--text-primary);
             cursor: pointer;
             transition: all 0.2s ease;
@@ -132,7 +340,7 @@
 
         .answer-btn:hover {
             border-color: var(--accent);
-            background: var(--bg-tertiary);
+            background: var(--accent-light);
         }
 
         .answer-btn.selected {
@@ -148,42 +356,124 @@
         }
 
         .answer-btn.wrong {
-            border-color: #ef4444;
-            background: #ef4444;
+            border-color: var(--error);
+            background: var(--error);
             color: white;
         }
 
-        /* Match input for matching tasks */
-        .match-input-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Matching blocks */
+        .match-container {
+            margin: 16px 0;
         }
 
         .match-row {
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-bottom: 12px;
         }
 
         .match-label {
-            min-width: 30px;
-            font-weight: 600;
+            width: 30px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
             font-size: 1.1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
         }
 
-        .match-select {
+        .match-dropzone {
             flex: 1;
-            padding: 12px 16px;
+            min-height: 44px;
+            padding: 10px 16px;
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .match-dropzone.drag-over {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .match-dropzone.has-answer {
+            border-style: solid;
+            border-color: var(--accent);
+        }
+
+        .match-dropzone.correct {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .match-dropzone.wrong {
+            border-color: var(--error);
+            background: var(--error-light);
+        }
+
+        .match-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .match-option {
+            min-width: 44px;
+            padding: 12px 18px;
+            font-size: 1rem;
+            font-weight: 600;
             border: 2px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-secondary);
+            border-radius: 10px;
+            background: var(--bg-primary);
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
             color: var(--text-primary);
         }
 
+        .match-option:active {
+            cursor: grabbing;
+        }
+
+        .match-option.used {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .match-option.dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+
         /* Short answer input */
+        .short-answer-container {
+            margin: 16px 0;
+        }
+
+        .short-answer-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
         .short-answer-input {
             width: 100%;
             padding: 16px 20px;
@@ -191,9 +481,8 @@
             text-align: center;
             border: 2px solid var(--border);
             border-radius: 12px;
-            background: var(--bg-secondary);
+            background: var(--bg-primary);
             color: var(--text-primary);
-            margin: 20px 0;
         }
 
         .short-answer-input:focus {
@@ -201,17 +490,116 @@
             border-color: var(--accent);
         }
 
+        .short-answer-input.correct {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .short-answer-input.wrong {
+            border-color: var(--error);
+            background: var(--error-light);
+        }
+
+        /* AI Hint */
+        .hint-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin: 12px 0;
+            width: 100%;
+            justify-content: center;
+            color: var(--text-primary);
+        }
+
+        .hint-btn:hover {
+            border-color: var(--purple);
+            background: #f3e5f5;
+        }
+
+        .hint-container {
+            padding: 16px;
+            background: #f3e5f5;
+            border-radius: 12px;
+            margin: 12px 0;
+            border-left: 4px solid var(--purple);
+        }
+
+        .hint-title {
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hint-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .hint-loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Feedback */
+        .feedback-message {
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 12px 0;
+            font-weight: 600;
+        }
+
+        .feedback-message.correct {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .feedback-message.wrong {
+            background: var(--error-light);
+            color: var(--error);
+        }
+
+        .feedback-message.partial {
+            background: #fff3e0;
+            color: var(--warning);
+        }
+
         /* Action buttons */
         .action-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             margin-top: 16px;
         }
 
-        .btn-submit {
+        .btn-primary {
             flex: 1;
             padding: 16px 24px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             border: none;
             border-radius: 12px;
@@ -221,92 +609,96 @@
             transition: all 0.2s ease;
         }
 
-        .btn-submit:disabled {
+        .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .btn-solution {
+        .btn-secondary {
             padding: 16px 20px;
             font-size: 1rem;
             border: 2px solid var(--border);
             border-radius: 12px;
-            background: var(--bg-secondary);
+            background: var(--bg-primary);
             color: var(--text-primary);
             cursor: pointer;
         }
 
         /* Result screen */
-        .result-summary {
+        .result-header {
             text-align: center;
-            padding: 30px 20px;
+            margin-bottom: 24px;
         }
 
         .result-emoji {
             font-size: 4rem;
+            margin-bottom: 12px;
+        }
+
+        .result-nmt-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .result-nmt-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
             margin-bottom: 16px;
         }
 
-        .result-score {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .result-text {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
+        .result-raw-score {
+            font-size: 1.2rem;
+            color: var(--text-primary);
         }
 
         .result-time {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-bottom: 24px;
+            margin-top: 8px;
         }
 
         .result-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
             margin: 20px 0;
-            text-align: left;
         }
 
         .result-row {
             display: flex;
             justify-content: space-between;
             padding: 12px 16px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .result-row-label {
+            color: var(--text-secondary);
+        }
+
+        .result-row-value {
+            font-weight: 600;
+        }
+
+        .result-row-value.success {
+            color: var(--success);
+        }
+
+        .result-row-value.error {
+            color: var(--error);
         }
 
         /* Solution screen */
-        .solution-image-container {
-            width: 100%;
-            margin: 16px 0;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #fff;
-        }
-
-        .solution-image {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
         .solution-answer {
             text-align: center;
             padding: 16px;
-            background: var(--bg-secondary);
+            background: var(--success-light);
             border-radius: 12px;
-            margin: 16px 0;
+            margin-bottom: 16px;
         }
 
         .solution-answer-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             margin-bottom: 4px;
         }
@@ -317,43 +709,22 @@
             color: var(--success);
         }
 
-        /* Task type indicator */
-        .task-type-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 20px;
-            background: var(--accent);
-            color: white;
-            margin-bottom: 12px;
-        }
-
-        .task-type-badge.match {
-            background: #8b5cf6;
-        }
-
-        .task-type-badge.short {
-            background: #06b6d4;
-        }
-
-        /* Feedback message */
-        .feedback-message {
-            padding: 16px;
+        .solution-image-container {
             border-radius: 12px;
-            text-align: center;
-            margin: 16px 0;
-            font-weight: 600;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid var(--border);
         }
 
-        .feedback-message.correct {
-            background: rgba(34, 197, 94, 0.2);
-            color: var(--success);
+        .solution-image {
+            width: 100%;
+            height: auto;
+            display: block;
         }
 
-        .feedback-message.wrong {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+        /* Hidden */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -367,8 +738,20 @@
             </div>
 
             <div class="card">
-                <h2 style="margin-bottom: 8px;">Виберіть варіант</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 16px;">6 тестів • 132 завдання</p>
+                <div class="topic-tabs" id="topicTabs">
+                    <button class="topic-tab active" data-topic="all">Всі</button>
+                    <button class="topic-tab" data-topic="1">Вирази</button>
+                    <button class="topic-tab" data-topic="2">Планіметрія</button>
+                    <button class="topic-tab" data-topic="3">Функції</button>
+                    <button class="topic-tab" data-topic="4">Тригонометрія</button>
+                    <button class="topic-tab" data-topic="5">Похідна</button>
+                    <button class="topic-tab" data-topic="6">Стереометрія</button>
+                </div>
+
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="exam">🎯 Екзамен</button>
+                    <button class="mode-btn" data-mode="training">📚 Навчання</button>
+                </div>
 
                 <div class="test-list" id="testList">
                     <!-- Tests will be loaded here -->
@@ -383,14 +766,21 @@
                 <span class="progress-text" id="progressText">1 / 22</span>
             </div>
 
+            <div class="task-nav" id="taskNav">
+                <!-- Task numbers will be generated here -->
+            </div>
+
             <div class="card">
-                <span class="task-type-badge" id="taskTypeBadge">Тест</span>
+                <div class="task-header">
+                    <span class="task-type-badge" id="taskTypeBadge">Тест</span>
+                    <span class="topic-badge" id="topicBadge">Вирази</span>
+                </div>
 
                 <div class="task-image-container">
                     <img class="task-image" id="taskImage" src="" alt="Завдання">
                 </div>
 
-                <!-- Quiz options (A, Б, В, Г, Д) -->
+                <!-- Quiz options -->
                 <div class="answer-options" id="quizOptions">
                     <button class="answer-btn" data-answer="А">А</button>
                     <button class="answer-btn" data-answer="Б">Б</button>
@@ -399,55 +789,55 @@
                     <button class="answer-btn" data-answer="Д">Д</button>
                 </div>
 
-                <!-- Match inputs -->
-                <div class="match-input-container" id="matchInputs" style="display: none;">
+                <!-- Matching blocks -->
+                <div class="match-container hidden" id="matchContainer">
                     <div class="match-row">
-                        <span class="match-label">1</span>
-                        <select class="match-select" data-row="1">
-                            <option value="">—</option>
-                            <option value="А">А</option>
-                            <option value="Б">Б</option>
-                            <option value="В">В</option>
-                            <option value="Г">Г</option>
-                            <option value="Д">Д</option>
-                        </select>
+                        <div class="match-label">1</div>
+                        <div class="match-dropzone" data-row="1" data-answer=""></div>
                     </div>
                     <div class="match-row">
-                        <span class="match-label">2</span>
-                        <select class="match-select" data-row="2">
-                            <option value="">—</option>
-                            <option value="А">А</option>
-                            <option value="Б">Б</option>
-                            <option value="В">В</option>
-                            <option value="Г">Г</option>
-                            <option value="Д">Д</option>
-                        </select>
+                        <div class="match-label">2</div>
+                        <div class="match-dropzone" data-row="2" data-answer=""></div>
                     </div>
                     <div class="match-row">
-                        <span class="match-label">3</span>
-                        <select class="match-select" data-row="3">
-                            <option value="">—</option>
-                            <option value="А">А</option>
-                            <option value="Б">Б</option>
-                            <option value="В">В</option>
-                            <option value="Г">Г</option>
-                            <option value="Д">Д</option>
-                        </select>
+                        <div class="match-label">3</div>
+                        <div class="match-dropzone" data-row="3" data-answer=""></div>
+                    </div>
+                    <div class="match-options" id="matchOptions">
+                        <div class="match-option" data-value="А" draggable="true">А</div>
+                        <div class="match-option" data-value="Б" draggable="true">Б</div>
+                        <div class="match-option" data-value="В" draggable="true">В</div>
+                        <div class="match-option" data-value="Г" draggable="true">Г</div>
+                        <div class="match-option" data-value="Д" draggable="true">Д</div>
                     </div>
                 </div>
 
                 <!-- Short answer input -->
-                <input type="text" class="short-answer-input" id="shortAnswerInput" style="display: none;" placeholder="Введіть відповідь">
-
-                <div class="feedback-message" id="feedbackMessage" style="display: none;"></div>
-
-                <div class="action-row">
-                    <button class="btn-submit" id="submitBtn">Відповісти</button>
-                    <button class="btn-solution" id="solutionBtn" style="display: none;">📖</button>
+                <div class="short-answer-container hidden" id="shortAnswerContainer">
+                    <div class="short-answer-label">Введіть числову відповідь (раціональне число)</div>
+                    <input type="text" class="short-answer-input" id="shortAnswerInput" placeholder="Наприклад: 3.5 або -2/3">
                 </div>
 
-                <div class="action-row" id="nextRow" style="display: none;">
-                    <button class="btn-submit" id="nextBtn">Далі →</button>
+                <!-- AI Hint (training mode only) -->
+                <button class="hint-btn hidden" id="hintBtn">
+                    <span>💡</span>
+                    <span>Підказка від ШІ</span>
+                </button>
+
+                <div class="hint-container hidden" id="hintContainer">
+                    <div class="hint-title">💡 Підказка</div>
+                    <div class="hint-text" id="hintText"></div>
+                </div>
+
+                <div class="feedback-message hidden" id="feedbackMessage"></div>
+
+                <div class="action-row">
+                    <button class="btn-primary" id="submitBtn">Відповісти</button>
+                    <button class="btn-secondary hidden" id="solutionBtn">📖</button>
+                </div>
+
+                <div class="action-row hidden" id="nextRow">
+                    <button class="btn-primary" id="nextBtn">Далі →</button>
                 </div>
             </div>
         </div>
@@ -477,32 +867,38 @@
                 <h1>Результат</h1>
             </div>
 
-            <div class="card result-summary">
-                <div class="result-emoji" id="resultEmoji">🎉</div>
-                <div class="result-score" id="resultScore">18/22</div>
-                <div class="result-text" id="resultText">Чудовий результат!</div>
-                <div class="result-time" id="resultTime">Час: 15:32</div>
+            <div class="card">
+                <div class="result-header">
+                    <div class="result-emoji" id="resultEmoji">🎉</div>
+                    <div class="result-nmt-score" id="resultNmtScore">167</div>
+                    <div class="result-nmt-label">балів НМТ</div>
+                    <div class="result-raw-score" id="resultRawScore">24/32 тестових балів</div>
+                    <div class="result-time" id="resultTime">Час: 45:32</div>
+                </div>
 
                 <div class="result-details">
                     <div class="result-row">
-                        <span>Правильних</span>
-                        <span id="correctCount">18</span>
+                        <span class="result-row-label">Повністю правильних</span>
+                        <span class="result-row-value success" id="correctCount">18</span>
                     </div>
                     <div class="result-row">
-                        <span>Неправильних</span>
-                        <span id="wrongCount">4</span>
+                        <span class="result-row-label">Частково правильних</span>
+                        <span class="result-row-value" id="partialCount">2</span>
                     </div>
                     <div class="result-row">
-                        <span>Відсоток</span>
-                        <span id="percentScore">82%</span>
+                        <span class="result-row-label">Неправильних</span>
+                        <span class="result-row-value error" id="wrongCount">2</span>
                     </div>
                 </div>
 
-                <button class="btn-submit" id="restartBtn" style="width: 100%; margin-top: 20px;">
-                    Спробувати знову
+                <button class="btn-primary" id="reviewBtn" style="width: 100%; margin-bottom: 12px;">
+                    📋 Переглянути відповіді
                 </button>
-                <button class="btn-solution" id="backToTestsBtn" style="width: 100%; margin-top: 12px;">
-                    До списку тестів
+                <button class="btn-primary" id="restartBtn" style="width: 100%; margin-bottom: 12px;">
+                    🔄 Спробувати знову
+                </button>
+                <button class="btn-secondary" id="backToTestsBtn" style="width: 100%;">
+                    ← До списку тестів
                 </button>
             </div>
         </div>

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Дослідник графіків | Math Quest</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        .explorer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .explorer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .explorer-title {
+            font-size: 1.4rem;
+            color: var(--text);
+        }
+
+        /* Function tabs */
+        .function-tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .function-tab {
+            padding: 0.6rem 1rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .function-tab.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .function-tab:hover:not(.active) {
+            border-color: var(--accent);
+        }
+
+        /* Main layout */
+        .explorer-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 900px) {
+            .explorer-content {
+                grid-template-columns: 1fr 350px;
+            }
+        }
+
+        /* Graph panel */
+        .graph-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+        }
+
+        #mainCanvas {
+            width: 100%;
+            height: 400px;
+            background: var(--bg);
+            border-radius: 12px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        @media (min-width: 900px) {
+            #mainCanvas { height: 500px; }
+        }
+
+        .graph-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Controls panel */
+        .controls-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 2px solid var(--border);
+        }
+
+        .formula-display {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .controls-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Sliders */
+        .slider-group {
+            margin-bottom: 1rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-label {
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .slider-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .slider-container {
+            position: relative;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+
+        /* Transformation description */
+        .transform-description {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .transform-text {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .transform-text .highlight {
+            background: rgba(99, 102, 241, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .transform-text .up { color: #10b981; }
+        .transform-text .down { color: #ef4444; }
+        .transform-text .left { color: #f59e0b; }
+        .transform-text .right { color: #8b5cf6; }
+
+        /* Quick buttons */
+        .quick-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .quick-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .quick-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Legend */
+        .graph-legend {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .legend-line {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-line.original { background: rgba(99, 102, 241, 0.4); }
+        .legend-line.transformed { background: #6366f1; }
+
+        /* Animations toggle */
+        .animation-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(22px);
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        /* Reset button */
+        .reset-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .reset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* AI hint section */
+        .ai-hint-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .ai-hint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .ai-hint-text {
+            font-size: 0.9rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+    </style>
+
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="explorer-container">
+        <div class="explorer-header">
+            <a href="../index.html" class="back-link">← Меню</a>
+            <h1 class="explorer-title">📊 Дослідник графіків</h1>
+            <div></div>
+        </div>
+
+        <!-- Function tabs -->
+        <div class="function-tabs" id="functionTabs">
+            <button class="function-tab active" data-func="linear">Лінійна</button>
+            <button class="function-tab" data-func="parabola">Парабола</button>
+            <button class="function-tab" data-func="sqrt">√x</button>
+            <button class="function-tab" data-func="abs">|x|</button>
+            <button class="function-tab" data-func="cubic">x³</button>
+            <button class="function-tab" data-func="hyperbola">1/x</button>
+            <button class="function-tab" data-func="sin">sin x</button>
+            <button class="function-tab" data-func="cos">cos x</button>
+            <button class="function-tab" data-func="exp">aˣ</button>
+            <button class="function-tab" data-func="log">log x</button>
+        </div>
+
+        <div class="explorer-content">
+            <!-- Graph panel -->
+            <div class="graph-panel">
+                <canvas id="mainCanvas"></canvas>
+                <div class="graph-legend">
+                    <div class="legend-item">
+                        <div class="legend-line original"></div>
+                        <span>Базова функція</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line transformed"></div>
+                        <span>Перетворена</span>
+                    </div>
+                </div>
+                <div class="graph-info">
+                    <span id="cursorPos">x: 0, y: 0</span>
+                    <span id="zoomLevel">Масштаб: 1x</span>
+                </div>
+            </div>
+
+            <!-- Controls panel -->
+            <div class="controls-panel">
+                <div class="formula-display" id="formulaDisplay">
+                    <!-- KaTeX formula will be rendered here -->
+                </div>
+
+                <div class="controls-section" id="transformControls">
+                    <div class="section-title">⚙️ Параметри</div>
+                    <!-- Sliders will be generated dynamically -->
+                </div>
+
+                <div class="controls-section">
+                    <div class="section-title">🎯 Швидкі налаштування</div>
+                    <div class="quick-buttons" id="quickButtons">
+                        <button class="quick-btn" data-action="reset">Скинути</button>
+                        <button class="quick-btn" data-action="flip-x">Відобразити X</button>
+                        <button class="quick-btn" data-action="flip-y">Відобразити Y</button>
+                        <button class="quick-btn" data-action="stretch">Розтягнути</button>
+                        <button class="quick-btn" data-action="compress">Стиснути</button>
+                    </div>
+                </div>
+
+                <div class="transform-description" id="transformDescription">
+                    <div class="transform-text">
+                        Рухай повзунки, щоб побачити, як змінюється графік функції!
+                    </div>
+                </div>
+
+                <div class="ai-hint-section">
+                    <div class="ai-hint-header">
+                        <span>💡</span>
+                        <span>Підказка</span>
+                    </div>
+                    <div class="ai-hint-text" id="aiHintText">
+                        Виберіть тип функції та експериментуйте з параметрами!
+                    </div>
+                </div>
+
+                <div class="animation-toggle">
+                    <div class="toggle-switch" id="animToggle"></div>
+                    <span class="toggle-label">Показувати анімацію переходу</span>
+                </div>
+
+                <button class="reset-btn" id="resetBtn">🔄 Скинути всі параметри</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ FUNCTION DEFINITIONS ============
+        const FUNCTIONS = {
+            linear: {
+                name: 'Лінійна функція',
+                baseFormula: 'y = x',
+                formula: (params) => `y = ${params.k !== 1 ? params.k : ''}x ${params.b >= 0 ? '+' : '-'} ${Math.abs(params.b)}`,
+                latexFormula: (params) => {
+                    let k = params.k;
+                    let b = params.b;
+                    let kStr = k === 1 ? '' : (k === -1 ? '-' : k);
+                    let bStr = b === 0 ? '' : (b > 0 ? `+ ${b}` : `- ${Math.abs(b)}`);
+                    return `y = ${kStr}x ${bStr}`.trim();
+                },
+                params: [
+                    { id: 'k', name: 'Кутовий коефіцієнт (k)', min: -5, max: 5, step: 0.5, default: 1 },
+                    { id: 'b', name: 'Вільний член (b)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => params.k * x + params.b,
+                baseCompute: (x) => x,
+                describe: (params) => {
+                    let desc = [];
+                    if (params.k > 1) desc.push(`<span class="highlight">k = ${params.k}</span> — функція <span class="up">зростає швидше</span>`);
+                    else if (params.k > 0 && params.k < 1) desc.push(`<span class="highlight">k = ${params.k}</span> — функція <span class="down">зростає повільніше</span>`);
+                    else if (params.k < 0) desc.push(`<span class="highlight">k = ${params.k}</span> — функція <span class="down">спадає</span>`);
+                    else if (params.k === 0) desc.push(`<span class="highlight">k = 0</span> — горизонтальна пряма`);
+
+                    if (params.b > 0) desc.push(`<span class="highlight">b = ${params.b}</span> — зсув <span class="up">вгору</span> на ${params.b}`);
+                    else if (params.b < 0) desc.push(`<span class="highlight">b = ${params.b}</span> — зсув <span class="down">вниз</span> на ${Math.abs(params.b)}`);
+
+                    return desc.join('<br>') || 'Базова функція y = x';
+                },
+                hint: 'k визначає нахил прямої: k > 0 — зростає, k < 0 — спадає. b — точка перетину з віссю Y.'
+            },
+            parabola: {
+                name: 'Парабола',
+                baseFormula: 'y = x²',
+                latexFormula: (params) => {
+                    let a = params.a;
+                    let p = params.p;
+                    let q = params.q;
+                    let aStr = a === 1 ? '' : (a === -1 ? '-' : a);
+                    let pStr = p === 0 ? 'x' : (p > 0 ? `(x - ${p})` : `(x + ${Math.abs(p)})`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = ${aStr}${pStr}^2${qStr}`;
+                },
+                params: [
+                    { id: 'a', name: 'Коефіцієнт a (розтяг/стиск)', min: -3, max: 3, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Зсув по X (p)', min: -5, max: 5, step: 0.5, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => params.a * Math.pow(x - params.p, 2) + params.q,
+                baseCompute: (x) => x * x,
+                describe: (params) => {
+                    let desc = [];
+                    if (params.a > 1) desc.push(`<span class="highlight">a = ${params.a}</span> — парабола <span class="up">вужча</span>`);
+                    else if (params.a > 0 && params.a < 1) desc.push(`<span class="highlight">a = ${params.a}</span> — парабола <span class="down">ширша</span>`);
+                    else if (params.a < 0) desc.push(`<span class="highlight">a = ${params.a}</span> — парабола <span class="down">перевернута</span>`);
+
+                    if (params.p > 0) desc.push(`<span class="highlight">p = ${params.p}</span> — зсув <span class="right">вправо</span> на ${params.p}`);
+                    else if (params.p < 0) desc.push(`<span class="highlight">p = ${params.p}</span> — зсув <span class="left">вліво</span> на ${Math.abs(params.p)}`);
+
+                    if (params.q > 0) desc.push(`<span class="highlight">q = ${params.q}</span> — зсув <span class="up">вгору</span> на ${params.q}`);
+                    else if (params.q < 0) desc.push(`<span class="highlight">q = ${params.q}</span> — зсув <span class="down">вниз</span> на ${Math.abs(params.q)}`);
+
+                    desc.push(`Вершина: (${params.p}, ${params.q})`);
+
+                    return desc.join('<br>') || 'Базова парабола y = x²';
+                },
+                hint: 'Формула y = a(x-p)² + q. Вершина параболи в точці (p, q). Якщо a < 0 — вітки вниз.'
+            },
+            sqrt: {
+                name: 'Корінь',
+                baseFormula: 'y = √x',
+                latexFormula: (params) => {
+                    let a = params.a;
+                    let p = params.p;
+                    let q = params.q;
+                    let aStr = a === 1 ? '' : (a === -1 ? '-' : a);
+                    let inner = p === 0 ? 'x' : (p > 0 ? `x - ${p}` : `x + ${Math.abs(p)}`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = ${aStr}\\sqrt{${inner}}${qStr}`;
+                },
+                params: [
+                    { id: 'a', name: 'Коефіцієнт a', min: -3, max: 3, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Зсув по X (p)', min: -5, max: 5, step: 0.5, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => {
+                    const inner = x - params.p;
+                    if (inner < 0) return NaN;
+                    return params.a * Math.sqrt(inner) + params.q;
+                },
+                baseCompute: (x) => x >= 0 ? Math.sqrt(x) : NaN,
+                describe: (params) => {
+                    let desc = [];
+                    if (params.a < 0) desc.push(`<span class="highlight">a < 0</span> — графік <span class="down">відображений відносно OX</span>`);
+                    if (params.p !== 0) desc.push(`Область визначення: x ≥ ${params.p}`);
+                    if (params.q !== 0) desc.push(`Початкова точка: (${params.p}, ${params.q})`);
+                    return desc.join('<br>') || 'Базова функція y = √x';
+                },
+                hint: 'Функція визначена тільки для x ≥ p. Зсув p переміщує початок графіка по осі X.'
+            },
+            abs: {
+                name: 'Модуль',
+                baseFormula: 'y = |x|',
+                latexFormula: (params) => {
+                    let a = params.a;
+                    let p = params.p;
+                    let q = params.q;
+                    let aStr = a === 1 ? '' : (a === -1 ? '-' : a);
+                    let inner = p === 0 ? 'x' : (p > 0 ? `x - ${p}` : `x + ${Math.abs(p)}`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = ${aStr}|${inner}|${qStr}`;
+                },
+                params: [
+                    { id: 'a', name: 'Коефіцієнт a', min: -3, max: 3, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Зсув по X (p)', min: -5, max: 5, step: 0.5, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => params.a * Math.abs(x - params.p) + params.q,
+                baseCompute: (x) => Math.abs(x),
+                describe: (params) => {
+                    let desc = [];
+                    if (params.a < 0) desc.push(`<span class="highlight">a < 0</span> — "кут" <span class="down">направлений вниз</span>`);
+                    if (params.a !== 1 && params.a !== -1) desc.push(`|a| = ${Math.abs(params.a)} — зміна кута нахилу`);
+                    desc.push(`Вершина: (${params.p}, ${params.q})`);
+                    return desc.join('<br>') || 'Базова функція y = |x|';
+                },
+                hint: 'Графік модуля — це "кут". Вершина кута знаходиться в точці (p, q).'
+            },
+            cubic: {
+                name: 'Кубічна',
+                baseFormula: 'y = x³',
+                latexFormula: (params) => {
+                    let a = params.a;
+                    let p = params.p;
+                    let q = params.q;
+                    let aStr = a === 1 ? '' : (a === -1 ? '-' : a);
+                    let inner = p === 0 ? 'x' : (p > 0 ? `(x - ${p})` : `(x + ${Math.abs(p)})`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = ${aStr}${inner}^3${qStr}`;
+                },
+                params: [
+                    { id: 'a', name: 'Коефіцієнт a', min: -2, max: 2, step: 0.25, default: 1 },
+                    { id: 'p', name: 'Зсув по X (p)', min: -5, max: 5, step: 0.5, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => params.a * Math.pow(x - params.p, 3) + params.q,
+                baseCompute: (x) => x * x * x,
+                describe: (params) => {
+                    let desc = [];
+                    if (params.a < 0) desc.push(`<span class="highlight">a < 0</span> — графік <span class="down">відображений</span>`);
+                    desc.push(`Точка перегину: (${params.p}, ${params.q})`);
+                    return desc.join('<br>') || 'Базова функція y = x³';
+                },
+                hint: 'Кубічна функція проходить через початок координат і має точку перегину.'
+            },
+            hyperbola: {
+                name: 'Гіпербола',
+                baseFormula: 'y = 1/x',
+                latexFormula: (params) => {
+                    let a = params.a;
+                    let p = params.p;
+                    let q = params.q;
+                    let inner = p === 0 ? 'x' : (p > 0 ? `x - ${p}` : `x + ${Math.abs(p)}`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = \\frac{${a}}{${inner}}${qStr}`;
+                },
+                params: [
+                    { id: 'a', name: 'Коефіцієнт a', min: -5, max: 5, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Зсув по X (p)', min: -5, max: 5, step: 0.5, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => {
+                    const denom = x - params.p;
+                    if (Math.abs(denom) < 0.01) return NaN;
+                    return params.a / denom + params.q;
+                },
+                baseCompute: (x) => Math.abs(x) < 0.01 ? NaN : 1 / x,
+                describe: (params) => {
+                    let desc = [];
+                    desc.push(`Вертикальна асимптота: x = ${params.p}`);
+                    desc.push(`Горизонтальна асимптота: y = ${params.q}`);
+                    if (params.a < 0) desc.push(`<span class="highlight">a < 0</span> — гіпербола в II і IV чвертях`);
+                    return desc.join('<br>');
+                },
+                hint: 'Гіпербола має дві асимптоти. Центр гіперболи в точці (p, q).'
+            },
+            sin: {
+                name: 'Синус',
+                baseFormula: 'y = sin(x)',
+                latexFormula: (params) => {
+                    let a = params.a;
+                    let k = params.k;
+                    let p = params.p;
+                    let q = params.q;
+                    let aStr = a === 1 ? '' : (a === -1 ? '-' : a);
+                    let kStr = k === 1 ? '' : k;
+                    let inner = p === 0 ? `${kStr}x` : (p > 0 ? `${kStr}x - ${p}` : `${kStr}x + ${Math.abs(p)}`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = ${aStr}\\sin(${inner})${qStr}`;
+                },
+                params: [
+                    { id: 'a', name: 'Амплітуда (a)', min: -3, max: 3, step: 0.5, default: 1 },
+                    { id: 'k', name: 'Частота (k)', min: 0.5, max: 4, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Фаза (p)', min: -3.14, max: 3.14, step: 0.314, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -3, max: 3, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => params.a * Math.sin(params.k * x - params.p) + params.q,
+                baseCompute: (x) => Math.sin(x),
+                describe: (params) => {
+                    let desc = [];
+                    desc.push(`Амплітуда: ${Math.abs(params.a)}`);
+                    desc.push(`Період: T = ${(2 * Math.PI / params.k).toFixed(2)}`);
+                    if (params.p !== 0) desc.push(`Фазовий зсув: ${params.p.toFixed(2)} рад`);
+                    if (params.q !== 0) desc.push(`Вертикальний зсув: ${params.q}`);
+                    return desc.join('<br>');
+                },
+                hint: 'Амплітуда — висота хвилі. Період T = 2π/k. Фаза зсуває графік по горизонталі.'
+            },
+            cos: {
+                name: 'Косинус',
+                baseFormula: 'y = cos(x)',
+                latexFormula: (params) => {
+                    let a = params.a;
+                    let k = params.k;
+                    let p = params.p;
+                    let q = params.q;
+                    let aStr = a === 1 ? '' : (a === -1 ? '-' : a);
+                    let kStr = k === 1 ? '' : k;
+                    let inner = p === 0 ? `${kStr}x` : (p > 0 ? `${kStr}x - ${p}` : `${kStr}x + ${Math.abs(p)}`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = ${aStr}\\cos(${inner})${qStr}`;
+                },
+                params: [
+                    { id: 'a', name: 'Амплітуда (a)', min: -3, max: 3, step: 0.5, default: 1 },
+                    { id: 'k', name: 'Частота (k)', min: 0.5, max: 4, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Фаза (p)', min: -3.14, max: 3.14, step: 0.314, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -3, max: 3, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => params.a * Math.cos(params.k * x - params.p) + params.q,
+                baseCompute: (x) => Math.cos(x),
+                describe: (params) => {
+                    let desc = [];
+                    desc.push(`Амплітуда: ${Math.abs(params.a)}`);
+                    desc.push(`Період: T = ${(2 * Math.PI / params.k).toFixed(2)}`);
+                    if (params.p !== 0) desc.push(`Фазовий зсув: ${params.p.toFixed(2)} рад`);
+                    return desc.join('<br>');
+                },
+                hint: 'Косинус — це синус, зсунутий на π/2 вліво. cos(x) = sin(x + π/2).'
+            },
+            exp: {
+                name: 'Показникова',
+                baseFormula: 'y = aˣ',
+                latexFormula: (params) => {
+                    let base = params.base;
+                    let k = params.k;
+                    let p = params.p;
+                    let q = params.q;
+                    let inner = p === 0 ? `${k !== 1 ? k : ''}x` : (p > 0 ? `${k !== 1 ? k : ''}x - ${p}` : `${k !== 1 ? k : ''}x + ${Math.abs(p)}`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    return `y = ${base}^{${inner}}${qStr}`;
+                },
+                params: [
+                    { id: 'base', name: 'Основа (a)', min: 0.5, max: 4, step: 0.5, default: 2 },
+                    { id: 'k', name: 'Коефіцієнт k', min: -2, max: 2, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Зсув по X (p)', min: -5, max: 5, step: 0.5, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => Math.pow(params.base, params.k * x - params.p) + params.q,
+                baseCompute: (x) => Math.pow(2, x),
+                describe: (params) => {
+                    let desc = [];
+                    if (params.base > 1) desc.push(`Основа ${params.base} > 1 — функція <span class="up">зростає</span>`);
+                    else if (params.base < 1) desc.push(`Основа ${params.base} < 1 — функція <span class="down">спадає</span>`);
+                    desc.push(`Горизонтальна асимптота: y = ${params.q}`);
+                    return desc.join('<br>');
+                },
+                hint: 'Якщо основа a > 1 — функція зростає. Якщо 0 < a < 1 — спадає. Асимптота y = q.'
+            },
+            log: {
+                name: 'Логарифмічна',
+                baseFormula: 'y = log(x)',
+                latexFormula: (params) => {
+                    let base = params.base;
+                    let k = params.k;
+                    let p = params.p;
+                    let q = params.q;
+                    let kStr = k === 1 ? '' : (k === -1 ? '-' : k);
+                    let inner = p === 0 ? 'x' : (p > 0 ? `x - ${p}` : `x + ${Math.abs(p)}`);
+                    let qStr = q === 0 ? '' : (q > 0 ? ` + ${q}` : ` - ${Math.abs(q)}`);
+                    let logStr = base === Math.E ? '\\ln' : `\\log_{${base}}`;
+                    return `y = ${kStr}${logStr}(${inner})${qStr}`;
+                },
+                params: [
+                    { id: 'base', name: 'Основа логарифма', min: 2, max: 10, step: 1, default: 2 },
+                    { id: 'k', name: 'Коефіцієнт k', min: -2, max: 2, step: 0.5, default: 1 },
+                    { id: 'p', name: 'Зсув по X (p)', min: -5, max: 5, step: 0.5, default: 0 },
+                    { id: 'q', name: 'Зсув по Y (q)', min: -5, max: 5, step: 0.5, default: 0 }
+                ],
+                compute: (x, params) => {
+                    const inner = x - params.p;
+                    if (inner <= 0) return NaN;
+                    return params.k * Math.log(inner) / Math.log(params.base) + params.q;
+                },
+                baseCompute: (x) => x > 0 ? Math.log2(x) : NaN,
+                describe: (params) => {
+                    let desc = [];
+                    desc.push(`Область визначення: x > ${params.p}`);
+                    desc.push(`Вертикальна асимптота: x = ${params.p}`);
+                    if (params.k < 0) desc.push(`<span class="highlight">k < 0</span> — графік відображений`);
+                    return desc.join('<br>');
+                },
+                hint: 'Логарифм визначений тільки для додатних аргументів. Асимптота x = p.'
+            }
+        };
+
+        // ============ GRAPH CONTROLLER ============
+        class GraphExplorer {
+            constructor() {
+                this.canvas = document.getElementById('mainCanvas');
+                this.ctx = this.canvas.getContext('2d');
+
+                this.currentFunc = 'linear';
+                this.params = {};
+                this.animateTransitions = true;
+                this.targetParams = {};
+                this.animationFrame = null;
+
+                this.scale = 40;
+                this.offsetX = 0;
+                this.offsetY = 0;
+
+                this.initParams();
+                this.resize();
+                this.setupEventListeners();
+                this.renderControls();
+                this.draw();
+
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            initParams() {
+                const func = FUNCTIONS[this.currentFunc];
+                this.params = {};
+                func.params.forEach(p => {
+                    this.params[p.id] = p.default;
+                });
+            }
+
+            resize() {
+                const rect = this.canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+                this.width = rect.width;
+                this.height = rect.height;
+                this.centerX = this.width / 2 + this.offsetX;
+                this.centerY = this.height / 2 + this.offsetY;
+                this.draw();
+            }
+
+            setupEventListeners() {
+                // Function tabs
+                document.querySelectorAll('.function-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.function-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        this.currentFunc = tab.dataset.func;
+                        this.initParams();
+                        this.renderControls();
+                        this.updateFormula();
+                        this.updateDescription();
+                        this.draw();
+                    });
+                });
+
+                // Quick buttons
+                document.querySelectorAll('.quick-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.handleQuickAction(btn.dataset.action));
+                });
+
+                // Reset button
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    this.initParams();
+                    this.renderControls();
+                    this.updateFormula();
+                    this.updateDescription();
+                    this.draw();
+                });
+
+                // Animation toggle
+                document.getElementById('animToggle').addEventListener('click', (e) => {
+                    this.animateTransitions = !this.animateTransitions;
+                    e.target.classList.toggle('active', this.animateTransitions);
+                });
+
+                // Mouse position
+                this.canvas.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = (e.clientX - rect.left - this.centerX) / this.scale;
+                    const y = -(e.clientY - rect.top - this.centerY) / this.scale;
+                    document.getElementById('cursorPos').textContent =
+                        `x: ${x.toFixed(2)}, y: ${y.toFixed(2)}`;
+                });
+
+                // Zoom with wheel
+                this.canvas.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                    this.scale *= delta;
+                    this.scale = Math.max(20, Math.min(100, this.scale));
+                    document.getElementById('zoomLevel').textContent =
+                        `Масштаб: ${(this.scale / 40).toFixed(1)}x`;
+                    this.draw();
+                });
+            }
+
+            renderControls() {
+                const func = FUNCTIONS[this.currentFunc];
+                const container = document.getElementById('transformControls');
+
+                let html = '<div class="section-title">⚙️ Параметри</div>';
+
+                func.params.forEach(param => {
+                    html += `
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span class="slider-label">${param.name}</span>
+                                <span class="slider-value" id="${param.id}Value">${this.params[param.id]}</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range"
+                                    id="${param.id}Slider"
+                                    min="${param.min}"
+                                    max="${param.max}"
+                                    step="${param.step}"
+                                    value="${this.params[param.id]}">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+
+                // Bind slider events
+                func.params.forEach(param => {
+                    const slider = document.getElementById(`${param.id}Slider`);
+                    slider.addEventListener('input', (e) => {
+                        const value = parseFloat(e.target.value);
+                        if (this.animateTransitions) {
+                            this.animateParam(param.id, value);
+                        } else {
+                            this.params[param.id] = value;
+                            document.getElementById(`${param.id}Value`).textContent = value;
+                            this.updateFormula();
+                            this.updateDescription();
+                            this.draw();
+                        }
+                    });
+                });
+
+                this.updateFormula();
+                this.updateDescription();
+
+                // Update AI hint
+                document.getElementById('aiHintText').textContent = func.hint;
+            }
+
+            animateParam(paramId, targetValue) {
+                const startValue = this.params[paramId];
+                const startTime = performance.now();
+                const duration = 200;
+
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+
+                    this.params[paramId] = startValue + (targetValue - startValue) * eased;
+                    document.getElementById(`${paramId}Value`).textContent =
+                        this.params[paramId].toFixed(2);
+
+                    this.updateFormula();
+                    this.updateDescription();
+                    this.draw();
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        this.params[paramId] = targetValue;
+                        document.getElementById(`${paramId}Value`).textContent = targetValue;
+                    }
+                };
+
+                requestAnimationFrame(animate);
+            }
+
+            handleQuickAction(action) {
+                const func = FUNCTIONS[this.currentFunc];
+
+                switch (action) {
+                    case 'reset':
+                        this.initParams();
+                        break;
+                    case 'flip-x':
+                        if ('p' in this.params) this.params.p *= -1;
+                        break;
+                    case 'flip-y':
+                        if ('a' in this.params) this.params.a *= -1;
+                        if ('k' in this.params && this.currentFunc !== 'sin' && this.currentFunc !== 'cos')
+                            this.params.k *= -1;
+                        break;
+                    case 'stretch':
+                        if ('a' in this.params) this.params.a *= 1.5;
+                        break;
+                    case 'compress':
+                        if ('a' in this.params) this.params.a *= 0.67;
+                        break;
+                }
+
+                this.renderControls();
+                this.updateFormula();
+                this.updateDescription();
+                this.draw();
+            }
+
+            updateFormula() {
+                const func = FUNCTIONS[this.currentFunc];
+                const latex = func.latexFormula(this.params);
+
+                try {
+                    katex.render(latex, document.getElementById('formulaDisplay'), {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                } catch (e) {
+                    document.getElementById('formulaDisplay').textContent = latex;
+                }
+            }
+
+            updateDescription() {
+                const func = FUNCTIONS[this.currentFunc];
+                document.getElementById('transformDescription').querySelector('.transform-text').innerHTML =
+                    func.describe(this.params);
+            }
+
+            toCanvas(x, y) {
+                return {
+                    x: this.centerX + x * this.scale,
+                    y: this.centerY - y * this.scale
+                };
+            }
+
+            draw() {
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, this.width, this.height);
+
+                this.drawGrid();
+                this.drawAxes();
+                this.drawBaseFunction();
+                this.drawTransformedFunction();
+            }
+
+            drawGrid() {
+                const ctx = this.ctx;
+                ctx.strokeStyle = 'rgba(128, 128, 128, 0.15)';
+                ctx.lineWidth = 1;
+
+                // Calculate grid bounds
+                const step = this.scale;
+
+                // Vertical lines
+                for (let x = this.centerX % step; x < this.width; x += step) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, this.height);
+                    ctx.stroke();
+                }
+
+                // Horizontal lines
+                for (let y = this.centerY % step; y < this.height; y += step) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(this.width, y);
+                    ctx.stroke();
+                }
+            }
+
+            drawAxes() {
+                const ctx = this.ctx;
+                ctx.strokeStyle = 'rgba(128, 128, 128, 0.5)';
+                ctx.lineWidth = 2;
+
+                // X axis
+                ctx.beginPath();
+                ctx.moveTo(0, this.centerY);
+                ctx.lineTo(this.width, this.centerY);
+                ctx.stroke();
+
+                // Y axis
+                ctx.beginPath();
+                ctx.moveTo(this.centerX, 0);
+                ctx.lineTo(this.centerX, this.height);
+                ctx.stroke();
+
+                // Labels
+                ctx.fillStyle = 'rgba(128, 128, 128, 0.7)';
+                ctx.font = '12px Inter';
+                ctx.fillText('x', this.width - 15, this.centerY - 8);
+                ctx.fillText('y', this.centerX + 8, 15);
+
+                // Numbers
+                const step = this.scale;
+                for (let i = -10; i <= 10; i++) {
+                    if (i === 0) continue;
+
+                    const px = this.centerX + i * step;
+                    const py = this.centerY - i * step;
+
+                    if (px > 0 && px < this.width) {
+                        ctx.fillText(i.toString(), px - 4, this.centerY + 15);
+                    }
+                    if (py > 0 && py < this.height) {
+                        ctx.fillText(i.toString(), this.centerX + 8, py + 4);
+                    }
+                }
+            }
+
+            drawBaseFunction() {
+                const ctx = this.ctx;
+                const func = FUNCTIONS[this.currentFunc];
+
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+
+                this.plotFunction(func.baseCompute);
+
+                ctx.setLineDash([]);
+            }
+
+            drawTransformedFunction() {
+                const ctx = this.ctx;
+                const func = FUNCTIONS[this.currentFunc];
+
+                ctx.strokeStyle = '#6366f1';
+                ctx.lineWidth = 3;
+
+                this.plotFunction((x) => func.compute(x, this.params));
+            }
+
+            plotFunction(fn) {
+                const ctx = this.ctx;
+                ctx.beginPath();
+
+                let started = false;
+                const step = 2 / this.scale; // Smaller step for smoother curves
+
+                for (let px = 0; px <= this.width; px += 2) {
+                    const x = (px - this.centerX) / this.scale;
+                    const y = fn(x);
+
+                    if (isNaN(y) || !isFinite(y) || Math.abs(y) > 100) {
+                        started = false;
+                        continue;
+                    }
+
+                    const canvasY = this.centerY - y * this.scale;
+
+                    if (canvasY < -100 || canvasY > this.height + 100) {
+                        started = false;
+                        continue;
+                    }
+
+                    if (!started) {
+                        ctx.moveTo(px, canvasY);
+                        started = true;
+                    } else {
+                        ctx.lineTo(px, canvasY);
+                    }
+                }
+
+                ctx.stroke();
+            }
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for KaTeX to load
+            if (typeof katex !== 'undefined') {
+                new GraphExplorer();
+            } else {
+                document.addEventListener('katex-loaded', () => new GraphExplorer());
+                // Fallback
+                setTimeout(() => new GraphExplorer(), 500);
+            }
+        });
+    </script>
+</body>
+</html>

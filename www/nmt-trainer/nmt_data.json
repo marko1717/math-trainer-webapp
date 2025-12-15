@@ -2,7 +2,7 @@
   "test_sets": [
     {
       "id": "test_1748266688",
-      "name": "Вирази та рівняння",
+      "name": "Функції, нерівності",
       "tasks": [
         {
           "task_num": 1,
@@ -162,7 +162,7 @@
     },
     {
       "id": "test_1748375081",
-      "name": "Планіметрія",
+      "name": "Тригонометрія",
       "tasks": [
         {
           "task_num": 1,
@@ -322,7 +322,7 @@
     },
     {
       "id": "test_1748844608",
-      "name": "Функції, нерівності",
+      "name": "Похідна, первісна",
       "tasks": [
         {
           "task_num": 1,
@@ -482,7 +482,7 @@
     },
     {
       "id": "test_1748872997",
-      "name": "Тригонометрія",
+      "name": "Стереометрія",
       "tasks": [
         {
           "task_num": 1,
@@ -642,7 +642,7 @@
     },
     {
       "id": "test_imported_1748895473",
-      "name": "Похідна, первісна",
+      "name": "Вирази та рівняння",
       "tasks": [
         {
           "task_num": 1,
@@ -802,7 +802,7 @@
     },
     {
       "id": "test_imported_1748903697",
-      "name": "Стереометрія",
+      "name": "Планіметрія",
       "tasks": [
         {
           "task_num": 1,
@@ -963,25 +963,3116 @@
   ],
   "quizzes": [
     {
-      "id": "1745839118",
+      "id": "1745873154",
       "type": "quiz",
-      "photo": "quiz_1745839118.jpg",
-      "correct": "В",
-      "hashtag": "#відсотки"
+      "photo": "quiz_1745873154.jpg",
+      "solution_photo": "",
+      "correct": "Г",
+      "tag": "#системи_рівнянь"
     },
     {
-      "id": "1745849107",
+      "id": "1745875952",
       "type": "quiz",
-      "photo": "quiz_1745849107.jpg",
+      "photo": "quiz_1745875952.jpg",
+      "solution_photo": "",
       "correct": "Д",
-      "hashtag": "#алгебра"
+      "tag": "#системи_рівнянь"
     },
     {
-      "id": "auto_1745881408",
+      "id": "auto_1745907443",
       "type": "quiz",
-      "photo": "quiz_auto_1745881408.jpg",
-      "correct": "",
-      "hashtag": ""
+      "photo": "quiz_auto_1745907443.jpg",
+      "solution_photo": "",
+      "correct": "А",
+      "tag": "інше"
+    },
+    {
+      "id": "1745907665",
+      "type": "quiz",
+      "photo": "quiz_1745907665.jpg",
+      "solution_photo": "",
+      "correct": "А",
+      "tag": "первісна"
+    },
+    {
+      "id": "1745915682",
+      "type": "quiz",
+      "photo": "quiz_1745915682.jpg",
+      "solution_photo": "",
+      "correct": "А",
+      "tag": "первісна"
+    },
+    {
+      "id": "1745935794",
+      "type": "quiz",
+      "photo": "quiz_1745935794.jpg",
+      "solution_photo": "",
+      "correct": "Б",
+      "tag": "пропорція"
+    },
+    {
+      "id": "1745935862",
+      "type": "quiz",
+      "photo": "quiz_1745935862.jpg",
+      "solution_photo": "",
+      "correct": "Г",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745935914",
+      "type": "quiz",
+      "photo": "quiz_1745935914.jpg",
+      "solution_photo": "",
+      "correct": "Б",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745935957",
+      "type": "quiz",
+      "photo": "quiz_1745935957.jpg",
+      "solution_photo": "",
+      "correct": "Г",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745935995",
+      "type": "quiz",
+      "photo": "quiz_1745935995.jpg",
+      "solution_photo": "",
+      "correct": "Д",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745943321",
+      "type": "quiz",
+      "photo": "quiz_1745943321.jpg",
+      "solution_photo": "",
+      "correct": "Г",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745954271",
+      "type": "quiz",
+      "photo": "quiz_1745954271.jpg",
+      "solution_photo": "quiz_1745954271_solution.jpg",
+      "correct": "Б",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745955175",
+      "type": "quiz",
+      "photo": "quiz_1745955175.jpg",
+      "solution_photo": "quiz_1745955175_solution.jpg",
+      "correct": "Г",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745955277",
+      "type": "quiz",
+      "photo": "quiz_1745955277.jpg",
+      "solution_photo": "quiz_1745955277_solution.jpg",
+      "correct": "Б",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745955335",
+      "type": "quiz",
+      "photo": "quiz_1745955335.jpg",
+      "solution_photo": "quiz_1745955335_solution.jpg",
+      "correct": "А",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1745955384",
+      "type": "quiz",
+      "photo": "quiz_1745955384.jpg",
+      "solution_photo": "quiz_1745955384_solution.jpg",
+      "correct": "Г",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1746013283",
+      "type": "quiz",
+      "photo": "quiz_1746013283.jpg",
+      "solution_photo": "quiz_1746013283_solution.jpg",
+      "correct": "Г",
+      "tag": "пропорції"
+    },
+    {
+      "id": "1746013338",
+      "type": "quiz",
+      "photo": "quiz_1746013338.jpg",
+      "solution_photo": "quiz_1746013338_solution.jpg",
+      "correct": "А",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1746013387",
+      "type": "quiz",
+      "photo": "quiz_1746013387.jpg",
+      "solution_photo": "quiz_1746013387_solution.jpg",
+      "correct": "Б",
+      "tag": "відсотки"
+    },
+    {
+      "id": "1746036518",
+      "type": "quiz",
+      "photo": "quiz_1746036518.jpg",
+      "solution_photo": "quiz_1746036518_solution.jpg",
+      "correct": "В",
+      "tag": "степені"
+    },
+    {
+      "id": "1746036575",
+      "type": "quiz",
+      "photo": "quiz_1746036575.jpg",
+      "solution_photo": "quiz_1746036575_solution.jpg",
+      "correct": "А",
+      "tag": "степені"
+    },
+    {
+      "id": "1746036625",
+      "type": "quiz",
+      "photo": "quiz_1746036625.jpg",
+      "solution_photo": "quiz_1746036625_solution.jpg",
+      "correct": "Д",
+      "tag": "степені"
+    },
+    {
+      "id": "1746036666",
+      "type": "quiz",
+      "photo": "quiz_1746036666.jpg",
+      "solution_photo": "quiz_1746036666_solution.jpg",
+      "correct": "В",
+      "tag": "степені"
+    },
+    {
+      "id": "1746036704",
+      "type": "quiz",
+      "photo": "quiz_1746036704.jpg",
+      "solution_photo": "quiz_1746036704_solution.jpg",
+      "correct": "А",
+      "tag": "степені"
+    },
+    {
+      "id": "1746036745",
+      "type": "quiz",
+      "photo": "quiz_1746036745.jpg",
+      "solution_photo": "quiz_1746036745_solution.jpg",
+      "correct": "Д",
+      "tag": "одночлени"
+    },
+    {
+      "id": "1746036791",
+      "type": "quiz",
+      "photo": "quiz_1746036791.jpg",
+      "solution_photo": "quiz_1746036791_solution.jpg",
+      "correct": "Д",
+      "tag": "степені"
+    },
+    {
+      "id": "1746105315",
+      "type": "quiz",
+      "photo": "quiz_1746105315.jpg",
+      "solution_photo": "",
+      "correct": "В",
+      "tag": "степені"
+    },
+    {
+      "id": "1746114543",
+      "type": "quiz",
+      "photo": "quiz_1746114543.jpg",
+      "solution_photo": "quiz_1746114543_solution.jpg",
+      "correct": "В",
+      "tag": "степені"
+    },
+    {
+      "id": "1746114952",
+      "type": "quiz",
+      "photo": "quiz_1746114952.jpg",
+      "solution_photo": "quiz_1746114952_solution.jpg",
+      "correct": "А",
+      "tag": "степені"
+    },
+    {
+      "id": "1746115008",
+      "type": "quiz",
+      "photo": "quiz_1746115008.jpg",
+      "solution_photo": "quiz_1746115008_solution.jpg",
+      "correct": "Д",
+      "tag": "степені"
+    },
+    {
+      "id": "1746120752",
+      "type": "quiz",
+      "photo": "quiz_1746120752.jpg",
+      "solution_photo": "quiz_1746120752_solution.jpg",
+      "correct": "А",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746120803",
+      "type": "quiz",
+      "photo": "quiz_1746120803.jpg",
+      "solution_photo": "quiz_1746120803_solution.jpg",
+      "correct": "Г",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746120849",
+      "type": "quiz",
+      "photo": "quiz_1746120849.jpg",
+      "solution_photo": "quiz_1746120849_solution.jpg",
+      "correct": "А",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746120898",
+      "type": "quiz",
+      "photo": "quiz_1746120898.jpg",
+      "solution_photo": "quiz_1746120898_solution.jpg",
+      "correct": "Г",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746120948",
+      "type": "short_answer",
+      "photo": "quiz_1746120948.jpg",
+      "solution_photo": "quiz_1746120948_solution.jpg",
+      "correct": "90",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746201523",
+      "type": "quiz",
+      "photo": "quiz_1746201523.jpg",
+      "solution_photo": "",
+      "correct": "В",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746202377",
+      "type": "quiz",
+      "photo": "quiz_1746202377.jpg",
+      "solution_photo": "quiz_1746202377_solution.jpg",
+      "correct": "Д",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746202488",
+      "type": "quiz",
+      "photo": "quiz_1746202488.jpg",
+      "solution_photo": "quiz_1746202488_solution.jpg",
+      "correct": "Г",
+      "tag": "многочлени"
+    },
+    {
+      "id": "1746256882",
+      "type": "quiz",
+      "photo": "quiz_1746256882.jpg",
+      "solution_photo": "quiz_1746256882_solution.jpg",
+      "correct": "Б",
+      "tag": "лінійні_рівняння"
+    },
+    {
+      "id": "1746256957",
+      "type": "quiz",
+      "photo": "quiz_1746256957.jpg",
+      "solution_photo": "quiz_1746256957_solution.jpg",
+      "correct": "Г",
+      "tag": "лінійні_рівняння"
+    },
+    {
+      "id": "1746257038",
+      "type": "quiz",
+      "photo": "quiz_1746257038.jpg",
+      "solution_photo": "quiz_1746257038_solution.jpg",
+      "correct": "Г",
+      "tag": "лінійні_рівняння"
+    },
+    {
+      "id": "1746257096",
+      "type": "short_answer",
+      "photo": "quiz_1746257096.jpg",
+      "solution_photo": "quiz_1746257096_solution.jpg",
+      "correct": "11,5",
+      "tag": "лінійні_рівняння"
+    },
+    {
+      "id": "1746364166",
+      "type": "quiz",
+      "photo": "quiz_1746364166.jpg",
+      "solution_photo": "quiz_1746364166_solution.jpg",
+      "correct": "Б",
+      "tag": "лінійні_рівняння"
+    },
+    {
+      "id": "1746364401",
+      "type": "quiz",
+      "photo": "quiz_1746364401.jpg",
+      "solution_photo": "quiz_1746364401_solution.jpg",
+      "correct": "Д",
+      "tag": "лінійні_рівняння"
+    },
+    {
+      "id": "1746364556",
+      "type": "quiz",
+      "photo": "quiz_1746364556.jpg",
+      "solution_photo": "quiz_1746364556_solution.jpg",
+      "correct": "В",
+      "tag": "лінійні_рівняння"
+    },
+    {
+      "id": "1746370239",
+      "type": "quiz",
+      "photo": "quiz_1746370239.jpg",
+      "solution_photo": "quiz_1746370239_solution.jpg",
+      "correct": "Б",
+      "tag": "дробові_раціональні_вирази"
+    },
+    {
+      "id": "1746370289",
+      "type": "quiz",
+      "photo": "quiz_1746370289.jpg",
+      "solution_photo": "quiz_1746370289_solution.jpg",
+      "correct": "Д",
+      "tag": "дробові_раціональні_вирази"
+    },
+    {
+      "id": "1746370338",
+      "type": "quiz",
+      "photo": "quiz_1746370338.jpg",
+      "solution_photo": "quiz_1746370338_solution.jpg",
+      "correct": "В",
+      "tag": "дробові_раціональні_вирази"
+    },
+    {
+      "id": "1746370408",
+      "type": "quiz",
+      "photo": "quiz_1746370408.jpg",
+      "solution_photo": "quiz_1746370408_solution.jpg",
+      "correct": "Д",
+      "tag": "дробові_раціональні_вирази"
+    },
+    {
+      "id": "1746370453",
+      "type": "quiz",
+      "photo": "quiz_1746370453.jpg",
+      "solution_photo": "quiz_1746370453_solution.jpg",
+      "correct": "В",
+      "tag": "дробові_раціональні_вирази"
+    },
+    {
+      "id": "1746370668",
+      "type": "quiz",
+      "photo": "quiz_1746370668.jpg",
+      "solution_photo": "quiz_1746370668_solution.jpg",
+      "correct": "Б",
+      "tag": "дробові_раціональні_вирази"
+    },
+    {
+      "id": "1746523207",
+      "type": "quiz",
+      "photo": "quiz_1746523207.jpg",
+      "solution_photo": "quiz_1746523207_solution.jpg",
+      "correct": "В",
+      "tag": "квадратні_корені"
+    },
+    {
+      "id": "1746524001",
+      "type": "quiz",
+      "photo": "quiz_1746524001.jpg",
+      "solution_photo": "quiz_1746524001_solution.jpg",
+      "correct": "Д",
+      "tag": "квадратні_корені"
+    },
+    {
+      "id": "1746524096",
+      "type": "quiz",
+      "photo": "quiz_1746524096.jpg",
+      "solution_photo": "quiz_1746524096_solution.jpg",
+      "correct": "Б",
+      "tag": "квадратні_корені"
+    },
+    {
+      "id": "1746524170",
+      "type": "quiz",
+      "photo": "quiz_1746524170.jpg",
+      "solution_photo": "quiz_1746524170_solution.jpg",
+      "correct": "В",
+      "tag": "квадратні_корені"
+    },
+    {
+      "id": "1746524224",
+      "type": "short_answer",
+      "photo": "quiz_1746524224.jpg",
+      "solution_photo": "quiz_1746524224_solution.jpg",
+      "correct": "0,25",
+      "tag": "квадратні_корені"
+    },
+    {
+      "id": "1746533100",
+      "type": "matching",
+      "photo": "quiz_1746533100.jpg",
+      "solution_photo": "quiz_1746533100_solution.jpg",
+      "correct": "А Д Г",
+      "tag": "квадратні_корені"
+    },
+    {
+      "id": "1746552986",
+      "type": "short_answer",
+      "photo": "quiz_1746552986.jpg",
+      "solution_photo": "quiz_1746552986_solution.jpg",
+      "correct": "0.25",
+      "tag": "квадратні_корені"
+    },
+    {
+      "id": "1746553282",
+      "type": "quiz",
+      "photo": "quiz_1746553282.jpg",
+      "solution_photo": "quiz_1746553282_solution.jpg",
+      "correct": "Г",
+      "tag": "квадратні_рівняння"
+    },
+    {
+      "id": "1746553422",
+      "type": "quiz",
+      "photo": "quiz_1746553422.jpg",
+      "solution_photo": "quiz_1746553422_solution.jpg",
+      "correct": "Б",
+      "tag": "квадратні_рівняння"
+    },
+    {
+      "id": "1746553492",
+      "type": "quiz",
+      "photo": "quiz_1746553492.jpg",
+      "solution_photo": "quiz_1746553492_solution.jpg",
+      "correct": "Д",
+      "tag": "квадратні_рівняння"
+    },
+    {
+      "id": "1746553580",
+      "type": "quiz",
+      "photo": "quiz_1746553580.jpg",
+      "solution_photo": "",
+      "correct": "Г",
+      "tag": "квадратні_рівняння"
+    },
+    {
+      "id": "1746553699",
+      "type": "quiz",
+      "photo": "quiz_1746553699.jpg",
+      "solution_photo": "",
+      "correct": "Д",
+      "tag": "квадратні_рівняння"
+    },
+    {
+      "id": "1746553796",
+      "type": "quiz",
+      "photo": "quiz_1746553796.jpg",
+      "solution_photo": "quiz_1746553796_solution.jpg",
+      "correct": "Г",
+      "tag": "квадратні_рівняння"
+    },
+    {
+      "id": "1746621822",
+      "type": "quiz",
+      "photo": "quiz_1746621822.jpg",
+      "solution_photo": "quiz_1746621822_solution.jpg",
+      "correct": "А",
+      "tag": "дробові_рівняння"
+    },
+    {
+      "id": "1746621870",
+      "type": "quiz",
+      "photo": "quiz_1746621870.jpg",
+      "solution_photo": "quiz_1746621870_solution.jpg",
+      "correct": "Г",
+      "tag": "дробові_рівняння"
+    },
+    {
+      "id": "1746621920",
+      "type": "quiz",
+      "photo": "quiz_1746621920.jpg",
+      "solution_photo": "quiz_1746621920_solution.jpg",
+      "correct": "А",
+      "tag": "раціональні_рівняння"
+    },
+    {
+      "id": "1746621978",
+      "type": "quiz",
+      "photo": "quiz_1746621978.jpg",
+      "solution_photo": "quiz_1746621978_solution.jpg",
+      "correct": "Г",
+      "tag": "біквадратні_рівняння"
+    },
+    {
+      "id": "1746622025",
+      "type": "quiz",
+      "photo": "quiz_1746622025.jpg",
+      "solution_photo": "quiz_1746622025_solution.jpg",
+      "correct": "Б",
+      "tag": "раціональні_рівняння"
+    },
+    {
+      "id": "1746682625",
+      "type": "matching",
+      "photo": "quiz_1746682625.jpg",
+      "solution_photo": "quiz_1746682625_solution.jpg",
+      "correct": "А Д Г",
+      "tag": "алгебра"
+    },
+    {
+      "id": "1746693967",
+      "type": "matching",
+      "photo": "quiz_1746693967.jpg",
+      "solution_photo": "quiz_1746693967_solution.jpg",
+      "correct": "А Д Г",
+      "tag": "алгебра"
+    },
+    {
+      "id": "1746714406",
+      "type": "quiz",
+      "photo": "quiz_1746714406.jpg",
+      "solution_photo": "quiz_1746714406_solution.jpg",
+      "correct": "В",
+      "tag": "системи_рівнянь"
+    },
+    {
+      "id": "1746714521",
+      "type": "quiz",
+      "photo": "quiz_1746714521.jpg",
+      "solution_photo": "quiz_1746714521_solution.jpg",
+      "correct": "А",
+      "tag": "система_рівнянь"
+    },
+    {
+      "id": "1746714597",
+      "type": "quiz",
+      "photo": "quiz_1746714597.jpg",
+      "solution_photo": "quiz_1746714597_solution.jpg",
+      "correct": "Д",
+      "tag": "система_рівнянь"
+    },
+    {
+      "id": "1746714659",
+      "type": "quiz",
+      "photo": "quiz_1746714659.jpg",
+      "solution_photo": "quiz_1746714659_solution.jpg",
+      "correct": "Г",
+      "tag": "система_рівнянь"
+    },
+    {
+      "id": "1746714723",
+      "type": "quiz",
+      "photo": "quiz_1746714723.jpg",
+      "solution_photo": "quiz_1746714723_solution.jpg",
+      "correct": "Д",
+      "tag": "система_рівнянь"
+    },
+    {
+      "id": "1746798861",
+      "type": "quiz",
+      "photo": "quiz_1746798861.jpg",
+      "solution_photo": "quiz_1746798861_solution.jpg",
+      "correct": "А",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746798914",
+      "type": "quiz",
+      "photo": "quiz_1746798914.jpg",
+      "solution_photo": "quiz_1746798914_solution.jpg",
+      "correct": "А",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746798962",
+      "type": "quiz",
+      "photo": "quiz_1746798962.jpg",
+      "solution_photo": "quiz_1746798962_solution.jpg",
+      "correct": "А",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799002",
+      "type": "quiz",
+      "photo": "quiz_1746799002.jpg",
+      "solution_photo": "quiz_1746799002_solution.jpg",
+      "correct": "Г",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799053",
+      "type": "quiz",
+      "photo": "quiz_1746799053.jpg",
+      "solution_photo": "quiz_1746799053_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799115",
+      "type": "quiz",
+      "photo": "quiz_1746799115.jpg",
+      "solution_photo": "quiz_1746799115_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799156",
+      "type": "quiz",
+      "photo": "quiz_1746799156.jpg",
+      "solution_photo": "quiz_1746799156_solution.jpg",
+      "correct": "В",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799193",
+      "type": "quiz",
+      "photo": "quiz_1746799193.jpg",
+      "solution_photo": "quiz_1746799193_solution.jpg",
+      "correct": "В",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799234",
+      "type": "quiz",
+      "photo": "quiz_1746799234.jpg",
+      "solution_photo": "quiz_1746799234_solution.jpg",
+      "correct": "Г",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799288",
+      "type": "quiz",
+      "photo": "quiz_1746799288.jpg",
+      "solution_photo": "quiz_1746799288_solution.jpg",
+      "correct": "Б",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799322",
+      "type": "quiz",
+      "photo": "quiz_1746799322.jpg",
+      "solution_photo": "quiz_1746799322_solution.jpg",
+      "correct": "Б",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799370",
+      "type": "quiz",
+      "photo": "quiz_1746799370.jpg",
+      "solution_photo": "quiz_1746799370_solution.jpg",
+      "correct": "Б",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799417",
+      "type": "quiz",
+      "photo": "quiz_1746799417.jpg",
+      "solution_photo": "quiz_1746799417_solution.jpg",
+      "correct": "А",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799468",
+      "type": "quiz",
+      "photo": "quiz_1746799468.jpg",
+      "solution_photo": "quiz_1746799468_solution.jpg",
+      "correct": "Г",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799505",
+      "type": "quiz",
+      "photo": "quiz_1746799505.jpg",
+      "solution_photo": "quiz_1746799505_solution.jpg",
+      "correct": "А",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799659",
+      "type": "matching",
+      "photo": "quiz_1746799659.jpg",
+      "solution_photo": "quiz_1746799659_solution.jpg",
+      "correct": "Д Г Б",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799708",
+      "type": "matching",
+      "photo": "quiz_1746799708.jpg",
+      "solution_photo": "quiz_1746799708_solution.jpg",
+      "correct": "В Б Д",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799776",
+      "type": "matching",
+      "photo": "quiz_1746799776.jpg",
+      "solution_photo": "quiz_1746799776_solution.jpg",
+      "correct": "Г В Б",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799822",
+      "type": "short_answer",
+      "photo": "quiz_1746799822.jpg",
+      "solution_photo": "",
+      "correct": "Д",
+      "tag": "в"
+    },
+    {
+      "id": "1746799868",
+      "type": "short_answer",
+      "photo": "quiz_1746799868.jpg",
+      "solution_photo": "quiz_1746799868_solution.jpg",
+      "correct": "16",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746799918",
+      "type": "short_answer",
+      "photo": "quiz_1746799918.jpg",
+      "solution_photo": "quiz_1746799918_solution.jpg",
+      "correct": "1,25",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746800024",
+      "type": "short_answer",
+      "photo": "quiz_1746800024.jpg",
+      "solution_photo": "quiz_1746800024_solution.jpg",
+      "correct": "12",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1746800099",
+      "type": "short_answer",
+      "photo": "quiz_1746800099.jpg",
+      "solution_photo": "quiz_1746800099_solution.jpg",
+      "correct": "46",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1747054972",
+      "type": "quiz",
+      "photo": "quiz_1747054972.jpg",
+      "solution_photo": "quiz_1747054972_solution.jpg",
+      "correct": "В",
+      "tag": "трикутники"
+    },
+    {
+      "id": "1747055190",
+      "type": "quiz",
+      "photo": "quiz_1747055190.jpg",
+      "solution_photo": "quiz_1747055190_solution.jpg",
+      "correct": "Б",
+      "tag": "кути"
+    },
+    {
+      "id": "1747055255",
+      "type": "quiz",
+      "photo": "quiz_1747055255.jpg",
+      "solution_photo": "quiz_1747055255_solution.jpg",
+      "correct": "Г",
+      "tag": "кути"
+    },
+    {
+      "id": "1747055337",
+      "type": "quiz",
+      "photo": "quiz_1747055337.jpg",
+      "solution_photo": "quiz_1747055337_solution.jpg",
+      "correct": "А",
+      "tag": "трикутники"
+    },
+    {
+      "id": "1747055402",
+      "type": "quiz",
+      "photo": "quiz_1747055402.jpg",
+      "solution_photo": "quiz_1747055402_solution.jpg",
+      "correct": "Г",
+      "tag": "кути"
+    },
+    {
+      "id": "1747055571",
+      "type": "quiz",
+      "photo": "quiz_1747055571.jpg",
+      "solution_photo": "quiz_1747055571_solution.jpg",
+      "correct": "Д",
+      "tag": "трикутники"
+    },
+    {
+      "id": "1747055624",
+      "type": "quiz",
+      "photo": "quiz_1747055624.jpg",
+      "solution_photo": "quiz_1747055624_solution.jpg",
+      "correct": "Д",
+      "tag": "відрізки"
+    },
+    {
+      "id": "1747055675",
+      "type": "quiz",
+      "photo": "quiz_1747055675.jpg",
+      "solution_photo": "quiz_1747055675_solution.jpg",
+      "correct": "Г",
+      "tag": "трикутники"
+    },
+    {
+      "id": "1747055806",
+      "type": "quiz",
+      "photo": "quiz_1747055806.jpg",
+      "solution_photo": "quiz_1747055806_solution.jpg",
+      "correct": "Д",
+      "tag": "кути"
+    },
+    {
+      "id": "1747056395",
+      "type": "quiz",
+      "photo": "quiz_1747056395.jpg",
+      "solution_photo": "quiz_1747056395_solution.jpg",
+      "correct": "Г",
+      "tag": "трикутники"
+    },
+    {
+      "id": "1747056442",
+      "type": "short_answer",
+      "photo": "quiz_1747056442.jpg",
+      "solution_photo": "quiz_1747056442_solution.jpg",
+      "correct": "55",
+      "tag": "кути"
+    },
+    {
+      "id": "1747155910",
+      "type": "quiz",
+      "photo": "quiz_1747155910.jpg",
+      "solution_photo": "quiz_1747155910_solution.jpg",
+      "correct": "В",
+      "tag": "прямокутний_трикутник"
+    },
+    {
+      "id": "1747155967",
+      "type": "quiz",
+      "photo": "quiz_1747155967.jpg",
+      "solution_photo": "quiz_1747155967_solution.jpg",
+      "correct": "В",
+      "tag": "трикутники"
+    },
+    {
+      "id": "1747156021",
+      "type": "quiz",
+      "photo": "quiz_1747156021.jpg",
+      "solution_photo": "quiz_1747156021_solution.jpg",
+      "correct": "В",
+      "tag": "прямокутний_трикутник"
+    },
+    {
+      "id": "1747156071",
+      "type": "quiz",
+      "photo": "quiz_1747156071.jpg",
+      "solution_photo": "quiz_1747156071_solution.jpg",
+      "correct": "Г",
+      "tag": "прямокутний_трикутник"
+    },
+    {
+      "id": "1747156124",
+      "type": "quiz",
+      "photo": "quiz_1747156124.jpg",
+      "solution_photo": "quiz_1747156124_solution.jpg",
+      "correct": "Д",
+      "tag": "теорема_синусів"
+    },
+    {
+      "id": "1747156177",
+      "type": "quiz",
+      "photo": "quiz_1747156177.jpg",
+      "solution_photo": "quiz_1747156177_solution.jpg",
+      "correct": "Д",
+      "tag": "теорема_косинусів"
+    },
+    {
+      "id": "1747156227",
+      "type": "quiz",
+      "photo": "quiz_1747156227.jpg",
+      "solution_photo": "quiz_1747156227_solution.jpg",
+      "correct": "Г",
+      "tag": "прямокутний_трикутник"
+    },
+    {
+      "id": "1747156278",
+      "type": "matching",
+      "photo": "quiz_1747156278.jpg",
+      "solution_photo": "quiz_1747156278_solution.jpg",
+      "correct": "Б В Д",
+      "tag": "прямокутний_трикутник"
+    },
+    {
+      "id": "1747290801",
+      "type": "quiz",
+      "photo": "quiz_1747290801.jpg",
+      "solution_photo": "quiz_1747290801_solution.jpg",
+      "correct": "А",
+      "tag": "паралелограм"
+    },
+    {
+      "id": "1747290857",
+      "type": "quiz",
+      "photo": "quiz_1747290857.jpg",
+      "solution_photo": "quiz_1747290857_solution.jpg",
+      "correct": "Г",
+      "tag": "ромб"
+    },
+    {
+      "id": "1747290974",
+      "type": "quiz",
+      "photo": "quiz_1747290974.jpg",
+      "solution_photo": "quiz_1747290974_solution.jpg",
+      "correct": "Д",
+      "tag": "трапеція"
+    },
+    {
+      "id": "1747291152",
+      "type": "quiz",
+      "photo": "quiz_1747291152.jpg",
+      "solution_photo": "quiz_1747291152_solution.jpg",
+      "correct": "Г",
+      "tag": "Трапеція"
+    },
+    {
+      "id": "1747291656",
+      "type": "quiz",
+      "photo": "quiz_1747291656.jpg",
+      "solution_photo": "quiz_1747291656_solution.jpg",
+      "correct": "Б",
+      "tag": "паралелограм"
+    },
+    {
+      "id": "1747291701",
+      "type": "quiz",
+      "photo": "quiz_1747291701.jpg",
+      "solution_photo": "quiz_1747291701_solution.jpg",
+      "correct": "Б",
+      "tag": "квадрат"
+    },
+    {
+      "id": "1747291789",
+      "type": "quiz",
+      "photo": "quiz_1747291789.jpg",
+      "solution_photo": "quiz_1747291789_solution.jpg",
+      "correct": "Д",
+      "tag": "прямокутник"
+    },
+    {
+      "id": "1747291871",
+      "type": "quiz",
+      "photo": "quiz_1747291871.jpg",
+      "solution_photo": "quiz_1747291871_solution.jpg",
+      "correct": "Б",
+      "tag": "прямокутник"
+    },
+    {
+      "id": "1747291937",
+      "type": "matching",
+      "photo": "quiz_1747291937.jpg",
+      "solution_photo": "quiz_1747291937_solution.jpg",
+      "correct": "В А Г",
+      "tag": "паралелограм"
+    },
+    {
+      "id": "1747291984",
+      "type": "matching",
+      "photo": "quiz_1747291984.jpg",
+      "solution_photo": "quiz_1747291984_solution.jpg",
+      "correct": "Б В А",
+      "tag": "ромб"
+    },
+    {
+      "id": "1747292059",
+      "type": "matching",
+      "photo": "quiz_1747292059.jpg",
+      "solution_photo": "quiz_1747292059_solution.jpg",
+      "correct": "А Б Г",
+      "tag": "паралелограм"
+    },
+    {
+      "id": "1747313794",
+      "type": "quiz",
+      "photo": "quiz_1747313794.jpg",
+      "solution_photo": "quiz_1747313794_solution.jpg",
+      "correct": "В",
+      "tag": "площа_квадрата"
+    },
+    {
+      "id": "1747313852",
+      "type": "quiz",
+      "photo": "quiz_1747313852.jpg",
+      "solution_photo": "quiz_1747313852_solution.jpg",
+      "correct": "В",
+      "tag": "площа_ромба"
+    },
+    {
+      "id": "1747313895",
+      "type": "quiz",
+      "photo": "quiz_1747313895.jpg",
+      "solution_photo": "quiz_1747313895_solution.jpg",
+      "correct": "Г",
+      "tag": "подібність"
+    },
+    {
+      "id": "1747313941",
+      "type": "quiz",
+      "photo": "quiz_1747313941.jpg",
+      "solution_photo": "quiz_1747313941_solution.jpg",
+      "correct": "Д",
+      "tag": "площа_трапеції"
+    },
+    {
+      "id": "1747313984",
+      "type": "quiz",
+      "photo": "quiz_1747313984.jpg",
+      "solution_photo": "quiz_1747313984_solution.jpg",
+      "correct": "А",
+      "tag": "площа_прямокутника"
+    },
+    {
+      "id": "1747314054",
+      "type": "quiz",
+      "photo": "quiz_1747314054.jpg",
+      "solution_photo": "quiz_1747314054_solution.jpg",
+      "correct": "В",
+      "tag": "площа_паралелограма"
+    },
+    {
+      "id": "1747314197",
+      "type": "matching",
+      "photo": "quiz_1747314197.jpg",
+      "solution_photo": "quiz_1747314197_solution.jpg",
+      "correct": "Г В Б",
+      "tag": "площі_фігур"
+    },
+    {
+      "id": "1747314344",
+      "type": "quiz",
+      "photo": "quiz_1747314344.jpg",
+      "solution_photo": "quiz_1747314344_solution.jpg",
+      "correct": "Д",
+      "tag": "подібність"
+    },
+    {
+      "id": "1747314614",
+      "type": "quiz",
+      "photo": "quiz_1747314614.jpg",
+      "solution_photo": "quiz_1747314614_solution.jpg",
+      "correct": "Г",
+      "tag": "площа_трикутника"
+    },
+    {
+      "id": "1747314647",
+      "type": "quiz",
+      "photo": "quiz_1747314647.jpg",
+      "solution_photo": "quiz_1747314647_solution.jpg",
+      "correct": "Г",
+      "tag": "площа_трикутника"
+    },
+    {
+      "id": "1747422100",
+      "type": "quiz",
+      "photo": "quiz_1747422100.jpg",
+      "solution_photo": "quiz_1747422100_solution.jpg",
+      "correct": "В",
+      "tag": "коло_і_круг"
+    },
+    {
+      "id": "1747422160",
+      "type": "quiz",
+      "photo": "quiz_1747422160.jpg",
+      "solution_photo": "quiz_1747422160_solution.jpg",
+      "correct": "Б",
+      "tag": "площа_круга"
+    },
+    {
+      "id": "1747422226",
+      "type": "quiz",
+      "photo": "quiz_1747422226.jpg",
+      "solution_photo": "quiz_1747422226_solution.jpg",
+      "correct": "В",
+      "tag": "вписані_кути"
+    },
+    {
+      "id": "1747422285",
+      "type": "quiz",
+      "photo": "quiz_1747422285.jpg",
+      "solution_photo": "quiz_1747422285_solution.jpg",
+      "correct": "Б",
+      "tag": "коло_і_круг"
+    },
+    {
+      "id": "1747422331",
+      "type": "quiz",
+      "photo": "quiz_1747422331.jpg",
+      "solution_photo": "",
+      "correct": "В",
+      "tag": "коло_і_круг"
+    },
+    {
+      "id": "1747422737",
+      "type": "quiz",
+      "photo": "quiz_1747422737.jpg",
+      "solution_photo": "quiz_1747422737_solution.jpg",
+      "correct": "В",
+      "tag": "коло_і_круг"
+    },
+    {
+      "id": "1747422806",
+      "type": "quiz",
+      "photo": "quiz_1747422806.jpg",
+      "solution_photo": "quiz_1747422806_solution.jpg",
+      "correct": "В",
+      "tag": "площа_круга"
+    },
+    {
+      "id": "1747422851",
+      "type": "quiz",
+      "photo": "quiz_1747422851.jpg",
+      "solution_photo": "quiz_1747422851_solution.jpg",
+      "correct": "В",
+      "tag": "описане_коло"
+    },
+    {
+      "id": "1747422896",
+      "type": "quiz",
+      "photo": "quiz_1747422896.jpg",
+      "solution_photo": "quiz_1747422896_solution.jpg",
+      "correct": "Г",
+      "tag": "описане_коло"
+    },
+    {
+      "id": "1747422978",
+      "type": "matching",
+      "photo": "quiz_1747422978.jpg",
+      "solution_photo": "quiz_1747422978_solution.jpg",
+      "correct": "Д А В",
+      "tag": "вписане_коло"
+    },
+    {
+      "id": "1747423128",
+      "type": "matching",
+      "photo": "quiz_1747423128.jpg",
+      "solution_photo": "quiz_1747423128_solution.jpg",
+      "correct": "В Д Б",
+      "tag": "вписані_кути"
+    },
+    {
+      "id": "1747467632",
+      "type": "quiz",
+      "photo": "quiz_1747467632.jpg",
+      "solution_photo": "quiz_1747467632_solution.jpg",
+      "correct": "Д",
+      "tag": "відстань_між_точками"
+    },
+    {
+      "id": "1747467928",
+      "type": "quiz",
+      "photo": "quiz_1747467928.jpg",
+      "solution_photo": "quiz_1747467928_solution.jpg",
+      "correct": "Б",
+      "tag": "координати_середини_відрізка"
+    },
+    {
+      "id": "1747467986",
+      "type": "quiz",
+      "photo": "quiz_1747467986.jpg",
+      "solution_photo": "quiz_1747467986_solution.jpg",
+      "correct": "В",
+      "tag": "рівняння_кола"
+    },
+    {
+      "id": "1747468045",
+      "type": "quiz",
+      "photo": "quiz_1747468045.jpg",
+      "solution_photo": "quiz_1747468045_solution.jpg",
+      "correct": "Б",
+      "tag": "рівняння_кола"
+    },
+    {
+      "id": "1747468099",
+      "type": "quiz",
+      "photo": "quiz_1747468099.jpg",
+      "solution_photo": "quiz_1747468099_solution.jpg",
+      "correct": "Д",
+      "tag": "рівняння_кола"
+    },
+    {
+      "id": "1747468129",
+      "type": "quiz",
+      "photo": "quiz_1747468129.jpg",
+      "solution_photo": "quiz_1747468129_solution.jpg",
+      "correct": "Д",
+      "tag": "рівняння_прямої"
+    },
+    {
+      "id": "1747468159",
+      "type": "quiz",
+      "photo": "quiz_1747468159.jpg",
+      "solution_photo": "quiz_1747468159_solution.jpg",
+      "correct": "В",
+      "tag": "рівняння_прямої"
+    },
+    {
+      "id": "1747468268",
+      "type": "quiz",
+      "photo": "quiz_1747468268.jpg",
+      "solution_photo": "quiz_1747468268_solution.jpg",
+      "correct": "Д",
+      "tag": "рівняння_кола"
+    },
+    {
+      "id": "1747468352",
+      "type": "short_answer",
+      "photo": "quiz_1747468352.jpg",
+      "solution_photo": "quiz_1747468352_solution.jpg",
+      "correct": "12",
+      "tag": "рівняння_кола"
+    },
+    {
+      "id": "1747468434",
+      "type": "short_answer",
+      "photo": "quiz_1747468434.jpg",
+      "solution_photo": "quiz_1747468434_solution.jpg",
+      "correct": "-3x+3",
+      "tag": "рівняння_прямої"
+    },
+    {
+      "id": "1747498990",
+      "type": "quiz",
+      "photo": "quiz_1747498990.jpg",
+      "solution_photo": "quiz_1747498990_solution.jpg",
+      "correct": "Д",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747499033",
+      "type": "quiz",
+      "photo": "quiz_1747499033.jpg",
+      "solution_photo": "quiz_1747499033_solution.jpg",
+      "correct": "Г",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747499082",
+      "type": "quiz",
+      "photo": "quiz_1747499082.jpg",
+      "solution_photo": "quiz_1747499082_solution.jpg",
+      "correct": "Д",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747499133",
+      "type": "quiz",
+      "photo": "quiz_1747499133.jpg",
+      "solution_photo": "quiz_1747499133_solution.jpg",
+      "correct": "В",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747499326",
+      "type": "quiz",
+      "photo": "quiz_1747499326.jpg",
+      "solution_photo": "quiz_1747499326_solution.jpg",
+      "correct": "Г",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747499383",
+      "type": "quiz",
+      "photo": "quiz_1747499383.jpg",
+      "solution_photo": "quiz_1747499383_solution.jpg",
+      "correct": "А",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747499508",
+      "type": "quiz",
+      "photo": "quiz_1747499508.jpg",
+      "solution_photo": "quiz_1747499508_solution.jpg",
+      "correct": "Г",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747499566",
+      "type": "quiz",
+      "photo": "quiz_1747499566.jpg",
+      "solution_photo": "quiz_1747499566_solution.jpg",
+      "correct": "А",
+      "tag": "вектори"
+    },
+    {
+      "id": "1747679271",
+      "type": "quiz",
+      "photo": "quiz_1747679271.jpg",
+      "solution_photo": "quiz_1747679271_solution.jpg",
+      "correct": "В",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679318",
+      "type": "quiz",
+      "photo": "quiz_1747679318.jpg",
+      "solution_photo": "quiz_1747679318_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679369",
+      "type": "quiz",
+      "photo": "quiz_1747679369.jpg",
+      "solution_photo": "quiz_1747679369_solution.jpg",
+      "correct": "В",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679406",
+      "type": "quiz",
+      "photo": "quiz_1747679406.jpg",
+      "solution_photo": "quiz_1747679406_solution.jpg",
+      "correct": "Г",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679454",
+      "type": "quiz",
+      "photo": "quiz_1747679454.jpg",
+      "solution_photo": "quiz_1747679454_solution.jpg",
+      "correct": "В",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679482",
+      "type": "quiz",
+      "photo": "quiz_1747679482.jpg",
+      "solution_photo": "quiz_1747679482_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679521",
+      "type": "quiz",
+      "photo": "quiz_1747679521.jpg",
+      "solution_photo": "quiz_1747679521_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679551",
+      "type": "quiz",
+      "photo": "quiz_1747679551.jpg",
+      "solution_photo": "quiz_1747679551_solution.jpg",
+      "correct": "Г",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747679722",
+      "type": "quiz",
+      "photo": "quiz_1747679722.jpg",
+      "solution_photo": "quiz_1747679722_solution.jpg",
+      "correct": "Б",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680023",
+      "type": "quiz",
+      "photo": "quiz_1747680023.jpg",
+      "solution_photo": "quiz_1747680023_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680185",
+      "type": "quiz",
+      "photo": "quiz_1747680185.jpg",
+      "solution_photo": "quiz_1747680185_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680348",
+      "type": "quiz",
+      "photo": "quiz_1747680348.jpg",
+      "solution_photo": "quiz_1747680348_solution.jpg",
+      "correct": "В",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680473",
+      "type": "quiz",
+      "photo": "quiz_1747680473.jpg",
+      "solution_photo": "quiz_1747680473_solution.jpg",
+      "correct": "Д",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680506",
+      "type": "quiz",
+      "photo": "quiz_1747680506.jpg",
+      "solution_photo": "quiz_1747680506_solution.jpg",
+      "correct": "Г",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680538",
+      "type": "quiz",
+      "photo": "quiz_1747680538.jpg",
+      "solution_photo": "quiz_1747680538_solution.jpg",
+      "correct": "Б",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680597",
+      "type": "matching",
+      "photo": "quiz_1747680597.jpg",
+      "solution_photo": "quiz_1747680597_solution.jpg",
+      "correct": "Г В А",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680646",
+      "type": "matching",
+      "photo": "quiz_1747680646.jpg",
+      "solution_photo": "quiz_1747680646_solution.jpg",
+      "correct": "А Б Д",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680685",
+      "type": "matching",
+      "photo": "quiz_1747680685.jpg",
+      "solution_photo": "quiz_1747680685_solution.jpg",
+      "correct": "В Б А",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747680954",
+      "type": "short_answer",
+      "photo": "quiz_1747680954.jpg",
+      "solution_photo": "quiz_1747680954_solution.jpg",
+      "correct": "8",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747681002",
+      "type": "short_answer",
+      "photo": "quiz_1747681002.jpg",
+      "solution_photo": "quiz_1747681002_solution.jpg",
+      "correct": "20",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747681047",
+      "type": "short_answer",
+      "photo": "quiz_1747681047.jpg",
+      "solution_photo": "quiz_1747681047_solution.jpg",
+      "correct": "8",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747681325",
+      "type": "short_answer",
+      "photo": "quiz_1747681325.jpg",
+      "solution_photo": "quiz_1747681325_solution.jpg",
+      "correct": "-5,2",
+      "tag": "НМТ_мікс_2"
+    },
+    {
+      "id": "1747741824",
+      "type": "quiz",
+      "photo": "quiz_1747741824.jpg",
+      "solution_photo": "quiz_1747741824_solution.jpg",
+      "correct": "Г",
+      "tag": "системи_лінійних_нерівностей"
+    },
+    {
+      "id": "1747741891",
+      "type": "quiz",
+      "photo": "quiz_1747741891.jpg",
+      "solution_photo": "quiz_1747741891_solution.jpg",
+      "correct": "Г",
+      "tag": "лінійні_нерівності"
+    },
+    {
+      "id": "1747741946",
+      "type": "quiz",
+      "photo": "quiz_1747741946.jpg",
+      "solution_photo": "quiz_1747741946_solution.jpg",
+      "correct": "Б",
+      "tag": "лінійні_нерівності"
+    },
+    {
+      "id": "1747742013",
+      "type": "quiz",
+      "photo": "quiz_1747742013.jpg",
+      "solution_photo": "quiz_1747742013_solution.jpg",
+      "correct": "Г",
+      "tag": "числові_проміжки"
+    },
+    {
+      "id": "1747742057",
+      "type": "quiz",
+      "photo": "quiz_1747742057.jpg",
+      "solution_photo": "quiz_1747742057_solution.jpg",
+      "correct": "Д",
+      "tag": "квадратні_нерівності"
+    },
+    {
+      "id": "1747742107",
+      "type": "quiz",
+      "photo": "quiz_1747742107.jpg",
+      "solution_photo": "quiz_1747742107_solution.jpg",
+      "correct": "А",
+      "tag": "квадратні_нерівності"
+    },
+    {
+      "id": "1747742170",
+      "type": "quiz",
+      "photo": "quiz_1747742170.jpg",
+      "solution_photo": "quiz_1747742170_solution.jpg",
+      "correct": "Б",
+      "tag": "системи_нерівностей"
+    },
+    {
+      "id": "1747742218",
+      "type": "quiz",
+      "photo": "quiz_1747742218.jpg",
+      "solution_photo": "quiz_1747742218_solution.jpg",
+      "correct": "Д",
+      "tag": "метод_інтервалів"
+    },
+    {
+      "id": "1747742251",
+      "type": "quiz",
+      "photo": "quiz_1747742251.jpg",
+      "solution_photo": "quiz_1747742251_solution.jpg",
+      "correct": "Б",
+      "tag": "метод_інтервалів"
+    },
+    {
+      "id": "1747742284",
+      "type": "short_answer",
+      "photo": "quiz_1747742284.jpg",
+      "solution_photo": "quiz_1747742284_solution.jpg",
+      "correct": "6",
+      "tag": "лінійні_нерівності"
+    },
+    {
+      "id": "1747756207",
+      "type": "quiz",
+      "photo": "quiz_1747756207.jpg",
+      "solution_photo": "quiz_1747756207_solution.jpg",
+      "correct": "Д",
+      "tag": "модулі"
+    },
+    {
+      "id": "1747756246",
+      "type": "quiz",
+      "photo": "quiz_1747756246.jpg",
+      "solution_photo": "quiz_1747756246_solution.jpg",
+      "correct": "Г",
+      "tag": "модулі"
+    },
+    {
+      "id": "1747756306",
+      "type": "quiz",
+      "photo": "quiz_1747756306.jpg",
+      "solution_photo": "quiz_1747756306_solution.jpg",
+      "correct": "Г",
+      "tag": "модульні_рівняння"
+    },
+    {
+      "id": "1747756339",
+      "type": "quiz",
+      "photo": "quiz_1747756339.jpg",
+      "solution_photo": "quiz_1747756339_solution.jpg",
+      "correct": "Г",
+      "tag": "модульні_рівняння"
+    },
+    {
+      "id": "1747756391",
+      "type": "quiz",
+      "photo": "quiz_1747756391.jpg",
+      "solution_photo": "quiz_1747756391_solution.jpg",
+      "correct": "Б",
+      "tag": "модульні_рівняння"
+    },
+    {
+      "id": "1747756433",
+      "type": "quiz",
+      "photo": "quiz_1747756433.jpg",
+      "solution_photo": "quiz_1747756433_solution.jpg",
+      "correct": "Г",
+      "tag": "модульні_нерівності"
+    },
+    {
+      "id": "1747756475",
+      "type": "quiz",
+      "photo": "quiz_1747756475.jpg",
+      "solution_photo": "quiz_1747756475_solution.jpg",
+      "correct": "А",
+      "tag": "модульні_нерівності"
+    },
+    {
+      "id": "1747756536",
+      "type": "matching",
+      "photo": "quiz_1747756536.jpg",
+      "solution_photo": "quiz_1747756536_solution.jpg",
+      "correct": "Б А Г",
+      "tag": "алгебра"
+    },
+    {
+      "id": "1747756580",
+      "type": "short_answer",
+      "photo": "quiz_1747756580.jpg",
+      "solution_photo": "quiz_1747756580_solution.jpg",
+      "correct": "120",
+      "tag": "модульні_нерівності"
+    },
+    {
+      "id": "1747756623",
+      "type": "short_answer",
+      "photo": "quiz_1747756623.jpg",
+      "solution_photo": "quiz_1747756623_solution.jpg",
+      "correct": "1",
+      "tag": "модулі"
+    },
+    {
+      "id": "1747822514",
+      "type": "quiz",
+      "photo": "quiz_1747822514.jpg",
+      "solution_photo": "quiz_1747822514_solution.jpg",
+      "correct": "Д",
+      "tag": "корені_вищих_степенів"
+    },
+    {
+      "id": "1747822565",
+      "type": "quiz",
+      "photo": "quiz_1747822565.jpg",
+      "solution_photo": "quiz_1747822565_solution.jpg",
+      "correct": "Г",
+      "tag": "корені_вищих_степенів"
+    },
+    {
+      "id": "1747822613",
+      "type": "quiz",
+      "photo": "quiz_1747822613.jpg",
+      "solution_photo": "quiz_1747822613_solution.jpg",
+      "correct": "А",
+      "tag": "корені_вищих_степенів"
+    },
+    {
+      "id": "1747822673",
+      "type": "quiz",
+      "photo": "quiz_1747822673.jpg",
+      "solution_photo": "quiz_1747822673_solution.jpg",
+      "correct": "Д",
+      "tag": "раціональний_степінь"
+    },
+    {
+      "id": "1747822729",
+      "type": "quiz",
+      "photo": "quiz_1747822729.jpg",
+      "solution_photo": "quiz_1747822729_solution.jpg",
+      "correct": "А",
+      "tag": "ірраціональні_рівняння"
+    },
+    {
+      "id": "1747822796",
+      "type": "quiz",
+      "photo": "quiz_1747822796.jpg",
+      "solution_photo": "quiz_1747822796_solution.jpg",
+      "correct": "Б",
+      "tag": "ірраціональні_рівняння"
+    },
+    {
+      "id": "1747822861",
+      "type": "quiz",
+      "photo": "quiz_1747822861.jpg",
+      "solution_photo": "quiz_1747822861_solution.jpg",
+      "correct": "Д",
+      "tag": "ірраціональні_рівняння"
+    },
+    {
+      "id": "1747822932",
+      "type": "matching",
+      "photo": "quiz_1747822932.jpg",
+      "solution_photo": "quiz_1747822932_solution.jpg",
+      "correct": "А Д Г",
+      "tag": "алгебраїчні_вирази"
+    },
+    {
+      "id": "1747908497",
+      "type": "quiz",
+      "photo": "quiz_1747908497.jpg",
+      "solution_photo": "quiz_1747908497_solution.jpg",
+      "correct": "В",
+      "tag": "геометрична_прогресія"
+    },
+    {
+      "id": "1747908536",
+      "type": "quiz",
+      "photo": "quiz_1747908536.jpg",
+      "solution_photo": "quiz_1747908536_solution.jpg",
+      "correct": "Б",
+      "tag": "арифметична_прогресія"
+    },
+    {
+      "id": "1747908589",
+      "type": "quiz",
+      "photo": "quiz_1747908589.jpg",
+      "solution_photo": "quiz_1747908589_solution.jpg",
+      "correct": "Д",
+      "tag": "арифметична_прогресія"
+    },
+    {
+      "id": "1747908629",
+      "type": "quiz",
+      "photo": "quiz_1747908629.jpg",
+      "solution_photo": "quiz_1747908629_solution.jpg",
+      "correct": "А",
+      "tag": "геометрична_прогресія"
+    },
+    {
+      "id": "1747908686",
+      "type": "quiz",
+      "photo": "quiz_1747908686.jpg",
+      "solution_photo": "quiz_1747908686_solution.jpg",
+      "correct": "В",
+      "tag": "арифметична_прогресія"
+    },
+    {
+      "id": "1747908728",
+      "type": "quiz",
+      "photo": "quiz_1747908728.jpg",
+      "solution_photo": "quiz_1747908728_solution.jpg",
+      "correct": "Б",
+      "tag": "геометрична_прогресія"
+    },
+    {
+      "id": "1747908764",
+      "type": "quiz",
+      "photo": "quiz_1747908764.jpg",
+      "solution_photo": "quiz_1747908764_solution.jpg",
+      "correct": "Г",
+      "tag": "арифметична_прогресія"
+    },
+    {
+      "id": "1747908823",
+      "type": "quiz",
+      "photo": "quiz_1747908823.jpg",
+      "solution_photo": "quiz_1747908823_solution.jpg",
+      "correct": "Г",
+      "tag": "геометрична_прогресія"
+    },
+    {
+      "id": "1747908974",
+      "type": "quiz",
+      "photo": "quiz_1747908974.jpg",
+      "solution_photo": "quiz_1747908974_solution.jpg",
+      "correct": "Б",
+      "tag": "арифметична_прогресія"
+    },
+    {
+      "id": "1747909305",
+      "type": "short_answer",
+      "photo": "quiz_1747909305.jpg",
+      "solution_photo": "quiz_1747909305_solution.jpg",
+      "correct": "205",
+      "tag": "арифметична_прогресія"
+    },
+    {
+      "id": "1747909391",
+      "type": "short_answer",
+      "photo": "quiz_1747909391.jpg",
+      "solution_photo": "quiz_1747909391_solution.jpg",
+      "correct": "-2,5",
+      "tag": "геометрична_прогресія"
+    },
+    {
+      "id": "1748017640",
+      "type": "quiz",
+      "photo": "quiz_1748017640.jpg",
+      "solution_photo": "quiz_1748017640_solution.jpg",
+      "correct": "А",
+      "tag": "властивості_функції"
+    },
+    {
+      "id": "1748017718",
+      "type": "quiz",
+      "photo": "quiz_1748017718.jpg",
+      "solution_photo": "quiz_1748017718_solution.jpg",
+      "correct": "В",
+      "tag": "властивості_функції"
+    },
+    {
+      "id": "1748017777",
+      "type": "quiz",
+      "photo": "quiz_1748017777.jpg",
+      "solution_photo": "quiz_1748017777_solution.jpg",
+      "correct": "А",
+      "tag": "властивості_функції"
+    },
+    {
+      "id": "1748017822",
+      "type": "quiz",
+      "photo": "quiz_1748017822.jpg",
+      "solution_photo": "quiz_1748017822_solution.jpg",
+      "correct": "Г",
+      "tag": "графіки_функцій"
+    },
+    {
+      "id": "1748017858",
+      "type": "quiz",
+      "photo": "quiz_1748017858.jpg",
+      "solution_photo": "quiz_1748017858_solution.jpg",
+      "correct": "В",
+      "tag": "графіки_функцій"
+    },
+    {
+      "id": "1748017908",
+      "type": "quiz",
+      "photo": "quiz_1748017908.jpg",
+      "solution_photo": "quiz_1748017908_solution.jpg",
+      "correct": "Д",
+      "tag": "графіки_функцій"
+    },
+    {
+      "id": "1748018011",
+      "type": "quiz",
+      "photo": "quiz_1748018011.jpg",
+      "solution_photo": "quiz_1748018011_solution.jpg",
+      "correct": "А",
+      "tag": "перетворення_графіків"
+    },
+    {
+      "id": "1748018245",
+      "type": "quiz",
+      "photo": "quiz_1748018245.jpg",
+      "solution_photo": "quiz_1748018245_solution.jpg",
+      "correct": "А",
+      "tag": "графіки_функцій"
+    },
+    {
+      "id": "1748018373",
+      "type": "matching",
+      "photo": "quiz_1748018373.jpg",
+      "solution_photo": "quiz_1748018373_solution.jpg",
+      "correct": "А В Д",
+      "tag": "графіки_функцій"
+    },
+    {
+      "id": "1748018416",
+      "type": "matching",
+      "photo": "quiz_1748018416.jpg",
+      "solution_photo": "quiz_1748018416_solution.jpg",
+      "correct": "А Б В",
+      "tag": "графіки_функцій"
+    },
+    {
+      "id": "1748018508",
+      "type": "matching",
+      "photo": "quiz_1748018508.jpg",
+      "solution_photo": "quiz_1748018508_solution.jpg",
+      "correct": "А Д Б",
+      "tag": "властивості_функцій"
+    },
+    {
+      "id": "1748018619",
+      "type": "matching",
+      "photo": "quiz_1748018619.jpg",
+      "solution_photo": "quiz_1748018619_solution.jpg",
+      "correct": "А Б В",
+      "tag": "властивості_функцій"
+    },
+    {
+      "id": "1748096656",
+      "type": "short_answer",
+      "photo": "quiz_1748096656.jpg",
+      "solution_photo": "quiz_1748096656_solution.jpg",
+      "correct": "Б",
+      "tag": "НМТ_мікс_1"
+    },
+    {
+      "id": "1748189422",
+      "type": "quiz",
+      "photo": "quiz_1748189422.jpg",
+      "solution_photo": "quiz_1748189422_solution.jpg",
+      "correct": "Д",
+      "tag": "тригонометрія"
+    },
+    {
+      "id": "1748189483",
+      "type": "quiz",
+      "photo": "quiz_1748189483.jpg",
+      "solution_photo": "quiz_1748189483_solution.jpg",
+      "correct": "Б",
+      "tag": "тригонометрія"
+    },
+    {
+      "id": "1748189522",
+      "type": "quiz",
+      "photo": "quiz_1748189522.jpg",
+      "solution_photo": "quiz_1748189522_solution.jpg",
+      "correct": "Д",
+      "tag": "тригонометрія"
+    },
+    {
+      "id": "1748189558",
+      "type": "quiz",
+      "photo": "quiz_1748189558.jpg",
+      "solution_photo": "quiz_1748189558_solution.jpg",
+      "correct": "В",
+      "tag": "тригонометрія"
+    },
+    {
+      "id": "1748189597",
+      "type": "quiz",
+      "photo": "quiz_1748189597.jpg",
+      "solution_photo": "quiz_1748189597_solution.jpg",
+      "correct": "Д",
+      "tag": "тригонометричні_рівняння"
+    },
+    {
+      "id": "1748189639",
+      "type": "quiz",
+      "photo": "quiz_1748189639.jpg",
+      "solution_photo": "quiz_1748189639_solution.jpg",
+      "correct": "А",
+      "tag": "тригонометричні_рівняння"
+    },
+    {
+      "id": "1748189677",
+      "type": "quiz",
+      "photo": "quiz_1748189677.jpg",
+      "solution_photo": "quiz_1748189677_solution.jpg",
+      "correct": "Д",
+      "tag": "тригонометричні_рівняння"
+    },
+    {
+      "id": "1748262448",
+      "type": "quiz",
+      "photo": "quiz_1748262448.jpg",
+      "solution_photo": "quiz_1748262448_solution.jpg",
+      "correct": "Б",
+      "tag": "показникова_функція"
+    },
+    {
+      "id": "1748262556",
+      "type": "quiz",
+      "photo": "quiz_1748262556.jpg",
+      "solution_photo": "quiz_1748262556_solution.jpg",
+      "correct": "Б",
+      "tag": "показникова_функція"
+    },
+    {
+      "id": "1748262654",
+      "type": "quiz",
+      "photo": "quiz_1748262654.jpg",
+      "solution_photo": "quiz_1748262654_solution.jpg",
+      "correct": "Б",
+      "tag": "показникові_рівняння"
+    },
+    {
+      "id": "1748262698",
+      "type": "quiz",
+      "photo": "quiz_1748262698.jpg",
+      "solution_photo": "quiz_1748262698_solution.jpg",
+      "correct": "В",
+      "tag": "показникові_рівняння"
+    },
+    {
+      "id": "1748262853",
+      "type": "quiz",
+      "photo": "quiz_1748262853.jpg",
+      "solution_photo": "quiz_1748262853_solution.jpg",
+      "correct": "Д",
+      "tag": "показникові_нерівності"
+    },
+    {
+      "id": "1748262911",
+      "type": "quiz",
+      "photo": "quiz_1748262911.jpg",
+      "solution_photo": "quiz_1748262911_solution.jpg",
+      "correct": "Д",
+      "tag": "показникові_нерівності"
+    },
+    {
+      "id": "1748287938",
+      "type": "quiz",
+      "photo": "quiz_1748287938.jpg",
+      "solution_photo": "quiz_1748287938_solution.jpg",
+      "correct": "Г",
+      "tag": "логарифмічна_функція"
+    },
+    {
+      "id": "1748288018",
+      "type": "quiz",
+      "photo": "quiz_1748288018.jpg",
+      "solution_photo": "quiz_1748288018_solution.jpg",
+      "correct": "Г",
+      "tag": "логарифми"
+    },
+    {
+      "id": "1748288060",
+      "type": "quiz",
+      "photo": "quiz_1748288060.jpg",
+      "solution_photo": "quiz_1748288060_solution.jpg",
+      "correct": "А",
+      "tag": "логарифми"
+    },
+    {
+      "id": "1748288095",
+      "type": "quiz",
+      "photo": "quiz_1748288095.jpg",
+      "solution_photo": "quiz_1748288095_solution.jpg",
+      "correct": "В",
+      "tag": "логарифми"
+    },
+    {
+      "id": "1748288142",
+      "type": "quiz",
+      "photo": "quiz_1748288142.jpg",
+      "solution_photo": "quiz_1748288142_solution.jpg",
+      "correct": "В",
+      "tag": "логарифми"
+    },
+    {
+      "id": "1748288197",
+      "type": "quiz",
+      "photo": "quiz_1748288197.jpg",
+      "solution_photo": "quiz_1748288197_solution.jpg",
+      "correct": "Б",
+      "tag": "логарифми"
+    },
+    {
+      "id": "1748288237",
+      "type": "quiz",
+      "photo": "quiz_1748288237.jpg",
+      "solution_photo": "quiz_1748288237_solution.jpg",
+      "correct": "А",
+      "tag": "логарифми"
+    },
+    {
+      "id": "1748288641",
+      "type": "matching",
+      "photo": "quiz_1748288641.jpg",
+      "solution_photo": "quiz_1748288641_solution.jpg",
+      "correct": "Б А В",
+      "tag": "логарифми"
+    },
+    {
+      "id": "1748333372",
+      "type": "quiz",
+      "photo": "quiz_1748333372.jpg",
+      "solution_photo": "quiz_1748333372_solution.jpg",
+      "correct": "В",
+      "tag": "логарифмічні_рівняння"
+    },
+    {
+      "id": "1748333423",
+      "type": "quiz",
+      "photo": "quiz_1748333423.jpg",
+      "solution_photo": "quiz_1748333423_solution.jpg",
+      "correct": "Б",
+      "tag": "логарифмічні_рівняння"
+    },
+    {
+      "id": "1748333487",
+      "type": "quiz",
+      "photo": "quiz_1748333487.jpg",
+      "solution_photo": "quiz_1748333487_solution.jpg",
+      "correct": "В",
+      "tag": "логарифмічні_рівняння"
+    },
+    {
+      "id": "1748333543",
+      "type": "quiz",
+      "photo": "quiz_1748333543.jpg",
+      "solution_photo": "quiz_1748333543_solution.jpg",
+      "correct": "Г",
+      "tag": "логарифмічні_рівняння"
+    },
+    {
+      "id": "1748333607",
+      "type": "quiz",
+      "photo": "quiz_1748333607.jpg",
+      "solution_photo": "quiz_1748333607_solution.jpg",
+      "correct": "Д",
+      "tag": "логарифмічні_рівняння"
+    },
+    {
+      "id": "1748333657",
+      "type": "quiz",
+      "photo": "quiz_1748333657.jpg",
+      "solution_photo": "quiz_1748333657_solution.jpg",
+      "correct": "А",
+      "tag": "логарифмічні_нерівності"
+    },
+    {
+      "id": "1748333759",
+      "type": "quiz",
+      "photo": "quiz_1748333759.jpg",
+      "solution_photo": "quiz_1748333759_solution.jpg",
+      "correct": "Д",
+      "tag": "логарифмічні_нерівності"
+    },
+    {
+      "id": "1748334545",
+      "type": "quiz",
+      "photo": "quiz_1748334545.jpg",
+      "solution_photo": "quiz_1748334545_solution.jpg",
+      "correct": "Б",
+      "tag": "логарифмічні_нерівності"
+    },
+    {
+      "id": "1748366128",
+      "type": "quiz",
+      "photo": "quiz_1748366128.jpg",
+      "solution_photo": "quiz_1748366128_solution.jpg",
+      "correct": "В",
+      "tag": "похідна"
+    },
+    {
+      "id": "1748366171",
+      "type": "quiz",
+      "photo": "quiz_1748366171.jpg",
+      "solution_photo": "quiz_1748366171_solution.jpg",
+      "correct": "Б",
+      "tag": "похідна"
+    },
+    {
+      "id": "1748366349",
+      "type": "quiz",
+      "photo": "quiz_1748366349.jpg",
+      "solution_photo": "quiz_1748366349_solution.jpg",
+      "correct": "Г",
+      "tag": "похідна"
+    },
+    {
+      "id": "1748366403",
+      "type": "quiz",
+      "photo": "quiz_1748366403.jpg",
+      "solution_photo": "quiz_1748366403_solution.jpg",
+      "correct": "Г",
+      "tag": "похідна"
+    },
+    {
+      "id": "1748366454",
+      "type": "quiz",
+      "photo": "quiz_1748366454.jpg",
+      "solution_photo": "quiz_1748366454_solution.jpg",
+      "correct": "Б",
+      "tag": "фізичний_зміст_похідної"
+    },
+    {
+      "id": "1748366510",
+      "type": "quiz",
+      "photo": "quiz_1748366510.jpg",
+      "solution_photo": "quiz_1748366510_solution.jpg",
+      "correct": "Д",
+      "tag": "похідна"
+    },
+    {
+      "id": "1748366586",
+      "type": "short_answer",
+      "photo": "quiz_1748366586.jpg",
+      "solution_photo": "quiz_1748366586_solution.jpg",
+      "correct": "1",
+      "tag": "геометричний_зміст_похідної"
+    },
+    {
+      "id": "1748366634",
+      "type": "short_answer",
+      "photo": "quiz_1748366634.jpg",
+      "solution_photo": "quiz_1748366634_solution.jpg",
+      "correct": "9",
+      "tag": "геометричний_зміст_похідної"
+    },
+    {
+      "id": "1748366686",
+      "type": "short_answer",
+      "photo": "quiz_1748366686.jpg",
+      "solution_photo": "quiz_1748366686_solution.jpg",
+      "correct": "-26,5",
+      "tag": "похідна"
+    },
+    {
+      "id": "1748427593",
+      "type": "quiz",
+      "photo": "quiz_1748427593.jpg",
+      "solution_photo": "quiz_1748427593_solution.jpg",
+      "correct": "Д",
+      "tag": "первісна"
+    },
+    {
+      "id": "1748427645",
+      "type": "quiz",
+      "photo": "quiz_1748427645.jpg",
+      "solution_photo": "quiz_1748427645_solution.jpg",
+      "correct": "В",
+      "tag": "первісна"
+    },
+    {
+      "id": "1748427785",
+      "type": "quiz",
+      "photo": "quiz_1748427785.jpg",
+      "solution_photo": "quiz_1748427785_solution.jpg",
+      "correct": "Г",
+      "tag": "інтеграл"
+    },
+    {
+      "id": "1748427841",
+      "type": "quiz",
+      "photo": "quiz_1748427841.jpg",
+      "solution_photo": "quiz_1748427841_solution.jpg",
+      "correct": "А",
+      "tag": "первісна"
+    },
+    {
+      "id": "1748427884",
+      "type": "quiz",
+      "photo": "quiz_1748427884.jpg",
+      "solution_photo": "quiz_1748427884_solution.jpg",
+      "correct": "Б",
+      "tag": "первісна"
+    },
+    {
+      "id": "1748427957",
+      "type": "quiz",
+      "photo": "quiz_1748427957.jpg",
+      "solution_photo": "quiz_1748427957_solution.jpg",
+      "correct": "А",
+      "tag": "інтеграл"
+    },
+    {
+      "id": "1748428021",
+      "type": "short_answer",
+      "photo": "quiz_1748428021.jpg",
+      "solution_photo": "quiz_1748428021_solution.jpg",
+      "correct": "36",
+      "tag": "первісна"
+    },
+    {
+      "id": "1748428057",
+      "type": "short_answer",
+      "photo": "quiz_1748428057.jpg",
+      "solution_photo": "quiz_1748428057_solution.jpg",
+      "correct": "-7,5",
+      "tag": "інтеграл"
+    },
+    {
+      "id": "1748428100",
+      "type": "short_answer",
+      "photo": "quiz_1748428100.jpg",
+      "solution_photo": "quiz_1748428100_solution.jpg",
+      "correct": "22,5",
+      "tag": "інтеграл"
+    },
+    {
+      "id": "1748428145",
+      "type": "short_answer",
+      "photo": "quiz_1748428145.jpg",
+      "solution_photo": "quiz_1748428145_solution.jpg",
+      "correct": "24",
+      "tag": "інтеграл_і_похідна"
+    },
+    {
+      "id": "1748446557",
+      "type": "quiz",
+      "photo": "quiz_1748446557.jpg",
+      "solution_photo": "quiz_1748446557_solution.jpg",
+      "correct": "Б",
+      "tag": "геометричний_зміст_інтеграла"
+    },
+    {
+      "id": "1748446619",
+      "type": "quiz",
+      "photo": "quiz_1748446619.jpg",
+      "solution_photo": "quiz_1748446619_solution.jpg",
+      "correct": "В",
+      "tag": "геометричний_зміст_інтеграла"
+    },
+    {
+      "id": "1748446658",
+      "type": "short_answer",
+      "photo": "quiz_1748446658.jpg",
+      "solution_photo": "quiz_1748446658_solution.jpg",
+      "correct": "-16",
+      "tag": "геометричний_зміст_інтеграла"
+    },
+    {
+      "id": "1748446708",
+      "type": "short_answer",
+      "photo": "quiz_1748446708.jpg",
+      "solution_photo": "quiz_1748446708_solution.jpg",
+      "correct": "4,5",
+      "tag": "геометричний_зміст_інтеграла"
+    },
+    {
+      "id": "1748446754",
+      "type": "short_answer",
+      "photo": "quiz_1748446754.jpg",
+      "solution_photo": "quiz_1748446754_solution.jpg",
+      "correct": "43,3",
+      "tag": "геометричний_зміст_інтеграла"
+    },
+    {
+      "id": "1748446799",
+      "type": "short_answer",
+      "photo": "quiz_1748446799.jpg",
+      "solution_photo": "quiz_1748446799_solution.jpg",
+      "correct": "22,5",
+      "tag": "геометричний_зміст_інтеграла"
+    },
+    {
+      "id": "1748446857",
+      "type": "short_answer",
+      "photo": "quiz_1748446857.jpg",
+      "solution_photo": "quiz_1748446857_solution.jpg",
+      "correct": "31",
+      "tag": "геометричний_зміст_інтеграла"
+    },
+    {
+      "id": "1748521685",
+      "type": "quiz",
+      "photo": "quiz_1748521685.jpg",
+      "solution_photo": "quiz_1748521685_solution.jpg",
+      "correct": "Г",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748521783",
+      "type": "quiz",
+      "photo": "quiz_1748521783.jpg",
+      "solution_photo": "quiz_1748521783_solution.jpg",
+      "correct": "Г",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748521871",
+      "type": "quiz",
+      "photo": "quiz_1748521871.jpg",
+      "solution_photo": "quiz_1748521871_solution.jpg",
+      "correct": "Г",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748521939",
+      "type": "quiz",
+      "photo": "quiz_1748521939.jpg",
+      "solution_photo": "quiz_1748521939_solution.jpg",
+      "correct": "А",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522008",
+      "type": "short_answer",
+      "photo": "quiz_1748522008.jpg",
+      "solution_photo": "quiz_1748522008_solution.jpg",
+      "correct": "10",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522071",
+      "type": "short_answer",
+      "photo": "quiz_1748522071.jpg",
+      "solution_photo": "quiz_1748522071_solution.jpg",
+      "correct": "54",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522127",
+      "type": "short_answer",
+      "photo": "quiz_1748522127.jpg",
+      "solution_photo": "quiz_1748522127_solution.jpg",
+      "correct": "69",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522174",
+      "type": "short_answer",
+      "photo": "quiz_1748522174.jpg",
+      "solution_photo": "quiz_1748522174_solution.jpg",
+      "correct": "240",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522249",
+      "type": "short_answer",
+      "photo": "quiz_1748522249.jpg",
+      "solution_photo": "quiz_1748522249_solution.jpg",
+      "correct": "2688",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522279",
+      "type": "short_answer",
+      "photo": "quiz_1748522279.jpg",
+      "solution_photo": "quiz_1748522279_solution.jpg",
+      "correct": "676000",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522354",
+      "type": "short_answer",
+      "photo": "quiz_1748522354.jpg",
+      "solution_photo": "",
+      "correct": "3",
+      "tag": "3"
+    },
+    {
+      "id": "1748522434",
+      "type": "short_answer",
+      "photo": "quiz_1748522434.jpg",
+      "solution_photo": "quiz_1748522434_solution.jpg",
+      "correct": "10",
+      "tag": "комбінаторика"
+    },
+    {
+      "id": "1748522479",
+      "type": "short_answer",
+      "photo": "quiz_1748522479.jpg",
+      "solution_photo": "quiz_1748522479_solution.jpg",
+      "correct": "48",
+      "tag": "комбінаториа"
+    },
+    {
+      "id": "1748551581",
+      "type": "quiz",
+      "photo": "quiz_1748551581.jpg",
+      "solution_photo": "quiz_1748551581_solution.jpg",
+      "correct": "Б",
+      "tag": "статистика"
+    },
+    {
+      "id": "1748551624",
+      "type": "quiz",
+      "photo": "quiz_1748551624.jpg",
+      "solution_photo": "quiz_1748551624_solution.jpg",
+      "correct": "В",
+      "tag": "статистика"
+    },
+    {
+      "id": "1748551659",
+      "type": "quiz",
+      "photo": "quiz_1748551659.jpg",
+      "solution_photo": "quiz_1748551659_solution.jpg",
+      "correct": "Б",
+      "tag": "статистика"
+    },
+    {
+      "id": "1748551744",
+      "type": "quiz",
+      "photo": "quiz_1748551744.jpg",
+      "solution_photo": "quiz_1748551744_solution.jpg",
+      "correct": "Б",
+      "tag": "статистика"
+    },
+    {
+      "id": "1748551786",
+      "type": "quiz",
+      "photo": "quiz_1748551786.jpg",
+      "solution_photo": "quiz_1748551786_solution.jpg",
+      "correct": "Б",
+      "tag": "статистика"
+    },
+    {
+      "id": "1748551832",
+      "type": "quiz",
+      "photo": "quiz_1748551832.jpg",
+      "solution_photo": "quiz_1748551832_solution.jpg",
+      "correct": "Г",
+      "tag": "теорія_ймовірності"
+    },
+    {
+      "id": "1748551875",
+      "type": "quiz",
+      "photo": "quiz_1748551875.jpg",
+      "solution_photo": "quiz_1748551875_solution.jpg",
+      "correct": "Д",
+      "tag": "теорія_ймовірності"
+    },
+    {
+      "id": "1748551917",
+      "type": "quiz",
+      "photo": "quiz_1748551917.jpg",
+      "solution_photo": "quiz_1748551917_solution.jpg",
+      "correct": "Б",
+      "tag": "теорія_ймовірності"
+    },
+    {
+      "id": "1748551960",
+      "type": "quiz",
+      "photo": "quiz_1748551960.jpg",
+      "solution_photo": "quiz_1748551960_solution.jpg",
+      "correct": "А",
+      "tag": "теорія_ймовірності"
+    },
+    {
+      "id": "1748552102",
+      "type": "quiz",
+      "photo": "quiz_1748552102.jpg",
+      "solution_photo": "quiz_1748552102_solution.jpg",
+      "correct": "Г",
+      "tag": "теорія_ймовірності"
+    },
+    {
+      "id": "1748552132",
+      "type": "short_answer",
+      "photo": "quiz_1748552132.jpg",
+      "solution_photo": "quiz_1748552132_solution.jpg",
+      "correct": "13,1",
+      "tag": "статистика"
+    },
+    {
+      "id": "1748552171",
+      "type": "short_answer",
+      "photo": "quiz_1748552171.jpg",
+      "solution_photo": "quiz_1748552171_solution.jpg",
+      "correct": "42",
+      "tag": "теорія_ймовірності"
+    },
+    {
+      "id": "1748612522",
+      "type": "quiz",
+      "photo": "quiz_1748612522.jpg",
+      "solution_photo": "quiz_1748612522_solution.jpg",
+      "correct": "А",
+      "tag": "куб"
+    },
+    {
+      "id": "1748612646",
+      "type": "quiz",
+      "photo": "quiz_1748612646.jpg",
+      "solution_photo": "quiz_1748612646_solution.jpg",
+      "correct": "Г",
+      "tag": "призма"
+    },
+    {
+      "id": "1748612792",
+      "type": "quiz",
+      "photo": "quiz_1748612792.jpg",
+      "solution_photo": "quiz_1748612792_solution.jpg",
+      "correct": "Б",
+      "tag": "паралелепіпед"
+    },
+    {
+      "id": "1748613115",
+      "type": "quiz",
+      "photo": "quiz_1748613115.jpg",
+      "solution_photo": "quiz_1748613115_solution.jpg",
+      "correct": "Г",
+      "tag": "куб"
+    },
+    {
+      "id": "1748613611",
+      "type": "quiz",
+      "photo": "quiz_1748613611.jpg",
+      "solution_photo": "quiz_1748613611_solution.jpg",
+      "correct": "Г",
+      "tag": "призма"
+    },
+    {
+      "id": "1748613701",
+      "type": "quiz",
+      "photo": "quiz_1748613701.jpg",
+      "solution_photo": "quiz_1748613701_solution.jpg",
+      "correct": "В",
+      "tag": "призма"
+    },
+    {
+      "id": "1748613741",
+      "type": "quiz",
+      "photo": "quiz_1748613741.jpg",
+      "solution_photo": "quiz_1748613741_solution.jpg",
+      "correct": "Б",
+      "tag": "призма"
+    },
+    {
+      "id": "1748613780",
+      "type": "quiz",
+      "photo": "quiz_1748613780.jpg",
+      "solution_photo": "quiz_1748613780_solution.jpg",
+      "correct": "Б",
+      "tag": "куб"
+    },
+    {
+      "id": "1748613835",
+      "type": "short_answer",
+      "photo": "quiz_1748613835.jpg",
+      "solution_photo": "quiz_1748613835_solution.jpg",
+      "correct": "260",
+      "tag": "призма"
+    },
+    {
+      "id": "1748626933",
+      "type": "quiz",
+      "photo": "quiz_1748626933.jpg",
+      "solution_photo": "quiz_1748626933_solution.jpg",
+      "correct": "Б",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748626966",
+      "type": "quiz",
+      "photo": "quiz_1748626966.jpg",
+      "solution_photo": "quiz_1748626966_solution.jpg",
+      "correct": "Г",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748627014",
+      "type": "quiz",
+      "photo": "quiz_1748627014.jpg",
+      "solution_photo": "quiz_1748627014_solution.jpg",
+      "correct": "Д",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748627041",
+      "type": "quiz",
+      "photo": "quiz_1748627041.jpg",
+      "solution_photo": "quiz_1748627041_solution.jpg",
+      "correct": "А",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748627113",
+      "type": "quiz",
+      "photo": "quiz_1748627113.jpg",
+      "solution_photo": "quiz_1748627113_solution.jpg",
+      "correct": "Б",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748627164",
+      "type": "quiz",
+      "photo": "quiz_1748627164.jpg",
+      "solution_photo": "quiz_1748627164_solution.jpg",
+      "correct": "А",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748627207",
+      "type": "quiz",
+      "photo": "quiz_1748627207.jpg",
+      "solution_photo": "quiz_1748627207_solution.jpg",
+      "correct": "Б",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748627237",
+      "type": "short_answer",
+      "photo": "quiz_1748627237.jpg",
+      "solution_photo": "quiz_1748627237_solution.jpg",
+      "correct": "18",
+      "tag": "піраміда"
+    },
+    {
+      "id": "1748767865",
+      "type": "quiz",
+      "photo": "quiz_1748767865.jpg",
+      "solution_photo": "quiz_1748767865_solution.jpg",
+      "correct": "Г",
+      "tag": "циліндр"
+    },
+    {
+      "id": "1748768037",
+      "type": "quiz",
+      "photo": "quiz_1748768037.jpg",
+      "solution_photo": "quiz_1748768037_solution.jpg",
+      "correct": "Б",
+      "tag": "циліндр"
+    },
+    {
+      "id": "1748768078",
+      "type": "quiz",
+      "photo": "quiz_1748768078.jpg",
+      "solution_photo": "quiz_1748768078_solution.jpg",
+      "correct": "Д",
+      "tag": "циліндр"
+    },
+    {
+      "id": "1748768147",
+      "type": "quiz",
+      "photo": "quiz_1748768147.jpg",
+      "solution_photo": "quiz_1748768147_solution.jpg",
+      "correct": "Г",
+      "tag": "циліндр"
+    },
+    {
+      "id": "1748768245",
+      "type": "short_answer",
+      "photo": "quiz_1748768245.jpg",
+      "solution_photo": "quiz_1748768245_solution.jpg",
+      "correct": "1296",
+      "tag": "циліндр"
+    },
+    {
+      "id": "1748768280",
+      "type": "quiz",
+      "photo": "quiz_1748768280.jpg",
+      "solution_photo": "quiz_1748768280_solution.jpg",
+      "correct": "А",
+      "tag": "конус"
+    },
+    {
+      "id": "1748768327",
+      "type": "quiz",
+      "photo": "quiz_1748768327.jpg",
+      "solution_photo": "quiz_1748768327_solution.jpg",
+      "correct": "Г",
+      "tag": "конус"
+    },
+    {
+      "id": "1748768384",
+      "type": "quiz",
+      "photo": "quiz_1748768384.jpg",
+      "solution_photo": "quiz_1748768384_solution.jpg",
+      "correct": "В",
+      "tag": "конус"
+    },
+    {
+      "id": "1748768456",
+      "type": "quiz",
+      "photo": "quiz_1748768456.jpg",
+      "solution_photo": "quiz_1748768456_solution.jpg",
+      "correct": "Б",
+      "tag": "конус"
+    },
+    {
+      "id": "1748768585",
+      "type": "short_answer",
+      "photo": "quiz_1748768585.jpg",
+      "solution_photo": "quiz_1748768585_solution.jpg",
+      "correct": "81",
+      "tag": "конус"
+    },
+    {
+      "id": "1748768888",
+      "type": "quiz",
+      "photo": "quiz_1748768888.jpg",
+      "solution_photo": "quiz_1748768888_solution.jpg",
+      "correct": "Б",
+      "tag": "сфера"
+    },
+    {
+      "id": "1748768938",
+      "type": "quiz",
+      "photo": "quiz_1748768938.jpg",
+      "solution_photo": "quiz_1748768938_solution.jpg",
+      "correct": "Г",
+      "tag": "сфера"
+    },
+    {
+      "id": "1748768962",
+      "type": "quiz",
+      "photo": "quiz_1748768962.jpg",
+      "solution_photo": "quiz_1748768962_solution.jpg",
+      "correct": "В",
+      "tag": "сфера"
+    },
+    {
+      "id": "1748769029",
+      "type": "quiz",
+      "photo": "quiz_1748769029.jpg",
+      "solution_photo": "quiz_1748769029_solution.jpg",
+      "correct": "В",
+      "tag": "куля"
+    },
+    {
+      "id": "1748804392",
+      "type": "quiz",
+      "photo": "quiz_1748804392.jpg",
+      "solution_photo": "quiz_1748804392_solution.jpg",
+      "correct": "Б",
+      "tag": "просторова_система_координат"
+    },
+    {
+      "id": "1748804426",
+      "type": "quiz",
+      "photo": "quiz_1748804426.jpg",
+      "solution_photo": "quiz_1748804426_solution.jpg",
+      "correct": "В",
+      "tag": "вектори_в_просторі"
+    },
+    {
+      "id": "1748804494",
+      "type": "quiz",
+      "photo": "quiz_1748804494.jpg",
+      "solution_photo": "quiz_1748804494_solution.jpg",
+      "correct": "А",
+      "tag": "просторова_система_координат"
+    },
+    {
+      "id": "1748804542",
+      "type": "quiz",
+      "photo": "quiz_1748804542.jpg",
+      "solution_photo": "quiz_1748804542_solution.jpg",
+      "correct": "Г",
+      "tag": "просторова_система_координат"
+    },
+    {
+      "id": "1748804572",
+      "type": "quiz",
+      "photo": "quiz_1748804572.jpg",
+      "solution_photo": "quiz_1748804572_solution.jpg",
+      "correct": "В",
+      "tag": "вектори_в_просторі"
+    },
+    {
+      "id": "1748804602",
+      "type": "quiz",
+      "photo": "quiz_1748804602.jpg",
+      "solution_photo": "quiz_1748804602_solution.jpg",
+      "correct": "Б",
+      "tag": "вектори_в_просторі"
+    },
+    {
+      "id": "1748804635",
+      "type": "quiz",
+      "photo": "quiz_1748804635.jpg",
+      "solution_photo": "quiz_1748804635_solution.jpg",
+      "correct": "Д",
+      "tag": "просторова_система_координат"
+    },
+    {
+      "id": "1761844031",
+      "type": "quiz",
+      "photo": "quiz_1761844031.jpg",
+      "solution_photo": "",
+      "correct": "А",
+      "tag": "а"
+    },
+    {
+      "id": "1761909506",
+      "type": "quiz",
+      "photo": "quiz_1761909506.jpg",
+      "solution_photo": "quiz_1761909506_solution.jpg",
+      "correct": "Б",
+      "tag": "дроби"
+    },
+    {
+      "id": "1761909547",
+      "type": "quiz",
+      "photo": "quiz_1761909547.jpg",
+      "solution_photo": "quiz_1761909547_solution.jpg",
+      "correct": "Б",
+      "tag": "дроби"
+    },
+    {
+      "id": "1761909585",
+      "type": "quiz",
+      "photo": "quiz_1761909585.jpg",
+      "solution_photo": "quiz_1761909585_solution.jpg",
+      "correct": "Д",
+      "tag": "дроби"
+    },
+    {
+      "id": "1761909629",
+      "type": "quiz",
+      "photo": "quiz_1761909629.jpg",
+      "solution_photo": "quiz_1761909629_solution.jpg",
+      "correct": "А",
+      "tag": "дроби"
+    },
+    {
+      "id": "1761909671",
+      "type": "matching",
+      "photo": "quiz_1761909671.jpg",
+      "solution_photo": "quiz_1761909671_solution.jpg",
+      "correct": "Д В А",
+      "tag": "дроби"
+    },
+    {
+      "id": "1762860160",
+      "type": "quiz",
+      "photo": "quiz_1762860160.jpg",
+      "solution_photo": "quiz_1762860160_solution.jpg",
+      "correct": "В",
+      "tag": "десятквові_дроби"
+    },
+    {
+      "id": "1762860280",
+      "type": "quiz",
+      "photo": "quiz_1762860280.jpg",
+      "solution_photo": "quiz_1762860280_solution.jpg",
+      "correct": "А",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762860411",
+      "type": "quiz",
+      "photo": "quiz_1762860411.jpg",
+      "solution_photo": "quiz_1762860411_solution.jpg",
+      "correct": "А",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762860494",
+      "type": "quiz",
+      "photo": "quiz_1762860494.jpg",
+      "solution_photo": "quiz_1762860494_solution.jpg",
+      "correct": "Б",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762954747",
+      "type": "quiz",
+      "photo": "quiz_1762954747.jpg",
+      "solution_photo": "quiz_1762954747_solution.jpg",
+      "correct": "Б",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762954924",
+      "type": "quiz",
+      "photo": "quiz_1762954924.jpg",
+      "solution_photo": "quiz_1762954924_solution.jpg",
+      "correct": "В",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762955022",
+      "type": "quiz",
+      "photo": "quiz_1762955022.jpg",
+      "solution_photo": "quiz_1762955022_solution.jpg",
+      "correct": "Г",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762955121",
+      "type": "quiz",
+      "photo": "quiz_1762955121.jpg",
+      "solution_photo": "quiz_1762955121_solution.jpg",
+      "correct": "В",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762955449",
+      "type": "quiz",
+      "photo": "quiz_1762955449.jpg",
+      "solution_photo": "quiz_1762955449_solution.jpg",
+      "correct": "В",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762955504",
+      "type": "quiz",
+      "photo": "quiz_1762955504.jpg",
+      "solution_photo": "quiz_1762955504_solution.jpg",
+      "correct": "Б",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1762955564",
+      "type": "quiz",
+      "photo": "quiz_1762955564.jpg",
+      "solution_photo": "quiz_1762955564_solution.jpg",
+      "correct": "Г",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1763037399",
+      "type": "quiz",
+      "photo": "quiz_1763037399.jpg",
+      "solution_photo": "quiz_1763037399_solution.jpg",
+      "correct": "В",
+      "tag": "протилежні_числа"
+    },
+    {
+      "id": "1763037941",
+      "type": "quiz",
+      "photo": "quiz_1763037941.jpg",
+      "solution_photo": "quiz_1763037941_solution.jpg",
+      "correct": "Г",
+      "tag": "цілі_числа"
+    },
+    {
+      "id": "1763037984",
+      "type": "quiz",
+      "photo": "quiz_1763037984.jpg",
+      "solution_photo": "quiz_1763037984_solution.jpg",
+      "correct": "В",
+      "tag": "модуль"
+    },
+    {
+      "id": "1763038049",
+      "type": "quiz",
+      "photo": "quiz_1763038049.jpg",
+      "solution_photo": "quiz_1763038049_solution.jpg",
+      "correct": "Г",
+      "tag": "числова_пряма"
+    },
+    {
+      "id": "1763038098",
+      "type": "quiz",
+      "photo": "quiz_1763038098.jpg",
+      "solution_photo": "quiz_1763038098_solution.jpg",
+      "correct": "Г",
+      "tag": "модуль"
+    },
+    {
+      "id": "1763038149",
+      "type": "quiz",
+      "photo": "quiz_1763038149.jpg",
+      "solution_photo": "quiz_1763038149_solution.jpg",
+      "correct": "А",
+      "tag": "модуль"
+    },
+    {
+      "id": "1763038357",
+      "type": "quiz",
+      "photo": "quiz_1763038357.jpg",
+      "solution_photo": "quiz_1763038357_solution.jpg",
+      "correct": "А",
+      "tag": "модуль"
+    },
+    {
+      "id": "1763129208",
+      "type": "quiz",
+      "photo": "quiz_1763129208.jpg",
+      "solution_photo": "quiz_1763129208_solution.jpg",
+      "correct": "А",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1763129247",
+      "type": "quiz",
+      "photo": "quiz_1763129247.jpg",
+      "solution_photo": "quiz_1763129247_solution.jpg",
+      "correct": "В",
+      "tag": "модуль"
+    },
+    {
+      "id": "1763129320",
+      "type": "quiz",
+      "photo": "quiz_1763129320.jpg",
+      "solution_photo": "quiz_1763129320_solution.jpg",
+      "correct": "А",
+      "tag": "модуль"
+    },
+    {
+      "id": "1763129412",
+      "type": "quiz",
+      "photo": "quiz_1763129412.jpg",
+      "solution_photo": "quiz_1763129412_solution.jpg",
+      "correct": "Г",
+      "tag": "десяткові_дроби"
+    },
+    {
+      "id": "1763129478",
+      "type": "quiz",
+      "photo": "quiz_1763129478.jpg",
+      "solution_photo": "quiz_1763129478_solution.jpg",
+      "correct": "Б",
+      "tag": "числова_пряма"
     }
   ]
 }

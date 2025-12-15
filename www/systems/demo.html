@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Анімована демонстрація | Системи рівнянь</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <style>
+        /* Demo specific styles */
+        .demo-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .demo-title {
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Animation canvas */
+        .animation-canvas {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border);
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* System display */
+        .system-box {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .equation-line {
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            color: var(--text);
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.5s ease;
+        }
+
+        .equation-line.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .equation-line .number {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            min-width: 20px;
+        }
+
+        /* Highlight parts */
+        .highlight {
+            background: rgba(99, 102, 241, 0.2);
+            padding: 0 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .highlight.active {
+            background: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .highlight-green {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .highlight-orange {
+            background: rgba(255, 152, 0, 0.2);
+        }
+
+        .highlight-red {
+            background: rgba(244, 67, 54, 0.2);
+        }
+
+        /* Step indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .step-dot.completed {
+            background: var(--success);
+        }
+
+        /* Narration box */
+        .narration-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .narration-text {
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.6;
+            min-height: 48px;
+        }
+
+        .narration-step {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Work area */
+        .work-area {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            min-height: 80px;
+        }
+
+        .work-line {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 0.5rem 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .work-line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .work-line.crossed {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Arrow animation */
+        .arrow {
+            display: inline-block;
+            color: var(--accent);
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .arrow.visible {
+            opacity: 1;
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Result box */
+        .result-box {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.1));
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            border: 2px solid var(--success);
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s ease;
+        }
+
+        .result-box.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .result-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .result-check {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .control-btn.primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .control-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .control-btn.secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .control-btn.secondary:hover {
+            border-color: var(--accent);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Speed control */
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+
+        .speed-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .speed-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .speed-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Method selector */
+        .method-selector {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+
+        .method-btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .method-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .method-btn:hover:not(.active) {
+            border-color: var(--accent);
+        }
+
+        /* Drawing line animation */
+        .draw-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 1s ease forwards;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Typing effect */
+        .typing::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* SVG container */
+        .svg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+    </style>
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="demo-container">
+        <a href="index.html" class="back-link">← Назад до тренажера</a>
+
+        <div class="demo-header">
+            <h1 class="demo-title">Анімований розв'язок</h1>
+            <p class="demo-subtitle">Покрокове пояснення з анімацією</p>
+        </div>
+
+        <!-- Method selector -->
+        <div class="method-selector">
+            <button class="method-btn active" data-method="addition">➕ Метод додавання</button>
+            <button class="method-btn" data-method="substitution">🔄 Метод підстановки</button>
+        </div>
+
+        <!-- Speed control -->
+        <div class="speed-control">
+            <span class="speed-label">Швидкість:</span>
+            <button class="speed-btn" data-speed="0.5">0.5x</button>
+            <button class="speed-btn active" data-speed="1">1x</button>
+            <button class="speed-btn" data-speed="2">2x</button>
+        </div>
+
+        <!-- Animation canvas -->
+        <div class="animation-canvas" id="animationCanvas">
+            <!-- Step indicator -->
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+
+            <!-- Narration -->
+            <div class="narration-box">
+                <div class="narration-step" id="narrationStep">Крок 0</div>
+                <div class="narration-text" id="narrationText">Натисни "Почати" для демонстрації</div>
+            </div>
+
+            <!-- System display -->
+            <div class="system-box" id="systemBox">
+                <div class="equation-line" id="eq1">
+                    <span class="number">①</span>
+                    <span id="eq1Content">x + y = 5</span>
+                </div>
+                <div class="equation-line" id="eq2">
+                    <span class="number">②</span>
+                    <span id="eq2Content">x - y = 1</span>
+                </div>
+            </div>
+
+            <!-- Work area -->
+            <div class="work-area" id="workArea">
+                <!-- Dynamic content -->
+            </div>
+
+            <!-- Result -->
+            <div class="result-box" id="resultBox">
+                <div class="result-check">✅</div>
+                <div class="result-text">x = 3, y = 2</div>
+            </div>
+
+            <!-- SVG overlay for arrows -->
+            <svg class="svg-overlay" id="svgOverlay">
+                <!-- Dynamic arrows -->
+            </svg>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn secondary" id="prevBtn" disabled>← Назад</button>
+            <button class="control-btn primary" id="playBtn">▶ Почати</button>
+            <button class="control-btn secondary" id="nextBtn">Далі →</button>
+        </div>
+    </div>
+
+    <script>
+        // Animation Controller
+        class AnimationController {
+            constructor() {
+                this.currentStep = 0;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.method = 'addition';
+                this.animationTimeout = null;
+
+                this.initElements();
+                this.bindEvents();
+                this.loadSteps();
+                this.reset();
+            }
+
+            initElements() {
+                this.stepIndicator = document.getElementById('stepIndicator');
+                this.narrationStep = document.getElementById('narrationStep');
+                this.narrationText = document.getElementById('narrationText');
+                this.eq1 = document.getElementById('eq1');
+                this.eq2 = document.getElementById('eq2');
+                this.eq1Content = document.getElementById('eq1Content');
+                this.eq2Content = document.getElementById('eq2Content');
+                this.workArea = document.getElementById('workArea');
+                this.resultBox = document.getElementById('resultBox');
+                this.playBtn = document.getElementById('playBtn');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+            }
+
+            bindEvents() {
+                this.playBtn.addEventListener('click', () => this.togglePlay());
+                this.prevBtn.addEventListener('click', () => this.prevStep());
+                this.nextBtn.addEventListener('click', () => this.nextStep());
+
+                document.querySelectorAll('.method-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.method = btn.dataset.method;
+                        this.loadSteps();
+                        this.reset();
+                    });
+                });
+
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.speed = parseFloat(btn.dataset.speed);
+                    });
+                });
+            }
+
+            loadSteps() {
+                if (this.method === 'addition') {
+                    this.steps = [
+                        {
+                            narration: 'Маємо систему рівнянь. Зверни увагу: коефіцієнти при y протилежні (+1 і -1)',
+                            action: () => {
+                                this.eq1.classList.add('visible');
+                                this.eq2.classList.add('visible');
+                                this.eq1Content.innerHTML = 'x + <span class="highlight active">y</span> = 5';
+                                this.eq2Content.innerHTML = 'x <span class="highlight active">- y</span> = 1';
+                            }
+                        },
+                        {
+                            narration: 'Складаємо обидва рівняння почленно. Ліві частини та праві частини окремо.',
+                            action: () => {
+                                this.eq1Content.innerHTML = 'x + y = 5';
+                                this.eq2Content.innerHTML = 'x - y = 1';
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible" style="transition-delay: 0s;">(x + y) + (x - y) = 5 + 1</div>
+                                `;
+                            }
+                        },
+                        {
+                            narration: 'При додаванні y скорочується! +y і -y дають 0. Залишається тільки x.',
+                            action: () => {
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible crossed">(x + y) + (x - y) = 5 + 1</div>
+                                    <div class="work-line visible" style="transition-delay: 0.3s;">
+                                        <span class="arrow visible">↓</span>
+                                    </div>
+                                    <div class="work-line visible" style="transition-delay: 0.5s;">
+                                        x + <span class="highlight-red">y</span> + x <span class="highlight-red">- y</span> = 6
+                                    </div>
+                                    <div class="work-line visible" style="transition-delay: 0.8s;">2x = 6</div>
+                                `;
+                            }
+                        },
+                        {
+                            narration: 'Ділимо обидві частини на 2. Знаходимо x = 3.',
+                            action: () => {
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible">2x = 6</div>
+                                    <div class="work-line visible" style="transition-delay: 0.3s;">
+                                        <span class="arrow visible">↓</span> ділимо на 2
+                                    </div>
+                                    <div class="work-line visible" style="transition-delay: 0.5s;">
+                                        <span class="highlight-green"><strong>x = 3</strong></span>
+                                    </div>
+                                `;
+                            }
+                        },
+                        {
+                            narration: 'Підставляємо x = 3 у перше рівняння і знаходимо y.',
+                            action: () => {
+                                this.eq1Content.innerHTML = '<span class="highlight-green">3</span> + y = 5';
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible">x = 3 підставляємо в ①</div>
+                                    <div class="work-line visible" style="transition-delay: 0.3s;">3 + y = 5</div>
+                                    <div class="work-line visible" style="transition-delay: 0.5s;">y = 5 - 3</div>
+                                    <div class="work-line visible" style="transition-delay: 0.7s;">
+                                        <span class="highlight-green"><strong>y = 2</strong></span>
+                                    </div>
+                                `;
+                                this.resultBox.classList.add('visible');
+                            }
+                        }
+                    ];
+                } else {
+                    // Substitution method
+                    this.steps = [
+                        {
+                            narration: 'Маємо систему рівнянь. Знайдемо рівняння, де легко виразити змінну.',
+                            action: () => {
+                                this.eq1.classList.add('visible');
+                                this.eq2.classList.add('visible');
+                                this.eq1Content.innerHTML = '<span class="highlight active">x</span> + y = 5';
+                                this.eq2Content.innerHTML = 'x - y = 1';
+                            }
+                        },
+                        {
+                            narration: 'З першого рівняння виражаємо x через y: x = 5 - y',
+                            action: () => {
+                                this.eq1Content.innerHTML = 'x + y = 5';
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible">З рівняння ①:</div>
+                                    <div class="work-line visible" style="transition-delay: 0.3s;">x + y = 5</div>
+                                    <div class="work-line visible" style="transition-delay: 0.5s;">
+                                        <span class="arrow visible">↓</span>
+                                    </div>
+                                    <div class="work-line visible" style="transition-delay: 0.7s;">
+                                        <span class="highlight-orange"><strong>x = 5 - y</strong></span>
+                                    </div>
+                                `;
+                            }
+                        },
+                        {
+                            narration: 'Підставляємо цей вираз замість x у друге рівняння.',
+                            action: () => {
+                                this.eq2Content.innerHTML = '<span class="highlight-orange">(5 - y)</span> - y = 1';
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible">Підставляємо x = 5 - y в ②:</div>
+                                    <div class="work-line visible" style="transition-delay: 0.3s;">(5 - y) - y = 1</div>
+                                `;
+                            }
+                        },
+                        {
+                            narration: 'Розкриваємо дужки і зводимо подібні. Знаходимо y = 2.',
+                            action: () => {
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible">(5 - y) - y = 1</div>
+                                    <div class="work-line visible" style="transition-delay: 0.2s;">5 - y - y = 1</div>
+                                    <div class="work-line visible" style="transition-delay: 0.4s;">5 - 2y = 1</div>
+                                    <div class="work-line visible" style="transition-delay: 0.6s;">-2y = 1 - 5</div>
+                                    <div class="work-line visible" style="transition-delay: 0.8s;">-2y = -4</div>
+                                    <div class="work-line visible" style="transition-delay: 1s;">
+                                        <span class="highlight-green"><strong>y = 2</strong></span>
+                                    </div>
+                                `;
+                            }
+                        },
+                        {
+                            narration: 'Підставляємо y = 2 назад і знаходимо x = 3. Готово!',
+                            action: () => {
+                                this.eq1Content.innerHTML = 'x + <span class="highlight-green">2</span> = 5';
+                                this.workArea.innerHTML = `
+                                    <div class="work-line visible">Підставляємо y = 2:</div>
+                                    <div class="work-line visible" style="transition-delay: 0.3s;">x = 5 - 2</div>
+                                    <div class="work-line visible" style="transition-delay: 0.5s;">
+                                        <span class="highlight-green"><strong>x = 3</strong></span>
+                                    </div>
+                                `;
+                                this.resultBox.classList.add('visible');
+                            }
+                        }
+                    ];
+                }
+            }
+
+            reset() {
+                this.currentStep = 0;
+                this.isPlaying = false;
+                clearTimeout(this.animationTimeout);
+
+                this.playBtn.textContent = '▶ Почати';
+                this.prevBtn.disabled = true;
+
+                // Reset visuals
+                this.eq1.classList.remove('visible');
+                this.eq2.classList.remove('visible');
+                this.eq1Content.innerHTML = 'x + y = 5';
+                this.eq2Content.innerHTML = 'x - y = 1';
+                this.workArea.innerHTML = '';
+                this.resultBox.classList.remove('visible');
+                this.narrationStep.textContent = 'Крок 0';
+                this.narrationText.textContent = 'Натисни "Почати" для демонстрації';
+
+                this.updateStepIndicator();
+            }
+
+            togglePlay() {
+                if (this.isPlaying) {
+                    this.pause();
+                } else {
+                    this.play();
+                }
+            }
+
+            play() {
+                this.isPlaying = true;
+                this.playBtn.textContent = '⏸ Пауза';
+                this.autoAdvance();
+            }
+
+            pause() {
+                this.isPlaying = false;
+                this.playBtn.textContent = '▶ Продовжити';
+                clearTimeout(this.animationTimeout);
+            }
+
+            autoAdvance() {
+                if (!this.isPlaying) return;
+
+                if (this.currentStep < this.steps.length) {
+                    this.showStep(this.currentStep);
+                    this.currentStep++;
+
+                    const delay = 3000 / this.speed;
+                    this.animationTimeout = setTimeout(() => this.autoAdvance(), delay);
+                } else {
+                    this.pause();
+                    this.playBtn.textContent = '🔄 Почати знову';
+                    this.playBtn.onclick = () => {
+                        this.reset();
+                        this.play();
+                    };
+                }
+            }
+
+            showStep(index) {
+                const step = this.steps[index];
+                if (!step) return;
+
+                this.narrationStep.textContent = `Крок ${index + 1}`;
+                this.narrationText.textContent = step.narration;
+                step.action();
+
+                this.updateStepIndicator();
+                this.prevBtn.disabled = index === 0;
+            }
+
+            nextStep() {
+                if (this.currentStep < this.steps.length) {
+                    this.showStep(this.currentStep);
+                    this.currentStep++;
+                    this.updateStepIndicator();
+                }
+            }
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.currentStep -= 2;
+                    this.reset();
+                    for (let i = 0; i <= this.currentStep; i++) {
+                        this.showStep(i);
+                    }
+                    this.currentStep++;
+                }
+            }
+
+            updateStepIndicator() {
+                const dots = this.stepIndicator.querySelectorAll('.step-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.remove('active', 'completed');
+                    if (i < this.currentStep - 1) {
+                        dot.classList.add('completed');
+                    } else if (i === this.currentStep - 1) {
+                        dot.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            new AnimationController();
+        });
+    </script>
+</body>
+</html>

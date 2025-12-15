@@ -868,18 +868,80 @@ async function showHint() {
     // Show loading
     hintBtn.classList.add('hidden');
     hintContainer.classList.remove('hidden');
-    hintText.innerHTML = '<div class="hint-loading"><div class="spinner"></div>Генерую підказку...</div>';
+    hintText.innerHTML = '<div class="hint-loading"><div class="spinner"></div>🤖 Генерую підказку...</div>';
 
-    // Generate hint (mock for now - can be replaced with actual AI call)
-    const hint = generateMockHint(task);
+    try {
+        // Try to get AI hint from API
+        const hint = await getAIHint(task);
 
-    // Cache it
-    hintCache[cacheKey] = hint;
-
-    // Display after small delay for UX
-    setTimeout(() => {
+        // Cache it
+        hintCache[cacheKey] = hint;
         displayHint(hint);
-    }, 500);
+    } catch (error) {
+        console.error('AI hint error:', error);
+        // Fallback to mock hint
+        const fallbackHint = generateMockHint(task);
+        hintCache[cacheKey] = fallbackHint;
+        displayHint(fallbackHint);
+    }
+}
+
+// Get hint from AI API
+async function getAIHint(task) {
+    const API_URL = 'https://marko17.pythonanywhere.com/api/hint';
+
+    // Build context from task
+    const tag = task.tag || task.hashtag || '';
+    const taskNum = task.task_num || currentTaskIndex + 1;
+
+    // Determine topic from tag or task number
+    let topic = 'math';
+    if (tag.includes('відсотк')) topic = 'percent';
+    else if (tag.includes('систем')) topic = 'systems';
+    else if (tag.includes('квадрат')) topic = 'quadratic';
+    else if (tag.includes('тригонометр')) topic = 'trigonometry';
+    else if (tag.includes('логарифм')) topic = 'logarithm';
+    else if (tag.includes('похідн')) topic = 'derivative';
+    else if (tag.includes('первісн')) topic = 'integral';
+    else if (tag.includes('геометр') || tag.includes('планіметр')) topic = 'geometry';
+    else if (tag.includes('стерео')) topic = 'stereometry';
+    else if (tag.includes('функц')) topic = 'functions';
+    else if (tag.includes('нерівн')) topic = 'inequalities';
+    else if (tag.includes('ймовірн')) topic = 'probability';
+    else if (tag.includes('комбінатор')) topic = 'combinatorics';
+    else if (tag.includes('прогрес') || tag.includes('послідовн')) topic = 'sequences';
+    else if (taskNum >= 1 && taskNum <= 4) topic = 'algebra';
+    else if (taskNum >= 5 && taskNum <= 8) topic = 'planimetry';
+    else if (taskNum >= 9 && taskNum <= 12) topic = 'functions';
+    else if (taskNum >= 13 && taskNum <= 16) topic = 'trigonometry';
+    else if (taskNum >= 17 && taskNum <= 19) topic = 'calculus';
+    else if (taskNum >= 20 && taskNum <= 22) topic = 'stereometry';
+
+    // Build question description
+    const question = `НМТ завдання ${taskNum}. Тема: ${tag || topic}. Тип: ${task.type || 'quiz'}`;
+
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            topic,
+            question,
+            level: 2,
+            context: {
+                taskNum,
+                tag,
+                type: task.type,
+                isNMT: true
+            }
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error('API error');
+    }
+
+    const data = await response.json();
+    return data.hint || generateMockHint(task);
 }
 
 function displayHint(hint) {

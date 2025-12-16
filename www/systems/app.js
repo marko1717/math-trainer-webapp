@@ -9,6 +9,24 @@ if (tg) {
     }
 }
 
+// === API Configuration ===
+const API_BASE = 'https://marko17.pythonanywhere.com';
+
+// === LaTeX Rendering ===
+function renderMath(element) {
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(element, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });
+    }
+}
+
 // === System Types ===
 const SYSTEM_TYPES = {
     substitutionSimple: {
@@ -481,7 +499,7 @@ class GameController {
         });
     }
 
-    showHint() {
+    async showHint() {
         if (!this.currentQuestion) return;
 
         const modal = document.getElementById('aiHelperModal');
@@ -489,27 +507,60 @@ class GameController {
         const response = document.getElementById('aiResponse');
 
         modal.classList.remove('hidden');
-        loading.style.display = 'none';
-        response.style.display = 'block';
+        loading.style.display = 'flex';
+        response.style.display = 'none';
 
-        const method = this.currentQuestion.method;
-        let hint = '';
+        // Try to get AI hint
+        try {
+            const apiResponse = await fetch(`${API_BASE}/api/hint`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: 'systems',
+                    question: this.currentQuestion.question + ': ' + this.currentQuestion.system?.join(', '),
+                    level: this.ai.level,
+                    context: {
+                        method: this.currentQuestion.method,
+                        systemType: this.currentQuestion.formula,
+                        typeName: SYSTEM_TYPES[this.currentQuestion.formula]?.name
+                    }
+                })
+            });
 
-        if (method === 'substitution') {
-            hint = `💡 <strong>Метод підстановки:</strong><br><br>
-                1. Знайди рівняння з коефіцієнтом 1 при x або y<br>
-                2. Вирази цю змінну через іншу<br>
-                3. Підстав у друге рівняння<br>
-                4. Знайди обидві змінні`;
-        } else {
-            hint = `💡 <strong>Метод додавання:</strong><br><br>
-                1. Якщо коефіцієнти при одній змінній рівні або протилежні - склади/відніми<br>
-                2. Інакше - помнож рівняння, щоб зрівняти коефіцієнти<br>
-                3. Склади або відніми рівняння<br>
-                4. Розв'яжи та знайди другу змінну`;
+            const data = await apiResponse.json();
+
+            loading.style.display = 'none';
+            response.style.display = 'block';
+
+            if (data.hint) {
+                response.innerHTML = `<p><strong>💡 Підказка від ШІ:</strong></p><p>${data.hint}</p>`;
+            } else {
+                throw new Error('No hint');
+            }
+        } catch (e) {
+            // Fallback to local hints
+            loading.style.display = 'none';
+            response.style.display = 'block';
+
+            const method = this.currentQuestion.method;
+            let hint = '';
+
+            if (method === 'substitution') {
+                hint = `<strong>Метод підстановки:</strong><br><br>
+                    1. Знайди рівняння з коефіцієнтом 1 при x або y<br>
+                    2. Вирази цю змінну через іншу<br>
+                    3. Підстав у друге рівняння<br>
+                    4. Знайди обидві змінні`;
+            } else {
+                hint = `<strong>Метод додавання:</strong><br><br>
+                    1. Якщо коефіцієнти при одній змінній рівні або протилежні - склади/відніми<br>
+                    2. Інакше - помнож рівняння, щоб зрівняти коефіцієнти<br>
+                    3. Склади або відніми рівняння<br>
+                    4. Розв'яжи та знайди другу змінну`;
+            }
+
+            response.innerHTML = `<p><strong>💡 Підказка:</strong></p><p>${hint}</p>`;
         }
-
-        response.innerHTML = `<p>${hint}</p>`;
     }
 
     showFormulaHelp() {

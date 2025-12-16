@@ -263,20 +263,132 @@ function renderTestList() {
         testList.appendChild(card);
     });
 
-    // Add quizzes section if available
+    // Add quizzes section with categories
     if (nmtData.quizzes && nmtData.quizzes.length > 0) {
-        const quizzesCard = document.createElement('div');
-        quizzesCard.className = 'test-card';
-        quizzesCard.innerHTML = `
+        // Group quizzes by tag
+        const quizzesByTag = {};
+        nmtData.quizzes.forEach(q => {
+            const tag = q.tag || 'інше';
+            if (!quizzesByTag[tag]) {
+                quizzesByTag[tag] = [];
+            }
+            quizzesByTag[tag].push(q);
+        });
+
+        // Sort tags by count
+        const sortedTags = Object.entries(quizzesByTag)
+            .sort((a, b) => b[1].length - a[1].length);
+
+        // Add header for quizzes
+        const quizzesHeader = document.createElement('div');
+        quizzesHeader.className = 'test-section-header';
+        quizzesHeader.innerHTML = `<h3>📝 Окремі завдання (${nmtData.quizzes.length})</h3>`;
+        quizzesHeader.style.cssText = 'margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-muted); font-size: 0.9rem;';
+        testList.appendChild(quizzesHeader);
+
+        // Add "All quizzes" option
+        const allCard = document.createElement('div');
+        allCard.className = 'test-card';
+        allCard.innerHTML = `
             <div class="test-card-info">
-                <h3>📝 Окремі завдання</h3>
-                <p>${nmtData.quizzes.length} завдань з різних тем</p>
+                <h3>🎯 Всі завдання</h3>
+                <p>${nmtData.quizzes.length} завдань (випадкові 15)</p>
             </div>
             <span class="test-card-arrow">→</span>
         `;
-        quizzesCard.addEventListener('click', () => startQuizzes());
-        testList.appendChild(quizzesCard);
+        allCard.addEventListener('click', () => startQuizzesRandom(15));
+        testList.appendChild(allCard);
+
+        // Add category cards
+        sortedTags.forEach(([tag, quizzes]) => {
+            const card = document.createElement('div');
+            card.className = 'test-card quiz-category';
+            const tagName = tag.replace('#', '').replace(/_/g, ' ');
+            card.innerHTML = `
+                <div class="test-card-info">
+                    <h3>${getTagEmoji(tag)} ${capitalizeFirst(tagName)}</h3>
+                    <p>${quizzes.length} завдань</p>
+                </div>
+                <span class="test-card-arrow">→</span>
+            `;
+            card.addEventListener('click', () => startQuizzesByTag(tag, quizzes));
+            testList.appendChild(card);
+        });
     }
+}
+
+// Get emoji for tag
+function getTagEmoji(tag) {
+    const tagLower = tag.toLowerCase();
+    if (tagLower.includes('відсот')) return '💯';
+    if (tagLower.includes('систем')) return '🔗';
+    if (tagLower.includes('тригонометр')) return '📐';
+    if (tagLower.includes('похідн')) return '📈';
+    if (tagLower.includes('первісн')) return '∫';
+    if (tagLower.includes('логарифм')) return '📊';
+    if (tagLower.includes('показник')) return 'ⁿ';
+    if (tagLower.includes('функц')) return '📉';
+    if (tagLower.includes('геометр') || tagLower.includes('планіметр')) return '🔺';
+    if (tagLower.includes('стерео')) return '🧊';
+    if (tagLower.includes('нерівн')) return '⚖️';
+    if (tagLower.includes('комбінатор')) return '🎲';
+    if (tagLower.includes('ймовірн')) return '🎯';
+    if (tagLower.includes('прогрес') || tagLower.includes('послідовн')) return '📋';
+    if (tagLower.includes('алгебра')) return '🔢';
+    if (tagLower.includes('пропорц')) return '⚖️';
+    return '📝';
+}
+
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Check if answer is numerical (requires keyboard input)
+function isNumericalAnswer(answer) {
+    if (!answer) return false;
+    // Letters А-Д are multiple choice
+    if (/^[АБВГД]$/.test(answer)) return false;
+    // Space-separated letters are matching
+    if (/^[АБВГД](\s+[АБВГД])+$/.test(answer)) return false;
+    // Everything else (numbers, decimals, fractions) is numerical
+    return true;
+}
+
+// Start random quizzes
+function startQuizzesRandom(count) {
+    const shuffled = [...nmtData.quizzes].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, count);
+
+    const quizTest = {
+        id: 'quizzes_random',
+        name: `Випадкові ${count} завдань`,
+        tasks: selected.map((q, i) => ({
+            task_num: i + 1,
+            type: isNumericalAnswer(q.correct) ? 'short' : 'quiz',
+            photo: q.photo,
+            correct: q.correct,
+            solution_photo: q.solution_photo || null,
+            tag: q.tag || ''
+        }))
+    };
+    startTest(quizTest);
+}
+
+// Start quizzes by tag
+function startQuizzesByTag(tag, quizzes) {
+    const quizTest = {
+        id: `quizzes_${tag}`,
+        name: tag.replace('#', '').replace(/_/g, ' '),
+        tasks: quizzes.map((q, i) => ({
+            task_num: i + 1,
+            type: isNumericalAnswer(q.correct) ? 'short' : 'quiz',
+            photo: q.photo,
+            correct: q.correct,
+            solution_photo: q.solution_photo || null,
+            tag: q.tag || ''
+        }))
+    };
+    startTest(quizTest);
 }
 
 // ========== TEST FLOW ==========
@@ -293,23 +405,6 @@ function startTest(test) {
     renderTaskNav();
     startTimer();
     showTask();
-}
-
-function startQuizzes() {
-    // Create a virtual test from quizzes
-    const quizTest = {
-        id: 'quizzes',
-        name: 'Окремі завдання',
-        tasks: nmtData.quizzes.map((q, i) => ({
-            task_num: i + 1,
-            type: q.type === 'short' ? 'short' : 'quiz',
-            photo: q.photo,
-            correct: q.correct,
-            solution_photo: q.solution_photo || null,
-            hashtag: q.tag || q.hashtag || ''
-        }))
-    };
-    startTest(quizTest);
 }
 
 function showScreen(screen) {
@@ -619,8 +714,8 @@ function checkAnswer() {
             return;
         }
         isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(task.correct);
-        partialScore = isCorrect ? 1 : 0;
-        maxScore = 1;
+        partialScore = isCorrect ? 2 : 0; // Short answer tasks worth 2 points
+        maxScore = 2;
     } else {
         const selected = document.querySelector('.answer-btn.selected');
         if (!selected) {

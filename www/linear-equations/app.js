@@ -9,6 +9,24 @@ if (tg) {
     }
 }
 
+// === API Configuration ===
+const API_BASE = 'https://marko17.pythonanywhere.com';
+
+// === LaTeX Rendering ===
+function renderMath(element) {
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(element, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+        });
+    }
+}
+
 // === Equation Types ===
 const EQUATION_TYPES = {
     simple: {
@@ -443,7 +461,7 @@ class GameController {
         });
     }
 
-    showHint() {
+    async showHint() {
         if (!this.currentQuestion) return;
 
         const modal = document.getElementById('aiHelperModal');
@@ -451,35 +469,65 @@ class GameController {
         const response = document.getElementById('aiResponse');
 
         modal.classList.remove('hidden');
-        loading.style.display = 'none';
-        response.style.display = 'block';
+        loading.style.display = 'flex';
+        response.style.display = 'none';
 
-        let hint = '';
+        // Try to get AI hint
+        try {
+            const apiResponse = await fetch(`${API_BASE}/api/hint`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: 'linear_equations',
+                    question: this.currentQuestion.question,
+                    level: this.ai.level,
+                    context: {
+                        equationType: this.currentQuestion.formula,
+                        typeName: EQUATION_TYPES[this.currentQuestion.formula]?.name
+                    }
+                })
+            });
 
-        switch (this.currentQuestion.formula) {
-            case 'simple':
-                hint = '💡 Перенеси число на праву сторону зі зміною знака.';
-                break;
-            case 'withCoefficient':
-                hint = '💡 Подiли обидві частини рівняння на коефіцієнт при x.';
-                break;
-            case 'twoSides':
-                hint = '💡 Перенеси всі члени з x вліво, числа — вправо. Не забудь змінити знаки!';
-                break;
-            case 'withBrackets':
-                hint = '💡 Спочатку розкрий дужки (помнож кожен член на число перед дужками).';
-                break;
-            case 'complex':
-                hint = '💡 Розкрий дужки з обох сторін, потім перенеси x вліво, числа вправо.';
-                break;
-            case 'expressVariable':
-                hint = '💡 Ізолюй потрібну змінну: перенеси інші члени, поділи на коефіцієнт.';
-                break;
-            default:
-                hint = '💡 Перенеси члени зі зміною знака, потім поділи на коефіцієнт.';
+            const data = await apiResponse.json();
+
+            loading.style.display = 'none';
+            response.style.display = 'block';
+
+            if (data.hint) {
+                response.innerHTML = `<p><strong>💡 Підказка від ШІ:</strong></p><p>${data.hint}</p>`;
+            } else {
+                throw new Error('No hint');
+            }
+        } catch (e) {
+            // Fallback to local hints
+            loading.style.display = 'none';
+            response.style.display = 'block';
+
+            let hint = '';
+            switch (this.currentQuestion.formula) {
+                case 'simple':
+                    hint = 'Перенеси число на праву сторону зі зміною знака.';
+                    break;
+                case 'withCoefficient':
+                    hint = 'Подiли обидві частини рівняння на коефіцієнт при x.';
+                    break;
+                case 'twoSides':
+                    hint = 'Перенеси всі члени з x вліво, числа — вправо. Не забудь змінити знаки!';
+                    break;
+                case 'withBrackets':
+                    hint = 'Спочатку розкрий дужки (помнож кожен член на число перед дужками).';
+                    break;
+                case 'complex':
+                    hint = 'Розкрий дужки з обох сторін, потім перенеси x вліво, числа вправо.';
+                    break;
+                case 'expressVariable':
+                    hint = 'Ізолюй потрібну змінну: перенеси інші члени, поділи на коефіцієнт.';
+                    break;
+                default:
+                    hint = 'Перенеси члени зі зміною знака, потім поділи на коефіцієнт.';
+            }
+            response.innerHTML = `<p><strong>💡 Підказка:</strong></p><p>${hint}</p>`;
         }
-
-        response.innerHTML = `<p>${hint}</p>`;
     }
 
     showFormulaHelp() {

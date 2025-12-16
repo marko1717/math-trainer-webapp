@@ -522,7 +522,7 @@ class GameController {
         });
     }
 
-    showHint() {
+    async showHint() {
         if (!this.currentQuestion) return;
 
         const modal = document.getElementById('aiHelperModal');
@@ -530,33 +530,62 @@ class GameController {
         const response = document.getElementById('aiResponse');
 
         modal.classList.remove('hidden');
-        loading.style.display = 'none';
-        response.style.display = 'block';
+        loading.style.display = 'flex';
+        response.style.display = 'none';
 
-        const operation = OPERATIONS[this.currentQuestion.formula];
-        let hint = '';
+        // Try to get AI hint
+        try {
+            const apiResponse = await fetch(`${API_BASE}/api/hint`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: 'polynomials',
+                    question: this.currentQuestion.question,
+                    level: this.ai.level,
+                    context: {
+                        operation: this.currentQuestion.formula,
+                        operationName: OPERATIONS[this.currentQuestion.formula]?.name
+                    }
+                })
+            });
 
-        switch (this.currentQuestion.formula) {
-            case 'addition':
-                hint = '💡 При додаванні зводь подібні члени: складай коефіцієнти біля однакових степенів змінної.';
-                break;
-            case 'subtraction':
-                hint = '💡 При відніманні спочатку зміни знаки у від\'ємника (в других дужках), потім зведи подібні.';
-                break;
-            case 'monomialMult':
-                hint = '💡 Множення на одночлен: помнож одночлен на кожен член многочлена окремо.';
-                break;
-            case 'polynomialMult':
-                hint = '💡 Кожен член першого многочлена помнож на кожен член другого. Не забудь звести подібні!';
-                break;
-            case 'combined':
-                hint = '💡 Спочатку розкрий дужки (помнож коефіцієнт на кожен член), потім зведи подібні.';
-                break;
-            default:
-                hint = '💡 Уважно прочитай умову та застосуй відповідне правило.';
+            const data = await apiResponse.json();
+
+            loading.style.display = 'none';
+            response.style.display = 'block';
+
+            if (data.hint) {
+                response.innerHTML = `<p><strong>💡 Підказка від ШІ:</strong></p><p>${data.hint}</p>`;
+            } else {
+                throw new Error('No hint');
+            }
+        } catch (e) {
+            // Fallback to local hints
+            loading.style.display = 'none';
+            response.style.display = 'block';
+
+            let hint = '';
+            switch (this.currentQuestion.formula) {
+                case 'addition':
+                    hint = 'При додаванні зводь подібні члени: складай коефіцієнти біля однакових степенів змінної.';
+                    break;
+                case 'subtraction':
+                    hint = 'При відніманні спочатку зміни знаки у від\'ємника (в других дужках), потім зведи подібні.';
+                    break;
+                case 'monomialMult':
+                    hint = 'Множення на одночлен: помнож одночлен на кожен член многочлена окремо.';
+                    break;
+                case 'polynomialMult':
+                    hint = 'Кожен член першого многочлена помнож на кожен член другого. Не забудь звести подібні!';
+                    break;
+                case 'combined':
+                    hint = 'Спочатку розкрий дужки (помнож коефіцієнт на кожен член), потім зведи подібні.';
+                    break;
+                default:
+                    hint = 'Уважно прочитай умову та застосуй відповідне правило.';
+            }
+            response.innerHTML = `<p><strong>💡 Підказка:</strong></p><p>${hint}</p>`;
         }
-
-        response.innerHTML = `<p>${hint}</p>`;
     }
 
     showFormulaHelp() {

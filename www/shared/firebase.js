@@ -75,22 +75,29 @@ async function initFirebase() {
 // Sign in with Google
 async function signInWithGoogle() {
     await initFirebase();
-    const { signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } = window.firebaseAuth;
+    const { signInWithPopup, GoogleAuthProvider } = window.firebaseAuth;
 
     try {
         const provider = new GoogleAuthProvider();
 
-        // Check if we're in a WebView (iOS/Android app) or standalone browser
-        const isWebView = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent) ||
-                          /wv|WebView/i.test(navigator.userAgent) ||
-                          window.Capacitor !== undefined;
+        // Check if we're in a Capacitor WebView
+        const isCapacitor = window.Capacitor !== undefined;
 
-        if (isWebView) {
-            // Use redirect for WebView (popup doesn't work)
-            console.log('📱 Using redirect auth for WebView');
-            await signInWithRedirect(auth, provider);
-            // The page will reload, result handled by getRedirectResult below
-            return null;
+        if (isCapacitor) {
+            // In Capacitor, we need to use a different approach
+            // Try popup first, if it fails show instructions
+            console.log('📱 Capacitor detected, trying popup auth');
+            try {
+                const result = await signInWithPopup(auth, provider);
+                currentUser = result.user;
+                await createOrUpdateUserProfile(currentUser);
+                console.log('✅ Signed in:', currentUser.displayName);
+                return currentUser;
+            } catch (popupError) {
+                console.error('Popup failed in Capacitor:', popupError);
+                // If popup blocked, inform user
+                throw new Error('Авторизація через Google поки недоступна в додатку. Спробуйте Apple ID або веб-версію.');
+            }
         } else {
             // Use popup for regular browser
             const result = await signInWithPopup(auth, provider);
@@ -108,47 +115,61 @@ async function signInWithGoogle() {
 // Sign in with Apple
 async function signInWithApple() {
     await initFirebase();
-    const { signInWithPopup, signInWithRedirect, signInWithCredential, OAuthProvider } = window.firebaseAuth;
+    const { signInWithPopup, signInWithCredential, OAuthProvider } = window.firebaseAuth;
 
     try {
         const provider = new OAuthProvider('apple.com');
         provider.addScope('email');
         provider.addScope('name');
 
-        // Check if we're in a Capacitor WebView
+        // Check if we're in a Capacitor WebView with native plugin
         const isCapacitor = window.Capacitor !== undefined;
+        const hasNativePlugin = isCapacitor && window.Capacitor.Plugins?.SignInWithApple;
 
-        if (isCapacitor && window.Capacitor.Plugins?.SignInWithApple) {
+        if (hasNativePlugin) {
             // Use native Sign In with Apple plugin
             console.log('🍎 Using native Apple Sign In');
-            const result = await window.Capacitor.Plugins.SignInWithApple.authorize({
-                clientId: 'com.mathtrainer.nmt',
-                redirectURI: 'https://nmt-trainer.firebaseapp.com/__/auth/handler',
-                scopes: 'email name'
-            });
+            try {
+                const result = await window.Capacitor.Plugins.SignInWithApple.authorize({
+                    clientId: 'com.mathtrainer.nmt',
+                    redirectURI: 'https://nmt-trainer.firebaseapp.com/__/auth/handler',
+                    scopes: 'email name'
+                });
 
-            // Create Firebase credential from Apple response
-            const credential = provider.credential({
-                idToken: result.response.identityToken,
-                rawNonce: result.response.authorizationCode
-            });
+                // Create Firebase credential from Apple response
+                const credential = provider.credential({
+                    idToken: result.response.identityToken,
+                    rawNonce: result.response.authorizationCode
+                });
 
-            const userCredential = await signInWithCredential(auth, credential);
-            currentUser = userCredential.user;
-            await createOrUpdateUserProfile(currentUser);
-            console.log('✅ Apple Sign-in successful:', currentUser.displayName || currentUser.email);
-            return currentUser;
-        } else {
-            // Use popup for browser
-            console.log('🍎 Using popup Apple Sign In');
-            const result = await signInWithPopup(auth, provider);
-            currentUser = result.user;
-            await createOrUpdateUserProfile(currentUser);
-            console.log('✅ Apple Sign-in successful:', currentUser.displayName || currentUser.email);
-            return currentUser;
+                const userCredential = await signInWithCredential(auth, credential);
+                currentUser = userCredential.user;
+                await createOrUpdateUserProfile(currentUser);
+                console.log('✅ Apple Sign-in successful:', currentUser.displayName || currentUser.email);
+                return currentUser;
+            } catch (nativeError) {
+                console.error('Native Apple Sign In failed:', nativeError);
+                // Fall back to popup
+                console.log('🍎 Falling back to popup Apple Sign In');
+            }
         }
+
+        // Use popup (for browser or as fallback)
+        console.log('🍎 Using popup Apple Sign In');
+        const result = await signInWithPopup(auth, provider);
+        currentUser = result.user;
+        await createOrUpdateUserProfile(currentUser);
+        console.log('✅ Apple Sign-in successful:', currentUser.displayName || currentUser.email);
+        return currentUser;
+
     } catch (error) {
         console.error('❌ Apple Sign in error:', error);
+        // Provide more helpful error message
+        if (error.code === 'auth/popup-blocked') {
+            throw new Error('Popup заблоковано. Дозвольте popup у налаштуваннях браузера.');
+        } else if (error.code === 'auth/operation-not-allowed') {
+            throw new Error('Apple Sign In не налаштовано. Зверніться до адміністратора.');
+        }
         throw error;
     }
 }

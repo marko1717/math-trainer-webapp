@@ -205,32 +205,53 @@
 /* Help panel */
 .help-panel {
     position: fixed;
-    bottom: 100px;
+    bottom: 20px;
+    left: 16px;
     right: 16px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     z-index: 50;
+    justify-content: center;
 }
 
 .help-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--card-bg);
-    border: 2px solid var(--border);
+    flex: 1;
+    max-width: 120px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 2px solid #e0e0e0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 4px;
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #333;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.help-btn span:first-child {
+    font-size: 1.5rem;
 }
 
 .help-btn:hover {
-    transform: scale(1.1);
+    transform: translateY(-2px);
     border-color: var(--accent);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.help-btn-ai {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: #fff;
+}
+
+.help-btn-ai:hover {
+    border-color: #764ba2;
 }
 
 /* Results screen */

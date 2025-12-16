@@ -114,12 +114,18 @@
                 </div>
 
                 <!-- Help Panel -->
-                <div class="help-panel">
-                    <button class="help-btn" id="hintBtn" title="Підказка">
+                <div class="help-panel" id="helpPanel">
+                    <button class="help-btn" id="hintBtn">
                         <span>💡</span>
+                        <span>Підказка</span>
                     </button>
-                    <button class="help-btn" id="formulaBtn" title="Правила">
+                    <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                        <span>🤖</span>
+                        <span>Допомога ШІ</span>
+                    </button>
+                    <button class="help-btn" id="formulaBtn">
                         <span>📐</span>
+                        <span>Формула</span>
                     </button>
                 </div>
             </div>
@@ -219,12 +225,20 @@
         <!-- AI Helper Modal -->
         <div class="ai-helper-modal hidden" id="aiHelperModal">
             <div class="ai-helper-content">
-                <button class="ai-close-btn" id="aiCloseBtn">×</button>
-                <div class="ai-loading" id="aiLoading">
-                    <div class="spinner"></div>
-                    <p>Думаю...</p>
+                <div class="ai-helper-header">
+                    <div class="ai-helper-title">
+                        <span id="modalIcon">🤖</span>
+                        <span id="modalTitle">Допомога ШІ</span>
+                    </div>
+                    <button class="ai-close-btn" id="aiCloseBtn">×</button>
                 </div>
-                <div class="ai-response" id="aiResponse" style="display: none;"></div>
+                <div class="ai-helper-body">
+                    <div class="ai-loading" id="aiLoading">
+                        <div class="spinner"></div>
+                        <p>Думаю...</p>
+                    </div>
+                    <div class="ai-response" id="aiResponse" style="display: none;"></div>
+                </div>
             </div>
         </div>
     </div>

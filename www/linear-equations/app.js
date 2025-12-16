@@ -453,6 +453,7 @@ class GameController {
         document.getElementById('backToQuizBtn').addEventListener('click', () => this.showResults());
 
         document.getElementById('hintBtn')?.addEventListener('click', () => this.showHint());
+        document.getElementById('aiHelpBtn')?.addEventListener('click', () => this.showAIHelp());
         document.getElementById('formulaBtn')?.addEventListener('click', () => this.showFormulaHelp());
 
         document.getElementById('aiCloseBtn')?.addEventListener('click', () => this.closeAIModal());
@@ -461,16 +462,66 @@ class GameController {
         });
     }
 
-    async showHint() {
+    showHint() {
         if (!this.currentQuestion) return;
 
         const modal = document.getElementById('aiHelperModal');
         const loading = document.getElementById('aiLoading');
         const response = document.getElementById('aiResponse');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+
+        modal.classList.remove('hidden');
+        loading.style.display = 'none';
+        response.style.display = 'block';
+
+        // Update modal header
+        if (modalIcon) modalIcon.textContent = '💡';
+        if (modalTitle) modalTitle.textContent = 'Підказка';
+
+        // Local hints based on equation type
+        let hint = '';
+        switch (this.currentQuestion.formula) {
+            case 'simple':
+                hint = 'Перенеси число на праву сторону зі зміною знака.';
+                break;
+            case 'withCoefficient':
+                hint = 'Поділи обидві частини рівняння на коефіцієнт при x.';
+                break;
+            case 'twoSides':
+                hint = 'Перенеси всі члени з x вліво, числа — вправо. Не забудь змінити знаки!';
+                break;
+            case 'withBrackets':
+                hint = 'Спочатку розкрий дужки (помнож кожен член на число перед дужками).';
+                break;
+            case 'complex':
+                hint = 'Розкрий дужки з обох сторін, потім перенеси x вліво, числа вправо.';
+                break;
+            case 'expressVariable':
+                hint = 'Ізолюй потрібну змінну: перенеси інші члени, поділи на коефіцієнт.';
+                break;
+            default:
+                hint = 'Перенеси члени зі зміною знака, потім поділи на коефіцієнт.';
+        }
+        response.innerHTML = `<p style="color: var(--primary); font-size: 1.1rem;">${hint}</p>`;
+    }
+
+    async showAIHelp() {
+        if (!this.currentQuestion) return;
+
+        const modal = document.getElementById('aiHelperModal');
+        const loading = document.getElementById('aiLoading');
+        const response = document.getElementById('aiResponse');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
 
         modal.classList.remove('hidden');
         loading.style.display = 'flex';
         response.style.display = 'none';
+
+        // Update modal header
+        if (modalIcon) modalIcon.textContent = '🤖';
+        if (modalTitle) modalTitle.textContent = 'Допомога ШІ';
 
         // Try to get AI hint
         try {
@@ -494,39 +545,22 @@ class GameController {
             response.style.display = 'block';
 
             if (data.hint) {
-                response.innerHTML = `<p><strong>💡 Підказка від ШІ:</strong></p><p>${data.hint}</p>`;
+                response.innerHTML = `<p>${data.hint}</p>`;
+                renderMath(response);
             } else {
                 throw new Error('No hint');
             }
         } catch (e) {
-            // Fallback to local hints
+            // Fallback - show detailed explanation
             loading.style.display = 'none';
             response.style.display = 'block';
 
-            let hint = '';
-            switch (this.currentQuestion.formula) {
-                case 'simple':
-                    hint = 'Перенеси число на праву сторону зі зміною знака.';
-                    break;
-                case 'withCoefficient':
-                    hint = 'Подiли обидві частини рівняння на коефіцієнт при x.';
-                    break;
-                case 'twoSides':
-                    hint = 'Перенеси всі члени з x вліво, числа — вправо. Не забудь змінити знаки!';
-                    break;
-                case 'withBrackets':
-                    hint = 'Спочатку розкрий дужки (помнож кожен член на число перед дужками).';
-                    break;
-                case 'complex':
-                    hint = 'Розкрий дужки з обох сторін, потім перенеси x вліво, числа вправо.';
-                    break;
-                case 'expressVariable':
-                    hint = 'Ізолюй потрібну змінну: перенеси інші члени, поділи на коефіцієнт.';
-                    break;
-                default:
-                    hint = 'Перенеси члени зі зміною знака, потім поділи на коефіцієнт.';
-            }
-            response.innerHTML = `<p><strong>💡 Підказка:</strong></p><p>${hint}</p>`;
+            const typeName = EQUATION_TYPES[this.currentQuestion.formula]?.name || 'Рівняння';
+            response.innerHTML = `
+                <p><strong>Тип:</strong> ${typeName}</p>
+                <p style="margin-top: 0.5rem;"><strong>Хід розв'язку:</strong></p>
+                <p style="white-space: pre-line; margin-top: 0.5rem;">${this.currentQuestion.explanation}</p>
+            `;
         }
     }
 
@@ -534,28 +568,42 @@ class GameController {
         const modal = document.getElementById('aiHelperModal');
         const loading = document.getElementById('aiLoading');
         const response = document.getElementById('aiResponse');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
 
         modal.classList.remove('hidden');
         loading.style.display = 'none';
         response.style.display = 'block';
 
+        // Update modal header
+        if (modalIcon) modalIcon.textContent = '📐';
+        if (modalTitle) modalTitle.textContent = 'Формули';
+
         response.innerHTML = `
-            <h3 style="color: var(--accent); margin-bottom: 1rem;">⚖️ Правила</h3>
+            <h3 style="color: var(--accent); margin-bottom: 1rem;">⚖️ Лінійні рівняння</h3>
             <div style="margin-bottom: 1rem;">
-                <p><strong>Перенос членів:</strong></p>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">При переносі знак змінюється на протилежний</p>
+                <p><strong>ax + b = c → x = (c - b) / a</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Загальний вигляд лінійного рівняння</p>
             </div>
             <div style="margin-bottom: 1rem;">
-                <p><strong>Коефіцієнт при x:</strong></p>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Поділи обидві частини на цей коефіцієнт</p>
+                <p><strong>x + a = b → x = b - a</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Перенос з протилежним знаком</p>
             </div>
             <div style="margin-bottom: 1rem;">
-                <p><strong>Дужки:</strong></p>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Спочатку розкрий дужки</p>
+                <p><strong>ax = b → x = b / a</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Ділення на коефіцієнт</p>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <p><strong>a(x + b) = c → ax + ab = c</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Розкриття дужок</p>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <p><strong>ax + b = cx + d → (a-c)x = d - b</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Зведення подібних членів</p>
             </div>
             <div>
-                <p><strong>Загальна схема:</strong></p>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">ax + b = c → x = (c - b) / a</p>
+                <p><strong>S = vt → v = S/t, t = S/v</strong></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Вираження змінної з формули</p>
             </div>
         `;
     }

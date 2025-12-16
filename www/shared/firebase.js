@@ -122,7 +122,7 @@ async function signInWithApple() {
             // Use native Sign In with Apple plugin
             console.log('🍎 Using native Apple Sign In');
             const result = await window.Capacitor.Plugins.SignInWithApple.authorize({
-                clientId: 'com.mathquest.app',
+                clientId: 'com.mathtrainer.nmt',
                 redirectURI: 'https://nmt-trainer.firebaseapp.com/__/auth/handler',
                 scopes: 'email name'
             });

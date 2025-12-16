@@ -34,6 +34,7 @@ const TRAINER_NAMES = {
 // DOM Elements
 const loginScreen = document.getElementById('loginScreen');
 const profileScreen = document.getElementById('profileScreen');
+const appleLoginBtn = document.getElementById('appleLoginBtn');
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 
@@ -69,7 +70,8 @@ async function init() {
     window.MathQuestFirebase.onAuthChange(handleAuthChange);
 
     // Setup event listeners
-    googleLoginBtn.addEventListener('click', handleLogin);
+    appleLoginBtn.addEventListener('click', handleAppleLogin);
+    googleLoginBtn.addEventListener('click', handleGoogleLogin);
     logoutBtn.addEventListener('click', handleLogout);
 }
 
@@ -103,16 +105,37 @@ function showScreen(screen) {
     }
 }
 
+// Handle Apple login
+async function handleAppleLogin() {
+    appleLoginBtn.disabled = true;
+    appleLoginBtn.textContent = 'Завантаження...';
+
+    try {
+        await window.MathQuestFirebase.signInWithApple();
+    } catch (error) {
+        console.error('Apple login error:', error);
+        alert('Помилка входу через Apple. Спробуйте ще раз.');
+    }
+
+    appleLoginBtn.disabled = false;
+    appleLoginBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.22 0-1.43.65-2.18.52-3.03-.4C3.79 16.17 4.38 9.94 8.9 9.69c1.27.07 2.15.73 2.9.78.96-.2 1.87-.81 2.87-.73 1.2.1 2.11.57 2.72 1.42-2.45 1.49-1.87 4.76.46 5.68-.57 1.49-1.3 2.96-2.8 4.44zm-3.41-15.3c-.09 1.93 1.6 3.52 3.48 3.37.22-1.98-1.73-3.67-3.48-3.37z"/>
+        </svg>
+        Увійти через Apple
+    `;
+}
+
 // Handle Google login
-async function handleLogin() {
+async function handleGoogleLogin() {
     googleLoginBtn.disabled = true;
     googleLoginBtn.textContent = 'Завантаження...';
 
     try {
         await window.MathQuestFirebase.signInWithGoogle();
     } catch (error) {
-        console.error('Login error:', error);
-        alert('Помилка входу. Спробуйте ще раз.');
+        console.error('Google login error:', error);
+        alert('Помилка входу через Google. Спробуйте ще раз.');
     }
 
     googleLoginBtn.disabled = false;

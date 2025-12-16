@@ -491,6 +491,8 @@ class GameController {
                 <p>${formula?.name || 'Формули скороченого множення'}</p>
             `;
         }
+        // Render LaTeX formulas in hint
+        renderMath(response);
     }
 
     async showAIHelp() {

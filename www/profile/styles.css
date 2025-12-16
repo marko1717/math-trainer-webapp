@@ -65,6 +65,41 @@ body.retro-mode .login-subtitle {
     font-size: 0.4rem;
 }
 
+/* Apple button - показується першою на iOS */
+.btn-apple {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 24px;
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+}
+
+body.retro-mode .btn-apple {
+    font-size: 0.45rem;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.btn-apple:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body.retro-mode .btn-apple:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--bg-dark);
+}
+
 .btn-google {
     display: flex;
     align-items: center;

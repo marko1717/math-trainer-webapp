@@ -1,0 +1,26 @@
+{
+  "name": "math-trainer",
+  "version": "1.0.0",
+  "description": "Математичні тренажери для підготовки до НМТ",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build needed - static files'",
+    "cap:init": "npx cap init 'Math Trainer' com.mathtrainer.nmt --web-dir .",
+    "cap:add:ios": "npx cap add ios",
+    "cap:add:android": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "cap:open:ios": "npx cap open ios",
+    "cap:open:android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/apple-sign-in": "^1.0.0",
+    "@capacitor/core": "^5.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^5.0.0",
+    "@capacitor/cli": "^5.0.0",
+    "@capacitor/ios": "^5.0.0"
+  },
+  "author": "Math Trainer Team",
+  "license": "MIT"
+}

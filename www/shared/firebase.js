@@ -26,7 +26,7 @@ async function initFirebase() {
     try {
         // Dynamic import for Firebase modules
         const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-        const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, GoogleAuthProvider } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+        const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, signInWithCredential, getRedirectResult, signOut, GoogleAuthProvider, OAuthProvider } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
         const { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, limit, getDocs, addDoc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
 
         app = initializeApp(firebaseConfig);
@@ -37,9 +37,11 @@ async function initFirebase() {
         window.firebaseAuth = {
             signInWithPopup,
             signInWithRedirect,
+            signInWithCredential,
             getRedirectResult,
             signOut,
             GoogleAuthProvider,
+            OAuthProvider,
             onAuthStateChanged
         };
 
@@ -99,6 +101,54 @@ async function signInWithGoogle() {
         }
     } catch (error) {
         console.error('❌ Sign in error:', error);
+        throw error;
+    }
+}
+
+// Sign in with Apple
+async function signInWithApple() {
+    await initFirebase();
+    const { signInWithPopup, signInWithRedirect, signInWithCredential, OAuthProvider } = window.firebaseAuth;
+
+    try {
+        const provider = new OAuthProvider('apple.com');
+        provider.addScope('email');
+        provider.addScope('name');
+
+        // Check if we're in a Capacitor WebView
+        const isCapacitor = window.Capacitor !== undefined;
+
+        if (isCapacitor && window.Capacitor.Plugins?.SignInWithApple) {
+            // Use native Sign In with Apple plugin
+            console.log('🍎 Using native Apple Sign In');
+            const result = await window.Capacitor.Plugins.SignInWithApple.authorize({
+                clientId: 'com.mathquest.app',
+                redirectURI: 'https://nmt-trainer.firebaseapp.com/__/auth/handler',
+                scopes: 'email name'
+            });
+
+            // Create Firebase credential from Apple response
+            const credential = provider.credential({
+                idToken: result.response.identityToken,
+                rawNonce: result.response.authorizationCode
+            });
+
+            const userCredential = await signInWithCredential(auth, credential);
+            currentUser = userCredential.user;
+            await createOrUpdateUserProfile(currentUser);
+            console.log('✅ Apple Sign-in successful:', currentUser.displayName || currentUser.email);
+            return currentUser;
+        } else {
+            // Use popup for browser
+            console.log('🍎 Using popup Apple Sign In');
+            const result = await signInWithPopup(auth, provider);
+            currentUser = result.user;
+            await createOrUpdateUserProfile(currentUser);
+            console.log('✅ Apple Sign-in successful:', currentUser.displayName || currentUser.email);
+            return currentUser;
+        }
+    } catch (error) {
+        console.error('❌ Apple Sign in error:', error);
         throw error;
     }
 }
@@ -449,6 +499,7 @@ window.MathQuestFirebase = {
 
     // Auth
     signInWithGoogle,
+    signInWithApple,
     signOutUser,
     onAuthChange,
     getCurrentUser,

@@ -416,36 +416,63 @@
 }
 
 .ai-helper-content {
-    background: var(--card-bg);
+    background: #ffffff;
     border-radius: 16px;
     padding: 1.5rem;
     max-width: 400px;
     width: 100%;
     position: relative;
-    border: 2px solid var(--border);
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.ai-helper-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.ai-helper-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
 }
 
 .ai-close-btn {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: var(--text-muted);
+    color: #999;
     cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.ai-close-btn:hover {
+    color: #333;
+}
+
+.ai-helper-body {
+    color: #333;
 }
 
 .ai-loading {
     text-align: center;
     padding: 2rem;
+    color: #666;
 }
 
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
+    border: 3px solid #e0e0e0;
+    border-top-color: #667eea;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 1rem;
@@ -456,8 +483,18 @@
 }
 
 .ai-response {
-    color: var(--text);
-    line-height: 1.6;
+    color: #333;
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.ai-response p {
+    margin-bottom: 0.75rem;
+    color: #333;
+}
+
+.ai-response strong {
+    color: #667eea;
 }
 
 /* Animations */

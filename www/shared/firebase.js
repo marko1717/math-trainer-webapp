@@ -75,17 +75,35 @@ async function initFirebase() {
 // Sign in with Google
 async function signInWithGoogle() {
     await initFirebase();
-    const { signInWithPopup, GoogleAuthProvider } = window.firebaseAuth;
+    const { signInWithPopup, signInWithCredential, GoogleAuthProvider } = window.firebaseAuth;
 
     try {
         const provider = new GoogleAuthProvider();
 
-        // Check if we're in a Capacitor WebView
+        // Check if we're in a Capacitor WebView with native plugin
         const isCapacitor = window.Capacitor !== undefined;
+        const hasNativeGoogleAuth = isCapacitor && window.Capacitor.Plugins?.GoogleAuth;
 
-        if (isCapacitor) {
-            // In Capacitor, we need to use a different approach
-            // Try popup first, if it fails show instructions
+        if (hasNativeGoogleAuth) {
+            // Use native Google Sign In plugin
+            console.log('📱 Using native Google Sign In');
+            try {
+                const googleUser = await window.Capacitor.Plugins.GoogleAuth.signIn();
+                console.log('Native Google response:', googleUser);
+
+                // Create Firebase credential from Google response
+                const credential = GoogleAuthProvider.credential(googleUser.authentication.idToken);
+                const userCredential = await signInWithCredential(auth, credential);
+                currentUser = userCredential.user;
+                await createOrUpdateUserProfile(currentUser);
+                console.log('✅ Google Sign-in successful:', currentUser.displayName);
+                return currentUser;
+            } catch (nativeError) {
+                console.error('Native Google Sign In failed:', nativeError);
+                throw new Error('Помилка входу через Google. Спробуйте ще раз.');
+            }
+        } else if (isCapacitor) {
+            // Capacitor without native plugin - try popup
             console.log('📱 Capacitor detected, trying popup auth');
             try {
                 const result = await signInWithPopup(auth, provider);
@@ -95,8 +113,7 @@ async function signInWithGoogle() {
                 return currentUser;
             } catch (popupError) {
                 console.error('Popup failed in Capacitor:', popupError);
-                // If popup blocked, inform user
-                throw new Error('Авторизація через Google поки недоступна в додатку. Спробуйте Apple ID або веб-версію.');
+                throw new Error('Авторизація через Google поки недоступна в додатку. Спробуйте Apple ID.');
             }
         } else {
             // Use popup for regular browser

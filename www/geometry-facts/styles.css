@@ -140,6 +140,82 @@
     font-size: 1.2rem;
 }
 
+/* === Mode Selection === */
+.mode-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.mode-selector {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.mode-btn {
+    flex: 1;
+    min-width: 140px;
+    max-width: 180px;
+    padding: var(--spacing-md);
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    position: relative;
+}
+
+.mode-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.mode-btn.active {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-color: var(--accent);
+}
+
+.mode-btn.nmt-mode {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(247, 147, 30, 0.05));
+}
+
+.mode-btn.nmt-mode.active {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(247, 147, 30, 0.15));
+    border-color: #ff6b35;
+}
+
+.mode-icon {
+    font-size: 2rem;
+}
+
+.mode-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: var(--font-base);
+}
+
+.mode-count {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+}
+
+.mode-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+}
+
 /* === Settings Section === */
 .settings-section {
     margin-bottom: var(--spacing-lg);
@@ -229,9 +305,30 @@
     margin-bottom: var(--spacing-lg);
     min-height: 150px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     box-shadow: var(--shadow);
+}
+
+.statement-image-container {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: var(--spacing-md);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--border);
+}
+
+.statement-image-container.hidden {
+    display: none;
+}
+
+.statement-image {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .statement-text {

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" width="300" height="250">
+  <style>
+    .line { stroke: #333; stroke-width: 2; fill: none; }
+    .height { stroke: #e74c3c; stroke-width: 2; stroke-dasharray: 5,3; }
+    .label { font-family: Arial, sans-serif; font-size: 16px; fill: #333; font-weight: bold; }
+    .point { fill: #333; }
+    .right-angle { stroke: #666; stroke-width: 1.5; fill: none; }
+  </style>
+
+  <!-- Rhombus ABCD -->
+  <polygon points="150,30 250,125 150,220 50,125" class="line"/>
+
+  <!-- Height BM -->
+  <line x1="250" y1="125" x2="100" y2="172.5" class="height"/>
+
+  <!-- Right angle mark at M -->
+  <polyline points="108,165 100,157 92,165" class="right-angle"/>
+
+  <!-- Points -->
+  <circle cx="150" cy="30" r="4" class="point"/>
+  <circle cx="250" cy="125" r="4" class="point"/>
+  <circle cx="150" cy="220" r="4" class="point"/>
+  <circle cx="50" cy="125" r="4" class="point"/>
+  <circle cx="100" cy="172.5" r="4" fill="#e74c3c"/>
+
+  <!-- Labels -->
+  <text x="150" y="20" class="label" text-anchor="middle">A</text>
+  <text x="262" y="130" class="label">B</text>
+  <text x="150" y="242" class="label" text-anchor="middle">C</text>
+  <text x="35" y="130" class="label">D</text>
+  <text x="90" y="195" class="label" fill="#e74c3c">M</text>
+</svg>

@@ -62,7 +62,7 @@
                     <div class="game-info">
                         <div class="info-card">
                             <span class="info-icon">📝</span>
-                            <span class="info-text">74 твердження</span>
+                            <span class="info-text" id="factCountInfo">74 твердження</span>
                         </div>
                         <div class="info-card">
                             <span class="info-icon">🎯</span>
@@ -74,13 +74,31 @@
                         </div>
                     </div>
 
+                    <!-- Mode Selection -->
+                    <div class="mode-section">
+                        <label class="setting-label">Оберіть режим:</label>
+                        <div class="mode-selector">
+                            <button class="mode-btn active" data-mode="general">
+                                <span class="mode-icon">📐</span>
+                                <span class="mode-name">Загальні факти</span>
+                                <span class="mode-count">74 твердження</span>
+                            </button>
+                            <button class="mode-btn nmt-mode" data-mode="nmt2025">
+                                <span class="mode-icon">🎓</span>
+                                <span class="mode-name">НМТ 2025</span>
+                                <span class="mode-count">51 твердження</span>
+                                <span class="mode-badge">NEW</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="settings-section">
                         <label class="setting-label">Кількість питань:</label>
                         <div class="question-count-selector">
                             <button class="count-btn active" data-count="10">10</button>
                             <button class="count-btn" data-count="20">20</button>
                             <button class="count-btn" data-count="30">30</button>
-                            <button class="count-btn" data-count="73">Всі</button>
+                            <button class="count-btn" data-count="all">Всі</button>
                         </div>
                     </div>
 
@@ -107,6 +125,9 @@
                     <div class="question-number" id="questionNumber">Твердження 1 / 10</div>
 
                     <div class="statement-card" id="statementCard">
+                        <div class="statement-image-container hidden" id="imageContainer">
+                            <img class="statement-image" id="statementImage" src="" alt="Рисунок до завдання">
+                        </div>
                         <div class="statement-text" id="statementText">
                             Завантаження...
                         </div>

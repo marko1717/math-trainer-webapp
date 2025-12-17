@@ -65,14 +65,14 @@ const NMT_2025_FACTS = [
     { statement: "Сума квадратів усіх сторін прямокутника дорівнює сумі квадратів його діагоналей", isTrue: true, explanation: "Для прямокутника зі сторонами a і b: 2(a² + b²) = 2d², де d - діагональ." },
     { statement: "Діаметр кола, описаного навколо прямокутника, дорівнює діагоналі прямокутника", isTrue: true, explanation: "Центр описаного кола прямокутника знаходиться в точці перетину діагоналей, а радіус дорівнює половині діагоналі." },
     { statement: "Висота будь-якого ромба більша за його сторону", isTrue: false, explanation: "Висота ромба може бути меншою за сторону, особливо коли кути ромба гострі." },
-    // Variant 16 (with image: rhombus_bm.svg)
-    { statement: "На рисунку зображено ромб ABCD, у якому BM — висота. Точка M лежить між точками A i D", isTrue: true, explanation: "У ромбі висота з вершини B падає на сторону AD, і точка M знаходиться між A і D.", image: "images/rhombus_bm.svg" },
-    { statement: "На рисунку зображено ромб ABCD, у якому BM — висота. Відрізок BM є бісектрисою кута ABС", isTrue: false, explanation: "Висота BM не є бісектрисою кута ABC. Бісектрисами кутів ромба є його діагоналі.", image: "images/rhombus_bm.svg" },
-    { statement: "На рисунку зображено ромб ABCD, у якому BM — висота. Трикутник ABM є прямокутним", isTrue: true, explanation: "Оскільки BM — висота, то кут BMА = 90°, тому трикутник ABM прямокутний.", image: "images/rhombus_bm.svg" },
-    // Variant 17 (with image: parallel_lines.svg)
-    { statement: "На рисунку зображено прямі a і b та січну c. Прямі a і b паралельні", isTrue: true, explanation: "За ознакою паралельності: якщо сума односторонніх кутів = 180° або відповідні/різносторонні кути рівні, прямі паралельні.", image: "images/parallel_lines.svg" },
-    { statement: "На рисунку зображено прямі a і b та січну c. Кути 2 і 3 є односторонніми", isTrue: false, explanation: "Кути 2 і 3 є різносторонніми (внутрішніми різносторонніми), а не односторонніми.", image: "images/parallel_lines.svg" },
-    { statement: "На рисунку зображено прямі a і b та січну c. Кути 1 і 2 є вертикальними", isTrue: false, explanation: "Кути 1 і 2 є суміжними (утворюють розгорнутий кут), а не вертикальними.", image: "images/parallel_lines.svg" }
+    // Variant 16 (with image: rhombus_bm.png)
+    { statement: "На рисунку зображено ромб ABCD, у якому BM — висота. Точка M лежить між точками A i D", isTrue: true, explanation: "У ромбі висота з вершини B падає на сторону AD, і точка M знаходиться між A і D.", image: "images/rhombus_bm.png" },
+    { statement: "На рисунку зображено ромб ABCD, у якому BM — висота. Відрізок BM є бісектрисою кута ABС", isTrue: false, explanation: "Висота BM не є бісектрисою кута ABC. Бісектрисами кутів ромба є його діагоналі.", image: "images/rhombus_bm.png" },
+    { statement: "На рисунку зображено ромб ABCD, у якому BM — висота. Трикутник ABM є прямокутним", isTrue: true, explanation: "Оскільки BM — висота, то кут BMА = 90°, тому трикутник ABM прямокутний.", image: "images/rhombus_bm.png" },
+    // Variant 17 (with image: parallel_lines.png)
+    { statement: "На рисунку зображено прямі a і b та січну c. Прямі a і b паралельні", isTrue: true, explanation: "За ознакою паралельності: якщо сума односторонніх кутів = 180° або відповідні/різносторонні кути рівні, прямі паралельні.", image: "images/parallel_lines.png" },
+    { statement: "На рисунку зображено прямі a і b та січну c. Кути 2 і 3 є односторонніми", isTrue: false, explanation: "Кути 2 і 3 є різносторонніми (внутрішніми різносторонніми), а не односторонніми.", image: "images/parallel_lines.png" },
+    { statement: "На рисунку зображено прямі a і b та січну c. Кути 1 і 2 є вертикальними", isTrue: false, explanation: "Кути 1 і 2 є суміжними (утворюють розгорнутий кут), а не вертикальними.", image: "images/parallel_lines.png" }
 ];
 
 // Geometry facts data (74 statements)

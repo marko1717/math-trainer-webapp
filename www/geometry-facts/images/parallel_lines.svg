@@ -1,42 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" width="300" height="280">
   <style>
-    .line { stroke: #333; stroke-width: 2; }
-    .transversal { stroke: #3498db; stroke-width: 2; }
-    .label { font-family: Arial, sans-serif; font-size: 14px; fill: #333; font-weight: bold; }
-    .angle-label { font-family: Arial, sans-serif; font-size: 12px; fill: #e74c3c; }
-    .line-label { font-family: Arial, sans-serif; font-size: 16px; fill: #333; font-style: italic; }
+    .line { stroke: #333; stroke-width: 2.5; }
+    .transversal { stroke: #3498db; stroke-width: 2.5; }
+    .angle-arc { fill: none; stroke: #e74c3c; stroke-width: 2; }
+    .angle-label { font-family: Arial, sans-serif; font-size: 14px; fill: #e74c3c; font-weight: 500; }
+    .line-label { font-family: Arial, sans-serif; font-size: 18px; fill: #333; font-style: italic; }
   </style>
 
   <!-- Line a -->
-  <line x1="20" y1="70" x2="280" y2="70" class="line"/>
-  <text x="285" y="75" class="line-label">a</text>
+  <line x1="20" y1="90" x2="280" y2="90" class="line"/>
+  <text x="285" y="95" class="line-label">a</text>
 
   <!-- Line b -->
-  <line x1="20" y1="150" x2="280" y2="150" class="line"/>
-  <text x="285" y="155" class="line-label">b</text>
+  <line x1="20" y1="190" x2="280" y2="190" class="line"/>
+  <text x="285" y="195" class="line-label">b</text>
 
-  <!-- Transversal c -->
-  <line x1="80" y1="20" x2="220" y2="200" class="transversal"/>
-  <text x="225" y="210" class="line-label" fill="#3498db">c</text>
+  <!-- Transversal c (from top-left to bottom-right) -->
+  <line x1="100" y1="20" x2="220" y2="260" class="transversal"/>
+  <text x="225" y="270" class="line-label" fill="#3498db">c</text>
 
-  <!-- Angle marks and labels -->
-  <!-- Angle 1 at line a (upper left of intersection) -->
-  <path d="M 120 70 A 15 15 0 0 1 108 57" fill="none" stroke="#e74c3c" stroke-width="1.5"/>
-  <text x="100" y="55" class="angle-label">1</text>
+  <!-- Intersection point on line a (approximately x=133) -->
+  <circle cx="133" cy="90" r="4" fill="#333"/>
 
-  <!-- Angle 2 at line a (upper right of intersection) -->
-  <path d="M 130 70 A 15 15 0 0 0 145 58" fill="none" stroke="#e74c3c" stroke-width="1.5"/>
-  <text x="148" y="55" class="angle-label">2</text>
+  <!-- Intersection point on line b (approximately x=178) -->
+  <circle cx="178" cy="190" r="4" fill="#333"/>
 
-  <!-- Angle 3 at line b (upper left of intersection) -->
-  <path d="M 175 150 A 15 15 0 0 1 163 137" fill="none" stroke="#e74c3c" stroke-width="1.5"/>
-  <text x="152" y="135" class="angle-label">3</text>
+  <!-- Angle 1 at line a (upper-left, between c going up and a going left) -->
+  <path d="M 118 90 A 20 20 0 0 1 125 72" class="angle-arc"/>
+  <text x="105" y="75" class="angle-label">1</text>
 
-  <!-- Angle 4 at line b (lower right of intersection) -->
-  <path d="M 185 150 A 15 15 0 0 0 200 162" fill="none" stroke="#e74c3c" stroke-width="1.5"/>
-  <text x="202" y="175" class="angle-label">4</text>
+  <!-- Angle 2 at line a (upper-right, between a going right and c going up) -->
+  <path d="M 148 90 A 20 20 0 0 0 140 72" class="angle-arc"/>
+  <text x="150" y="75" class="angle-label">2</text>
 
-  <!-- Intersection points -->
-  <circle cx="125" cy="70" r="3" fill="#333"/>
-  <circle cx="180" cy="150" r="3" fill="#333"/>
+  <!-- Angle 3 at line b (upper-left, between c going up and b going left) -->
+  <path d="M 163 190 A 20 20 0 0 1 170 172" class="angle-arc"/>
+  <text x="152" y="175" class="angle-label">3</text>
+
+  <!-- Angle 4 at line b (lower-right, between b going right and c going down) -->
+  <path d="M 193 190 A 20 20 0 0 0 185 208" class="angle-arc"/>
+  <text x="192" y="220" class="angle-label">4</text>
 </svg>

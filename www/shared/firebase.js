@@ -318,16 +318,12 @@ async function signInWithApple() {
                 // This properly handles the iOS bundle ID as audience
                 console.log('🍎 Using Firebase SDK with OAuthCredential...');
 
-                // Create OAuthCredential for Apple
-                const credential = OAuthProvider.credentialWithPopupRedirectResolver
-                    ? OAuthProvider.credential({
-                        idToken: result.response.identityToken,
-                        rawNonce: rawNonce
-                    })
-                    : OAuthProvider.credential('apple.com', {
-                        idToken: result.response.identityToken,
-                        rawNonce: rawNonce
-                    });
+                // Create OAuthCredential for Apple using provider instance
+                const appleProvider = new OAuthProvider('apple.com');
+                const credential = appleProvider.credential({
+                    idToken: result.response.identityToken,
+                    rawNonce: rawNonce
+                });
 
                 console.log('🍎 Signing in with Firebase credential...');
                 const userCredential = await signInWithCredential(auth, credential);

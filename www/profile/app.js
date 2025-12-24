@@ -38,6 +38,20 @@ const appleLoginBtn = document.getElementById('appleLoginBtn');
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 
+// Name input elements removed - Apple App Store Guideline 4.0 compliance
+// We never ask users for name/email after Sign in with Apple
+
+// Logout modal elements
+const logoutModal = document.getElementById('logoutModal');
+const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+// Delete account elements
+const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+const deleteAccountModal = document.getElementById('deleteAccountModal');
+const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
 // Profile elements
 const userAvatar = document.getElementById('userAvatar');
 const userName = document.getElementById('userName');
@@ -53,6 +67,9 @@ const trainerProgressList = document.getElementById('trainerProgressList');
 const recentActivity = document.getElementById('recentActivity');
 const achievementsList = document.getElementById('achievementsList');
 
+// Current user reference
+let currentUserRef = null;
+
 // Wait for Firebase to load
 async function init() {
     // Wait a bit for firebase.js to load
@@ -66,19 +83,55 @@ async function init() {
     // Initialize Firebase
     await window.MathQuestFirebase.initFirebase();
 
-    // Listen for auth changes
+    // Check if user is already logged in (from localStorage)
+    const existingUser = window.MathQuestFirebase.getCurrentUser();
+    console.log('📱 Checking existing user on init:', existingUser ? existingUser.email : 'none');
+    if (existingUser) {
+        // User already logged in, show profile immediately
+        handleAuthChange(existingUser);
+    }
+
+    // Listen for auth changes (Firebase SDK)
     window.MathQuestFirebase.onAuthChange(handleAuthChange);
+
+    // Also listen for custom authStateChanged event (for REST API auth in Capacitor)
+    window.addEventListener('authStateChanged', (e) => {
+        const user = e.detail?.user;
+        console.log('📱 Custom authStateChanged event received:', user ? user.email : 'null');
+        handleAuthChange(user);
+    });
 
     // Setup event listeners
     appleLoginBtn.addEventListener('click', handleAppleLogin);
     googleLoginBtn.addEventListener('click', handleGoogleLogin);
-    logoutBtn.addEventListener('click', handleLogout);
+    logoutBtn.addEventListener('click', showLogoutModal);
+    cancelLogoutBtn.addEventListener('click', hideLogoutModal);
+    confirmLogoutBtn.addEventListener('click', handleLogout);
+
+    // Delete account listeners
+    deleteAccountBtn.addEventListener('click', showDeleteModal);
+    cancelDeleteBtn.addEventListener('click', hideDeleteModal);
+    confirmDeleteBtn.addEventListener('click', handleDeleteAccount);
 }
+
+// Apple App Store Guideline 4.0 - Design compliance
+// We NEVER ask users for name/email after Sign in with Apple
+// The name input screen has been completely removed from the app
 
 // Handle auth state changes
 async function handleAuthChange(user) {
+    currentUserRef = user;
+
     if (user) {
-        // User is signed in
+        // Load saved display name from Firestore if available
+        const profile = await window.MathQuestFirebase.getUserProfile();
+        const savedDisplayName = profile?.displayName;
+
+        if (savedDisplayName && savedDisplayName.length > 1) {
+            user.displayName = savedDisplayName;
+        }
+
+        // Show profile directly - never ask for name (Apple Guideline 4.0)
         showScreen('profile');
         await loadUserProfile(user);
         await loadTrainerProgress();
@@ -150,11 +203,31 @@ async function handleGoogleLogin() {
     `;
 }
 
+// Show logout modal
+function showLogoutModal() {
+    logoutModal.classList.remove('hidden');
+}
+
+// Hide logout modal
+function hideLogoutModal() {
+    logoutModal.classList.add('hidden');
+}
+
 // Handle logout
 async function handleLogout() {
-    if (confirm('Ви впевнені, що хочете вийти?')) {
+    hideLogoutModal();
+    confirmLogoutBtn.disabled = true;
+    confirmLogoutBtn.textContent = 'Виходимо...';
+
+    try {
+        localStorage.removeItem('math_quest_name_skipped');
         await window.MathQuestFirebase.signOutUser();
+    } catch (error) {
+        console.error('Logout error:', error);
     }
+
+    confirmLogoutBtn.disabled = false;
+    confirmLogoutBtn.textContent = 'Так, вийти';
 }
 
 // Load user profile
@@ -162,28 +235,54 @@ async function loadUserProfile(user) {
     // Set basic info
     userAvatar.src = user.photoURL || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧙</text></svg>';
     userName.textContent = user.displayName || 'Користувач';
-    userEmail.textContent = user.email;
+    userEmail.textContent = user.email || 'Анонімний користувач';
 
-    // Load stats from Firestore
-    const profile = await window.MathQuestFirebase.getUserProfile();
+    // Try to load stats from Firestore
+    try {
+        const profile = await window.MathQuestFirebase.getUserProfile();
 
-    if (profile && profile.stats) {
-        const stats = profile.stats;
-        totalXP.textContent = stats.totalXP || 0;
-        userLevel.textContent = stats.level || 1;
-        userStreak.textContent = stats.streak || 0;
-        trainersCompleted.textContent = stats.trainersCompleted || 0;
+        // Use saved displayName if available
+        if (profile?.displayName) {
+            userName.textContent = profile.displayName;
+        }
 
-        // Update level progress
-        const xp = stats.totalXP || 0;
-        const level = stats.level || 1;
-        const xpForCurrentLevel = (level - 1) * 100;
-        const xpInCurrentLevel = xp - xpForCurrentLevel;
-        const xpNeeded = 100;
+        if (profile && profile.stats) {
+            const stats = profile.stats;
+            totalXP.textContent = stats.totalXP || 0;
+            userLevel.textContent = stats.level || 1;
+            userStreak.textContent = stats.streak || 0;
+            trainersCompleted.textContent = stats.trainersCompleted || 0;
 
-        currentLevel.textContent = level;
-        xpProgress.textContent = `${xpInCurrentLevel}/${xpNeeded} XP`;
-        levelFill.style.width = `${(xpInCurrentLevel / xpNeeded) * 100}%`;
+            // Update level progress
+            const xp = stats.totalXP || 0;
+            const level = stats.level || 1;
+            const xpForCurrentLevel = (level - 1) * 100;
+            const xpInCurrentLevel = xp - xpForCurrentLevel;
+            const xpNeeded = 100;
+
+            currentLevel.textContent = level;
+            xpProgress.textContent = `${xpInCurrentLevel}/${xpNeeded} XP`;
+            levelFill.style.width = `${(xpInCurrentLevel / xpNeeded) * 100}%`;
+        } else {
+            // Default stats for new user
+            totalXP.textContent = 0;
+            userLevel.textContent = 1;
+            userStreak.textContent = 0;
+            trainersCompleted.textContent = 0;
+            currentLevel.textContent = 1;
+            xpProgress.textContent = '0/100 XP';
+            levelFill.style.width = '0%';
+        }
+    } catch (error) {
+        console.log('Could not load profile from Firestore, using defaults:', error);
+        // Default stats
+        totalXP.textContent = 0;
+        userLevel.textContent = 1;
+        userStreak.textContent = 0;
+        trainersCompleted.textContent = 0;
+        currentLevel.textContent = 1;
+        xpProgress.textContent = '0/100 XP';
+        levelFill.style.width = '0%';
     }
 }
 
@@ -287,6 +386,43 @@ function formatDate(date) {
     if (yesterday === dateStr) return 'Вчора';
 
     return d.toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' });
+}
+
+// Show delete account modal
+function showDeleteModal() {
+    deleteAccountModal.classList.remove('hidden');
+}
+
+// Hide delete account modal
+function hideDeleteModal() {
+    deleteAccountModal.classList.add('hidden');
+}
+
+// Handle account deletion
+async function handleDeleteAccount() {
+    confirmDeleteBtn.disabled = true;
+    confirmDeleteBtn.textContent = 'Видаляємо...';
+
+    try {
+        await window.MathQuestFirebase.deleteUserAccount();
+
+        // Hide modal and show login screen
+        hideDeleteModal();
+        alert('Ваш акаунт успішно видалено.');
+
+    } catch (error) {
+        console.error('Delete account error:', error);
+
+        // Check for specific errors
+        if (error.code === 'auth/requires-recent-login') {
+            alert('Для видалення акаунту потрібно повторно увійти в систему. Будь ласка, вийдіть і увійдіть знову.');
+        } else {
+            alert('Помилка видалення акаунту: ' + (error.message || 'Спробуйте ще раз.'));
+        }
+    }
+
+    confirmDeleteBtn.disabled = false;
+    confirmDeleteBtn.textContent = 'Так, видалити';
 }
 
 // Initialize

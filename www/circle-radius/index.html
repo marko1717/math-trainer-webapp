@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Радіуси кіл | Math Quest</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <a href="../index.html" class="back-btn">← Меню</a>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Радіуси кіл</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="welcome-screen">
+                <div class="welcome-icon">⭕</div>
+                <h2 class="welcome-title">Вписані та описані кола</h2>
+                <p class="welcome-description">Формули радіусів для різних фігур</p>
+
+                <div class="topic-select">
+                    <h3>Обери тему:</h3>
+
+                    <button class="btn btn-topic" data-topic="circumscribed">
+                        <span class="topic-icon">🔵</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Описане коло (R)</span>
+                            <span class="topic-formula">R = abc/4S</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="inscribed">
+                        <span class="topic-icon">🟢</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Вписане коло (r)</span>
+                            <span class="topic-formula">r = S/p</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="special">
+                        <span class="topic-icon">📐</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Особливі фігури</span>
+                            <span class="topic-formula">квадрат, ромб, трапеція</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic btn-mixed" data-topic="mixed">
+                        <span class="topic-icon">🎲</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Змішаний режим</span>
+                            <span class="topic-formula">Всі формули</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="backBtn">← Назад</button>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title" id="topicTitle">Радіуси</h1>
+                </div>
+                <div class="header-right">
+                    <div class="stats-mini">
+                        <span class="stat-good">✅ <span id="correct">0</span></span>
+                        <span class="stat-bad">❌ <span id="wrong">0</span></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <main class="main-content">
+                <div class="question-container">
+                    <div class="topic-badge" id="questionType">Описане коло</div>
+                    <div class="question-number" id="questionNumber">Питання 1 / 10</div>
+                    <div class="question-text" id="questionText"></div>
+
+                    <div class="answers-container" id="answers"></div>
+
+                    <div class="feedback-container" id="feedback"></div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Формули</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
+                    Далі →
+                </button>
+            </main>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="resultBackBtn">← Назад</button>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Результати</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="results-content">
+                <div class="results-icon" id="resultIcon">🎉</div>
+                <h2 class="results-title" id="resultTitle">Чудова робота!</h2>
+
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalCorrect">0</div>
+                        <div class="stat-label">Правильно</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalWrong">0</div>
+                        <div class="stat-label">Помилок</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalAccuracy">0%</div>
+                        <div class="stat-label">Точність</div>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary btn-large" id="restartBtn">🔄 Ще раз</button>
+                    <button class="btn btn-secondary" id="menuBtn">📚 Інші теми</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formula Modal -->
+        <div id="formulaModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📐 Формули радіусів</h3>
+                    <button class="modal-close" id="formulaCloseBtn">&times;</button>
+                </div>
+                <div class="modal-body" id="formulaBody">
+                    <div class="formula-section">
+                        <h4>🔵 Описане коло (R):</h4>
+                        <div class="formula-item" id="f1"></div>
+                        <div class="formula-item" id="f2"></div>
+                        <div class="formula-item" id="f3"></div>
+                        <div class="formula-item" id="f4"></div>
+                    </div>
+                    <div class="formula-section">
+                        <h4>🟢 Вписане коло (r):</h4>
+                        <div class="formula-item" id="f5"></div>
+                        <div class="formula-item" id="f6"></div>
+                        <div class="formula-item" id="f7"></div>
+                    </div>
+                    <div class="formula-section">
+                        <h4>📐 Особливі випадки:</h4>
+                        <div class="formula-item" id="f8"></div>
+                        <div class="formula-item" id="f9"></div>
+                        <div class="formula-item" id="f10"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Helper Modal -->
+        <div id="aiHelperModal" class="ai-modal hidden">
+            <div class="ai-modal-content">
+                <div class="ai-modal-header">
+                    <div class="ai-modal-title">
+                        <span>🤖</span>
+                        <span>Допомога ШІ</span>
+                    </div>
+                    <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+                </div>
+                <div class="ai-modal-body" id="aiModalBody">
+                    <div class="ai-loading" id="aiLoading">
+                        <div class="ai-loading-spinner"></div>
+                        <span>Думаю...</span>
+                    </div>
+                    <div class="ai-response" id="aiResponse"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

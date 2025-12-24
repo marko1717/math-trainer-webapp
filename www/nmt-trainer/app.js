@@ -39,6 +39,10 @@ let mode = 'exam'; // 'exam' or 'training'
 let selectedTopic = 'all';
 let hintCache = {}; // Cache for AI hints
 let draggedOption = null;
+let isPaused = false;
+
+// Saved progress key
+const SAVED_TEST_KEY = 'nmt_saved_test';
 
 // ========== DOM ELEMENTS ==========
 
@@ -133,6 +137,13 @@ function setupEventListeners() {
         showScreen('task');
         showTask();
     });
+
+    // Pause and navigation buttons
+    document.getElementById('backToListBtn').addEventListener('click', showPauseModal);
+    document.getElementById('pauseBtn').addEventListener('click', showPauseModal);
+    document.getElementById('resumeBtn').addEventListener('click', hidePauseModal);
+    document.getElementById('saveExitBtn').addEventListener('click', saveAndExit);
+    document.getElementById('quitTestBtn').addEventListener('click', quitTest);
 }
 
 function setupMatchingDragDrop() {
@@ -241,6 +252,28 @@ function placeAnswer(zone, value) {
 
 function renderTestList() {
     testList.innerHTML = '';
+
+    // Check for saved test
+    const savedTest = loadSavedTest();
+    if (savedTest) {
+        const continueCard = document.createElement('div');
+        continueCard.className = 'test-card continue-card';
+        continueCard.style.cssText = 'border-color: var(--success); background: rgba(52, 199, 89, 0.1);';
+
+        const answeredCount = savedTest.userAnswers.filter(a => a !== null).length;
+        const totalCount = savedTest.userAnswers.length;
+        const minutes = Math.floor(savedTest.elapsedSeconds / 60);
+
+        continueCard.innerHTML = `
+            <div class="test-card-info">
+                <h3>▶️ Продовжити: ${savedTest.testData.name}</h3>
+                <p>${answeredCount}/${totalCount} завдань • ${minutes} хв</p>
+            </div>
+            <span class="test-card-arrow" style="color: var(--success);">→</span>
+        `;
+        continueCard.addEventListener('click', () => continueSavedTest(savedTest));
+        testList.appendChild(continueCard);
+    }
 
     // Sort tests by name
     const sortedTests = [...nmtData.test_sets].sort((a, b) => {
@@ -444,6 +477,80 @@ function stopTimer() {
         clearInterval(timerInterval);
         timerInterval = null;
     }
+}
+
+// ========== PAUSE & SAVE ==========
+
+function showPauseModal() {
+    isPaused = true;
+    stopTimer();
+    document.getElementById('pauseModal').classList.remove('hidden');
+}
+
+function hidePauseModal() {
+    isPaused = false;
+    document.getElementById('pauseModal').classList.add('hidden');
+    startTimer();
+}
+
+function saveAndExit() {
+    // Save current test progress
+    const saveData = {
+        testId: currentTest.id || currentTest.name,
+        testData: currentTest,
+        currentTaskIndex,
+        totalScore,
+        userAnswers,
+        elapsedSeconds,
+        mode,
+        savedAt: Date.now()
+    };
+
+    localStorage.setItem(SAVED_TEST_KEY, JSON.stringify(saveData));
+
+    // Return to list
+    hidePauseModal();
+    stopTimer();
+    showScreen('select');
+    renderTestList(); // Update list to show continue option
+}
+
+function quitTest() {
+    // Clear any saved progress for this test
+    localStorage.removeItem(SAVED_TEST_KEY);
+
+    hidePauseModal();
+    stopTimer();
+    showScreen('select');
+}
+
+function loadSavedTest() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(SAVED_TEST_KEY));
+        if (saved && saved.testData) {
+            return saved;
+        }
+    } catch (e) {
+        console.error('Error loading saved test:', e);
+    }
+    return null;
+}
+
+function continueSavedTest(savedData) {
+    currentTest = savedData.testData;
+    currentTaskIndex = savedData.currentTaskIndex;
+    totalScore = savedData.totalScore;
+    userAnswers = savedData.userAnswers;
+    elapsedSeconds = savedData.elapsedSeconds;
+    mode = savedData.mode;
+
+    // Clear saved data
+    localStorage.removeItem(SAVED_TEST_KEY);
+
+    showScreen('task');
+    renderTaskNav();
+    startTimer();
+    showTask();
 }
 
 function updateTimerDisplay() {
@@ -1105,6 +1212,91 @@ function generateMockHint(task) {
 
     return numHints[taskNum] || 'Уважно прочитай умову та визнач тип задачі. Запиши, що дано і що потрібно знайти.';
 }
+
+// ========== ZOOM FUNCTIONALITY ==========
+
+const zoomModal = document.getElementById('zoomModal');
+const zoomImage = document.getElementById('zoomImage');
+const zoomClose = document.getElementById('zoomClose');
+
+// Open zoom modal when clicking on task image
+document.querySelector('.task-image-container').addEventListener('click', () => {
+    const taskImg = document.getElementById('taskImage');
+    if (taskImg.src && !taskImg.src.endsWith('/')) {
+        zoomImage.src = taskImg.src;
+        zoomModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+});
+
+// Close zoom modal
+function closeZoom() {
+    zoomModal.classList.remove('active');
+    zoomImage.classList.remove('zoomed');
+    document.body.style.overflow = '';
+}
+
+zoomClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeZoom();
+});
+
+zoomModal.addEventListener('click', (e) => {
+    if (e.target === zoomModal || e.target === zoomImage) {
+        // Toggle zoom on image click, close on background click
+        if (e.target === zoomImage && !zoomImage.classList.contains('zoomed')) {
+            zoomImage.classList.add('zoomed');
+        } else {
+            closeZoom();
+        }
+    }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && zoomModal.classList.contains('active')) {
+        closeZoom();
+    }
+});
+
+// Pinch zoom support for mobile
+let initialDistance = 0;
+let currentScale = 1;
+
+zoomImage.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        initialDistance = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY
+        );
+    }
+}, { passive: true });
+
+zoomImage.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+        const distance = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY
+        );
+
+        if (initialDistance > 0) {
+            const scale = distance / initialDistance;
+            currentScale = Math.min(Math.max(1, scale), 3);
+            zoomImage.style.transform = `scale(${currentScale})`;
+        }
+    }
+}, { passive: true });
+
+zoomImage.addEventListener('touchend', () => {
+    if (currentScale <= 1.2) {
+        currentScale = 1;
+        zoomImage.style.transform = '';
+        zoomImage.classList.remove('zoomed');
+    } else if (currentScale > 1.5) {
+        zoomImage.classList.add('zoomed');
+    }
+    initialDistance = 0;
+}, { passive: true });
 
 // ========== INIT ==========
 

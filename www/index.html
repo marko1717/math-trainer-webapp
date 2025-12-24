@@ -9,13 +9,21 @@
     <title>Math Quest - НМТ</title>
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="manifest" href="manifest.json">
-    <!-- 8-bit pixel font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- e-Ukraine font (like Дія app) -->
+    <link href="https://fonts.cdnfonts.com/css/e-ukraine" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        /* Prevent iOS bounce/overscroll */
+        html, body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
 
         :root {
@@ -32,46 +40,57 @@
             --success: #7C9D85;
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
-            --pixel-border: 4px;
-            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-pixel: 'Press Start 2P', monospace;
-            --border-radius: 12px;
+            --tab-height: 80px;
+            --font-main: 'e-Ukraine', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-head: 'e-Ukraine Head', 'e-Ukraine', -apple-system, sans-serif;
+            --border-radius: 16px;
+            /* Liquid Glass colors */
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-highlight: rgba(255, 255, 255, 0.25);
+            --glass-shadow: rgba(0, 0, 0, 0.3);
         }
 
         body {
             font-family: var(--font-main);
             background: var(--bg);
             color: var(--text);
-            min-height: 100vh;
-            padding: calc(16px + var(--safe-top)) 12px calc(16px + var(--safe-bottom));
             font-size: 16px;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            /* Prevent overscroll bounce */
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Retro mode - activated by class on body */
-        body.retro-mode {
-            font-family: var(--font-pixel);
-            image-rendering: pixelated;
-            -webkit-font-smoothing: none;
-        }
-
-        body.retro-mode::before {
-            content: '';
+        .app-wrapper {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 0, 0, 0.06) 2px,
-                rgba(0, 0, 0, 0.06) 4px
-            );
-            pointer-events: none;
-            z-index: 1000;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            padding-top: calc(8px + var(--safe-top));
+            padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 16px);
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        /* Light mode */
+        body.light-mode {
+            --bg: #f5f5f7;
+            --bg-dark: #e5e5ea;
+            --card-bg: #ffffff;
+            --text: #1c1c1e;
+            --text-muted: #6e6e73;
+            --border: #d1d1d6;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-highlight: rgba(255, 255, 255, 0.9);
+            --glass-shadow: rgba(0, 0, 0, 0.1);
         }
 
         .container {
@@ -80,7 +99,7 @@
             position: relative;
         }
 
-        /* Card style - modern by default */
+        /* Cards */
         .pixel-box {
             background: var(--card-bg);
             border: 2px solid var(--border);
@@ -88,63 +107,83 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        /* Retro mode cards */
-        body.retro-mode .pixel-box {
-            border-radius: 0;
-            border-width: var(--pixel-border);
-            box-shadow:
-                var(--pixel-border) var(--pixel-border) 0 var(--bg-dark),
-                inset -2px -2px 0 rgba(0,0,0,0.3),
-                inset 2px 2px 0 rgba(255,255,255,0.1);
+        body.light-mode .pixel-box {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header - compact */
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            padding: 24px 20px;
+            margin-bottom: 16px;
+            padding: 16px 16px;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
         .header h1 {
-            font-size: 1.75rem;
+            font-family: var(--font-head);
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--accent);
-            margin-bottom: 8px;
-            line-height: 1.3;
+            letter-spacing: 1px;
         }
 
-        body.retro-mode .header h1 {
-            font-size: 1.1rem;
-            text-shadow: 3px 3px 0 var(--bg-dark);
+        .header-mascot {
+            font-size: 2rem;
         }
 
-        .header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.5;
+        .xp-bar {
+            height: 10px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            margin-top: 12px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
         }
 
-        body.retro-mode .header p {
-            font-size: 0.55rem;
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 35%;
+            transition: width 0.5s ease;
         }
 
-        /* Pixel character */
-        .pixel-mascot {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 12px;
-            animation: bounce 1s ease-in-out infinite;
+        .xp-text {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        /* Stats bar - like game HUD */
+        /* Stats bar */
         .stats-bar {
             display: flex;
             justify-content: space-between;
-            padding: 16px 20px;
+            padding: 14px 16px;
             margin-bottom: 16px;
             gap: 8px;
         }
@@ -155,70 +194,31 @@
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--accent);
         }
 
-        body.retro-mode .stat-value {
-            font-size: 1rem;
-            text-shadow: 2px 2px 0 var(--bg-dark);
-        }
-
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 2px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        body.retro-mode .stat-label {
-            font-size: 0.4rem;
-        }
-
-        /* HP/XP bars */
-        .xp-bar {
-            height: 12px;
-            background: var(--bg-dark);
-            border: 2px solid var(--border);
-            margin: 12px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .xp-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            width: 35%;
-            transition: width 0.5s ease;
-            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.3);
-        }
-
-        .xp-text {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.4rem;
-            color: var(--text);
-            text-shadow: 1px 1px 0 var(--bg-dark);
-        }
-
+        /* Section titles */
         .section-title {
+            font-family: var(--font-head);
             color: var(--primary);
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             margin: 24px 0 12px 4px;
         }
 
-        body.retro-mode .section-title {
-            font-size: 0.55rem;
-            text-shadow: 2px 2px 0 var(--bg-dark);
-        }
-
+        /* Trainer grid */
         .trainer-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -226,69 +226,39 @@
         }
 
         .trainer-card {
-            padding: 18px 14px;
+            padding: 16px 12px;
             text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.2s ease;
             cursor: pointer;
-            position: relative;
         }
 
         .trainer-card:hover, .trainer-card:active {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
             border-color: var(--accent);
         }
 
-        body.retro-mode .trainer-card:hover {
-            transform: translate(-2px, -2px);
-            box-shadow:
-                6px 6px 0 var(--bg-dark),
-                inset -2px -2px 0 rgba(0,0,0,0.3),
-                inset 2px 2px 0 rgba(255,255,255,0.1);
-        }
-
-        .trainer-card:active {
-            transform: translateY(0);
-        }
-
-        body.retro-mode .trainer-card:active {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0 var(--bg-dark);
-        }
-
         .trainer-icon {
-            font-size: 2.2rem;
-        }
-
-        body.retro-mode .trainer-icon {
-            filter: drop-shadow(2px 2px 0 var(--bg-dark));
+            font-size: 2rem;
         }
 
         .trainer-name {
             color: var(--text);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             text-align: center;
             line-height: 1.3;
         }
 
-        body.retro-mode .trainer-name {
-            font-size: 0.55rem;
-        }
-
         .trainer-desc {
             color: var(--text-muted);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-align: center;
-            line-height: 1.4;
-        }
-
-        body.retro-mode .trainer-desc {
-            font-size: 0.4rem;
+            line-height: 1.3;
         }
 
         .trainer-card.wide {
@@ -307,53 +277,184 @@
             margin-left: 12px;
         }
 
-        /* Level badge */
-        .level-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: var(--accent);
-            color: var(--bg-dark);
-            font-size: 0.4rem;
-            padding: 4px 6px;
-            border: 2px solid var(--bg-dark);
-            box-shadow: 2px 2px 0 var(--bg-dark);
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 24px;
-            padding: 16px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            line-height: 1.6;
-        }
-
-        body.retro-mode .footer {
-            font-size: 0.4rem;
-        }
-
-        .footer a {
-            color: var(--accent);
+        /* Featured card (NMT) */
+        .featured-card {
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
             text-decoration: none;
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-dark));
+            border-color: var(--accent);
         }
 
-        /* Settings toggle */
+        .featured-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(239, 135, 72, 0.3);
+        }
+
+        .featured-icon {
+            font-size: 3rem;
+        }
+
+        .featured-info h2 {
+            font-family: var(--font-head);
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .featured-info p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Bottom Tab Bar - Liquid Glass Style */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: calc(var(--tab-height) + var(--safe-bottom));
+            padding-bottom: var(--safe-bottom);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 1000;
+            padding-left: 12px;
+            padding-right: 12px;
+            padding-top: 8px;
+            /* Frosted glass background */
+            background: linear-gradient(
+                180deg,
+                rgba(30, 30, 50, 0.6) 0%,
+                rgba(20, 20, 35, 0.85) 100%
+            );
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            backdrop-filter: blur(40px) saturate(180%);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        body.light-mode .tab-bar {
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.7) 0%,
+                rgba(245, 245, 247, 0.9) 100%
+            );
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-bar-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+            height: 64px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: var(--text-muted);
+            position: relative;
+            border-radius: 16px;
+        }
+
+        .tab-item.active {
+            color: var(--text);
+        }
+
+        /* Liquid Glass pill for active tab */
+        .tab-item.active::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: linear-gradient(
+                135deg,
+                var(--glass-highlight) 0%,
+                var(--glass-bg) 50%,
+                rgba(239, 135, 72, 0.15) 100%
+            );
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow:
+                0 4px 16px var(--glass-shadow),
+                inset 0 1px 1px var(--glass-highlight),
+                0 0 20px rgba(239, 135, 72, 0.1);
+            z-index: -1;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        body.light-mode .tab-item.active::before {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                rgba(239, 135, 72, 0.1) 100%
+            );
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.08),
+                inset 0 1px 2px rgba(255, 255, 255, 1),
+                0 0 30px rgba(239, 135, 72, 0.08);
+        }
+
+        .tab-item:active {
+            transform: scale(0.92);
+        }
+
+        .tab-icon {
+            font-size: 1.4rem;
+            margin-bottom: 3px;
+            transition: transform 0.3s ease;
+        }
+
+        .tab-item.active .tab-icon {
+            transform: scale(1.1);
+        }
+
+        .tab-label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            opacity: 0.9;
+        }
+
+        .tab-item.active .tab-label {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Settings in Profile tab */
+        .settings-section {
+            margin-top: 20px;
+        }
+
         .settings-toggle {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 20px 0;
-            padding: 16px;
+            justify-content: space-between;
+            padding: 14px 16px;
+            margin-bottom: 10px;
         }
 
         .toggle-switch {
             position: relative;
-            width: 56px;
-            height: 30px;
+            width: 50px;
+            height: 28px;
             background: var(--border);
-            border-radius: 15px;
+            border-radius: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -361,8 +462,8 @@
         .toggle-switch::after {
             content: '';
             position: absolute;
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             background: var(--text);
             border-radius: 50%;
             top: 3px;
@@ -375,317 +476,738 @@
         }
 
         .toggle-switch.active::after {
-            transform: translateX(26px);
+            transform: translateX(22px);
         }
 
         .toggle-label {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        /* Profile Header in Profile Tab */
+        .profile-header-card {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            gap: 14px;
+            text-decoration: none;
+            margin-bottom: 16px;
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-info h3 {
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .profile-info p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .profile-arrow {
+            margin-left: auto;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* Courses placeholder */
+        .coming-soon {
+            text-align: center;
+            padding: 40px 20px;
             color: var(--text-muted);
         }
 
-        body.retro-mode .toggle-label {
-            font-size: 0.45rem;
+        .coming-soon-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
         }
 
-        /* Blinking cursor effect */
-        .blink {
-            animation: blink 1s step-end infinite;
+        .coming-soon h3 {
+            color: var(--text);
+            margin-bottom: 8px;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* Start button */
-        .start-hint {
+        /* App version */
+        .app-version {
             text-align: center;
-            margin: 16px 0;
-            padding: 12px;
-            font-size: 0.45rem;
-            color: var(--accent);
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        /* Stories Bar on Home */
+        .stories-bar-home {
+            display: flex;
+            gap: 14px;
+            padding: 12px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            margin-bottom: 16px;
+        }
+
+        .stories-bar-home::-webkit-scrollbar {
+            display: none;
+        }
+
+        .story-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .story-avatar-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, #EF8748, #f5a66e, #EF8748);
+            transition: transform 0.2s;
+        }
+
+        .story-circle:active .story-avatar-wrapper {
+            transform: scale(0.95);
+        }
+
+        .story-circle.viewed .story-avatar-wrapper {
+            background: var(--border);
+        }
+
+        .story-avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--card-bg);
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-avatar-inner .emoji {
+            font-size: 1.7rem;
+        }
+
+        .story-circle-name {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            max-width: 64px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Story Viewer Modal */
+        .story-viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .story-viewer-modal.active {
+            display: flex;
+        }
+
+        .story-progress {
+            display: flex;
+            gap: 4px;
+            padding: 12px 12px 8px;
+            padding-top: calc(var(--safe-top) + 12px);
+        }
+
+        .progress-segment {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            width: 0%;
+        }
+
+        .progress-segment.completed .progress-fill {
+            width: 100%;
+        }
+
+        .progress-segment.active .progress-fill {
+            animation: storyProgress 5s linear forwards;
+        }
+
+        @keyframes storyProgress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        .story-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+        }
+
+        .story-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .story-avatar-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .story-title-text {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .story-close-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .story-content-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .story-slide {
+            width: 100%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px 24px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        body.light-mode .story-slide {
+            background: #fff;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .slide-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .slide-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1c1c1e;
+            margin-bottom: 20px;
+        }
+
+        .slide-formula {
+            background: #f5f5f7;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        .slide-description {
+            font-size: 0.95rem;
+            color: #6e6e73;
+            line-height: 1.6;
+        }
+
+        .slide-animation {
+            margin: 20px 0;
+        }
+
+        .slide-animation svg {
+            max-width: 200px;
+            height: auto;
+        }
+
+        .slide-example {
+            background: rgba(239, 135, 72, 0.1);
+            border: 1px solid rgba(239, 135, 72, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: left;
+        }
+
+        .example-label {
+            font-size: 0.75rem;
+            color: #EF8748;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .example-content {
+            font-size: 0.95rem;
+            color: #1c1c1e;
+        }
+
+        .story-nav {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            pointer-events: none;
+        }
+
+        .story-nav-left,
+        .story-nav-right {
+            flex: 1;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        /* SVG animations */
+        .triangle-side {
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            animation: drawLine 1s ease forwards;
+        }
+        .triangle-side:nth-child(1) { animation-delay: 0s; }
+        .triangle-side:nth-child(2) { animation-delay: 0.3s; }
+        .triangle-side:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+        .animated-circle {
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            animation: drawCircle 1.5s ease forwards;
+        }
+        @keyframes drawCircle {
+            to { stroke-dashoffset: 0; }
+        }
+        .formula-highlight {
+            display: inline-block;
             animation: pulse 2s ease-in-out infinite;
         }
-
         @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        @media (max-width: 360px) {
-            .trainer-grid {
-                grid-template-columns: 1fr;
-            }
-            .trainer-card.wide {
-                grid-column: span 1;
-            }
-            .header h1 {
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Pixel art decorations */
-        .pixel-star {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
-            box-shadow:
-                8px 0 0 var(--accent),
-                16px 0 0 var(--accent),
-                0 8px 0 var(--accent),
-                8px 8px 0 var(--primary),
-                16px 8px 0 var(--accent);
-        }
-
-        /* Light mode overrides */
-        body.light-mode {
-            --bg: #f5f5f7;
-            --bg-dark: #e5e5ea;
-            --card-bg: #ffffff;
-            --text: #1c1c1e;
-            --text-muted: #6e6e73;
-            --border: #d1d1d6;
-        }
-
-        body.light-mode .pixel-box {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        body.light-mode.retro-mode .pixel-box {
-            box-shadow:
-                var(--pixel-border) var(--pixel-border) 0 var(--border),
-                inset -2px -2px 0 rgba(0,0,0,0.1),
-                inset 2px 2px 0 rgba(255,255,255,0.5);
-        }
-
-        body.light-mode .xp-fill {
-            background: linear-gradient(90deg, var(--primary-dark), var(--accent-dark));
-        }
-
-        body.light-mode .level-badge {
-            color: #ffffff;
-        }
-
-        body.light-mode .trainer-card:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 </head>
 <body>
+    <div class="app-wrapper">
     <div class="container">
-        <div class="header pixel-box">
-            <span class="pixel-mascot">🎮</span>
-            <h1>MATH QUEST</h1>
-            <p>Підготовка до НМТ</p>
-            <div class="xp-bar">
-                <div class="xp-fill" id="xp-fill"></div>
-                <span class="xp-text">LVL <span id="level">1</span></span>
+        <!-- TAB 1: Home -->
+        <div class="tab-content active" id="tab-home">
+            <div class="header pixel-box">
+                <div class="header-row">
+                    <span class="header-mascot">🎮</span>
+                    <h1>MATH QUEST</h1>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xp-fill"></div>
+                    <span class="xp-text">LVL <span id="level">1</span></span>
+                </div>
             </div>
-        </div>
 
-        <div class="stats-bar pixel-box">
-            <div class="stat-item">
-                <div class="stat-value" id="total-solved">0</div>
-                <div class="stat-label">SCORE</div>
+            <div class="stats-bar pixel-box">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-solved">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="best-streak">0</div>
+                    <div class="stat-label">Combo</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="trainers-used">0</div>
+                    <div class="stat-label">Quests</div>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value" id="best-streak">0</div>
-                <div class="stat-label">COMBO</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="trainers-used">0</div>
-                <div class="stat-label">QUESTS</div>
-            </div>
-        </div>
 
-        <div class="start-hint">
-            ▶ SELECT QUEST <span class="blink">_</span>
-        </div>
+            <!-- Stories Bar -->
+            <div class="stories-bar-home" id="storiesBarHome">
+                <!-- Story circles will be inserted here -->
+            </div>
 
-        <div class="section-title">📝 НМТ</div>
-        <div class="trainer-grid">
-            <a href="nmt-trainer/index.html" class="trainer-card pixel-box wide">
-                <span class="trainer-icon">📝</span>
-                <div class="trainer-info">
-                    <span class="trainer-name">НМТ Тренажер</span>
-                    <span class="trainer-desc">6 варіантів • 132 завдання</span>
+            <a href="nmt-trainer/index.html" class="featured-card pixel-box">
+                <span class="featured-icon">📝</span>
+                <div class="featured-info">
+                    <h2>НМТ Тренажер</h2>
+                    <p>6 варіантів • 132 завдання</p>
                 </div>
             </a>
+
+            <div class="section-title">⭐ Рекомендовані</div>
+            <div class="trainer-grid">
+                <a href="quadratic/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📈</span>
+                    <span class="trainer-name">Квадратні рівняння</span>
+                </a>
+                <a href="trigonometry/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📐</span>
+                    <span class="trainer-name">Тригонометрія</span>
+                </a>
+                <a href="arithmetic/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">➕</span>
+                    <span class="trainer-name">Прогресії</span>
+                </a>
+                <a href="graphs/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📉</span>
+                    <span class="trainer-name">Графіки</span>
+                </a>
+            </div>
         </div>
 
-        <div class="section-title">⚔ ALGEBRA</div>
-        <div class="trainer-grid">
-            <a href="polynomials/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📊</span>
-                <span class="trainer-name">Многочлени</span>
-                <span class="trainer-desc">Дії з многочленами</span>
-            </a>
-            <a href="linear-equations/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">⚖️</span>
-                <span class="trainer-name">Рівняння</span>
-                <span class="trainer-desc">Лінійні рівняння</span>
-            </a>
-            <a href="systems/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">🔗</span>
-                <span class="trainer-name">Системи</span>
-                <span class="trainer-desc">Системи рівнянь</span>
-            </a>
-            <a href="fsm/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📐</span>
-                <span class="trainer-name">ФСМ</span>
-                <span class="trainer-desc">Формули скороченого множення</span>
-            </a>
-            <a href="quadratic/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📈</span>
-                <span class="trainer-name">Квадратні</span>
-                <span class="trainer-desc">Дискримінант, корені</span>
-            </a>
-            <a href="powers/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">⚡</span>
-                <span class="trainer-name">Степені</span>
-                <span class="trainer-desc">Властивості степенів</span>
-            </a>
-            <a href="percent/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">💰</span>
-                <span class="trainer-name">Відсотки</span>
-                <span class="trainer-desc">Пропорції, формули</span>
-            </a>
+        <!-- TAB 2: Trainers -->
+        <div class="tab-content" id="tab-trainers">
+            <div class="section-title">⚔ Алгебра</div>
+            <div class="trainer-grid">
+                <a href="polynomials/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📊</span>
+                    <span class="trainer-name">Многочлени</span>
+                    <span class="trainer-desc">Дії з многочленами</span>
+                </a>
+                <a href="linear-equations/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">⚖️</span>
+                    <span class="trainer-name">Рівняння</span>
+                    <span class="trainer-desc">Лінійні рівняння</span>
+                </a>
+                <a href="systems/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🔗</span>
+                    <span class="trainer-name">Системи</span>
+                    <span class="trainer-desc">Системи рівнянь</span>
+                </a>
+                <a href="fsm/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📐</span>
+                    <span class="trainer-name">ФСМ</span>
+                    <span class="trainer-desc">Формули скороченого множення</span>
+                </a>
+                <a href="quadratic/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📈</span>
+                    <span class="trainer-name">Квадратні</span>
+                    <span class="trainer-desc">Дискримінант, корені</span>
+                </a>
+                <a href="powers/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">⚡</span>
+                    <span class="trainer-name">Степені</span>
+                    <span class="trainer-desc">Властивості степенів</span>
+                </a>
+                <a href="logarithms/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📊</span>
+                    <span class="trainer-name">Логарифми</span>
+                    <span class="trainer-desc">Властивості, обчислення</span>
+                </a>
+                <a href="percent/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">💰</span>
+                    <span class="trainer-name">Відсотки</span>
+                    <span class="trainer-desc">Пропорції, формули</span>
+                </a>
+            </div>
+
+            <div class="section-title">📈 Прогресії</div>
+            <div class="trainer-grid">
+                <a href="arithmetic/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">➕</span>
+                    <span class="trainer-name">Арифметична</span>
+                    <span class="trainer-desc">d, aₙ, Sₙ</span>
+                </a>
+                <a href="geometric/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">✖</span>
+                    <span class="trainer-name">Геометрична</span>
+                    <span class="trainer-desc">q, bₙ, Sₙ</span>
+                </a>
+            </div>
+
+            <div class="section-title">📉 Функції</div>
+            <div class="trainer-grid">
+                <a href="graphs/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📈</span>
+                    <span class="trainer-name">Графіки</span>
+                    <span class="trainer-desc">Трансформації</span>
+                </a>
+                <a href="parity/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">⚖</span>
+                    <span class="trainer-name">Парність</span>
+                    <span class="trainer-desc">Парні/непарні</span>
+                </a>
+                <a href="function-properties/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🎯</span>
+                    <span class="trainer-name">Властивості</span>
+                    <span class="trainer-desc">D(f), E(f), нулі</span>
+                </a>
+            </div>
+
+            <div class="section-title">🔺 Геометрія</div>
+            <div class="trainer-grid">
+                <a href="trigonometry/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📐</span>
+                    <span class="trainer-name">Тригонометрія</span>
+                    <span class="trainer-desc">Радіани, таблиця</span>
+                </a>
+                <a href="trig-formulas/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🔄</span>
+                    <span class="trainer-name">Формули триг.</span>
+                    <span class="trainer-desc">sin(α±β), подвійний кут</span>
+                </a>
+                <a href="trig-equations/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🔢</span>
+                    <span class="trainer-name">Триг. рівняння</span>
+                    <span class="trainer-desc">sin x = a, cos x = a</span>
+                </a>
+                <a href="triangle/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🔺</span>
+                    <span class="trainer-name">Трикутник</span>
+                    <span class="trainer-desc">Піфагор, тригонометрія</span>
+                </a>
+                <a href="circle-radius/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">⭕</span>
+                    <span class="trainer-name">Радіуси кіл</span>
+                    <span class="trainer-desc">Вписане, описане</span>
+                </a>
+            </div>
+
+            <div class="section-title">🔢 Числа</div>
+            <div class="trainer-grid">
+                <a href="standard-form/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🔬</span>
+                    <span class="trainer-name">Стандартний вигляд</span>
+                    <span class="trainer-desc">a×10ⁿ, одиниці</span>
+                </a>
+            </div>
         </div>
 
-        <div class="section-title">📈 PROGRESSIONS</div>
-        <div class="trainer-grid">
-            <a href="arithmetic/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">➕</span>
-                <span class="trainer-name">Арифметична</span>
-                <span class="trainer-desc">d, aₙ, Sₙ</span>
-            </a>
-            <a href="geometric/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">✖</span>
-                <span class="trainer-name">Геометрична</span>
-                <span class="trainer-desc">q, bₙ, Sₙ</span>
-            </a>
+        <!-- TAB 3: Materials -->
+        <div class="tab-content" id="tab-materials">
+            <div class="section-title">📚 Довідники</div>
+            <div class="trainer-grid">
+                <a href="formulas/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📋</span>
+                    <span class="trainer-name">Формули НМТ</span>
+                    <span class="trainer-desc">Всі формули</span>
+                </a>
+                <a href="graphs-reference/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📚</span>
+                    <span class="trainer-name">Графіки</span>
+                    <span class="trainer-desc">Типові графіки</span>
+                </a>
+            </div>
+
+            <div class="section-title">🎴 Інтерактивні</div>
+            <div class="trainer-grid">
+                <a href="traps/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🎯</span>
+                    <span class="trainer-name">Пастки НМТ</span>
+                    <span class="trainer-desc">Знайди помилку</span>
+                </a>
+                <a href="formula-task/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🔗</span>
+                    <span class="trainer-name">Формула → Задача</span>
+                    <span class="trainer-desc">Розпізнай патерн</span>
+                </a>
+                <a href="stereo-2d/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📦</span>
+                    <span class="trainer-name">Стереометрія</span>
+                    <span class="trainer-desc">3D фігури в 2D</span>
+                </a>
+                <a href="fill-blank/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🧩</span>
+                    <span class="trainer-name">Вибір методу</span>
+                    <span class="trainer-desc">Який метод застосувати?</span>
+                </a>
+                <a href="stories/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">📖</span>
+                    <span class="trainer-name">Всі історії</span>
+                    <span class="trainer-desc">Переглянути ще раз</span>
+                </a>
+                <a href="flashcards/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🃏</span>
+                    <span class="trainer-name">Флеш-картки</span>
+                    <span class="trainer-desc">Формули та теореми</span>
+                </a>
+                <a href="geometry-facts/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">✅</span>
+                    <span class="trainer-name">Вірю/Не вірю</span>
+                    <span class="trainer-desc">74 факти геометрії</span>
+                </a>
+            </div>
+
+            <div class="section-title">✏️ Інструменти</div>
+            <div class="trainer-grid">
+                <a href="graph-builder/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">✏</span>
+                    <span class="trainer-name">Побудова графіків</span>
+                    <span class="trainer-desc">Інтерактивне малювання</span>
+                </a>
+                <a href="graph-explorer/index.html" class="trainer-card pixel-box">
+                    <span class="trainer-icon">🔍</span>
+                    <span class="trainer-name">Дослідник</span>
+                    <span class="trainer-desc">Перетворення функцій</span>
+                </a>
+            </div>
         </div>
 
-        <div class="section-title">📉 FUNCTIONS</div>
-        <div class="trainer-grid">
-            <a href="graphs/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📈</span>
-                <span class="trainer-name">Графіки</span>
-                <span class="trainer-desc">Трансформації</span>
-            </a>
-            <a href="parity/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">⚖</span>
-                <span class="trainer-name">Парність</span>
-                <span class="trainer-desc">Парні/непарні</span>
-            </a>
-            <a href="graph-builder/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">✏</span>
-                <span class="trainer-name">Побудова</span>
-                <span class="trainer-desc">Інтерактивне малювання</span>
-            </a>
-            <a href="graphs-reference/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📚</span>
-                <span class="trainer-name">Довідник</span>
-                <span class="trainer-desc">Типові графіки</span>
-            </a>
-            <a href="function-properties/index.html" class="trainer-card pixel-box wide">
-                <span class="trainer-icon">🎯</span>
-                <div class="trainer-info">
-                    <span class="trainer-name">Властивості функцій</span>
-                    <span class="trainer-desc">D(f), E(f), нулі, парність</span>
+        <!-- TAB 4: Courses -->
+        <div class="tab-content" id="tab-courses">
+            <div class="coming-soon pixel-box">
+                <div class="coming-soon-icon">🎓</div>
+                <h3>Курси скоро будуть!</h3>
+                <p>Тут з'являться міні-курси з математики для підготовки до НМТ</p>
+            </div>
+        </div>
+
+        <!-- TAB 5: Profile -->
+        <div class="tab-content" id="tab-profile">
+            <a href="profile/index.html" class="profile-header-card pixel-box">
+                <div class="profile-avatar">🧙</div>
+                <div class="profile-info">
+                    <h3 id="profileName">Увійти</h3>
+                    <p id="profileDesc">Збереження прогресу в хмарі</p>
                 </div>
+                <span class="profile-arrow">›</span>
             </a>
-        </div>
 
-        <div class="section-title">🔺 GEOMETRY</div>
-        <div class="trainer-grid">
-            <a href="trigonometry/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📐</span>
-                <span class="trainer-name">Тригонометрія</span>
-                <span class="trainer-desc">Радіани, парність, таблиця</span>
-            </a>
-            <a href="triangle/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">🔺</span>
-                <span class="trainer-name">Прямокутний △</span>
-                <span class="trainer-desc">Піфагор, тригонометрія</span>
-            </a>
-            <a href="geometry-facts/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">✅</span>
-                <span class="trainer-name">Вірю/Не вірю</span>
-                <span class="trainer-desc">74 факти геометрії</span>
-            </a>
-        </div>
-
-        <div class="section-title">📊 ГРАФІКИ</div>
-        <div class="trainer-grid">
-            <a href="graph-explorer/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📈</span>
-                <span class="trainer-name">Дослідник графіків</span>
-                <span class="trainer-desc">Перетворення функцій</span>
-            </a>
-        </div>
-
-        <div class="section-title">🎴 ITEMS</div>
-        <div class="trainer-grid">
-            <a href="flashcards/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">🃏</span>
-                <span class="trainer-name">Флеш-картки</span>
-                <span class="trainer-desc">Формули та теореми</span>
-            </a>
-            <a href="formulas/index.html" class="trainer-card pixel-box">
-                <span class="trainer-icon">📋</span>
-                <span class="trainer-name">Довідник</span>
-                <span class="trainer-desc">Всі формули НМТ</span>
-            </a>
-        </div>
-
-        <div class="section-title">👤 PROFILE</div>
-        <div class="trainer-grid">
-            <a href="profile/index.html" class="trainer-card pixel-box wide" id="profileCard">
-                <span class="trainer-icon">🧙</span>
-                <div class="trainer-info">
-                    <span class="trainer-name" id="profileName">Увійти</span>
-                    <span class="trainer-desc" id="profileDesc">Збереження прогресу в хмарі</span>
+            <div class="settings-section">
+                <div class="section-title">⚙️ Налаштування</div>
+                <div class="settings-toggle pixel-box">
+                    <span class="toggle-label">☀️ Світла тема</span>
+                    <div class="toggle-switch" id="lightToggle"></div>
                 </div>
-            </a>
-        </div>
+                <div class="settings-toggle pixel-box" id="notificationsSetting" style="display: none;">
+                    <span class="toggle-label">🔔 Нагадування</span>
+                    <div class="toggle-switch" id="notifyToggle"></div>
+                </div>
+            </div>
 
-        <div class="settings-toggle pixel-box">
-            <span class="toggle-label">☀ Світла тема</span>
-            <div class="toggle-switch" id="lightToggle"></div>
+            <div class="app-version">
+                Math Quest v1.0 • Підготовка до НМТ
+            </div>
         </div>
+    </div>
+    </div>
 
-        <div class="settings-toggle pixel-box">
-            <span class="toggle-label">🎮 Ретро режим</span>
-            <div class="toggle-switch" id="retroToggle"></div>
+    <!-- Story Viewer Modal -->
+    <div class="story-viewer-modal" id="storyViewerModal">
+        <div class="story-progress" id="storyProgress"></div>
+        <div class="story-header">
+            <div class="story-info">
+                <div class="story-avatar-small" id="storyAvatarSmall"></div>
+                <div class="story-title-text" id="storyTitleText"></div>
+            </div>
+            <button class="story-close-btn" id="storyCloseBtn">✕</button>
         </div>
+        <div class="story-content-area" id="storyContentArea"></div>
+        <div class="story-nav">
+            <div class="story-nav-left" id="storyNavLeft"></div>
+            <div class="story-nav-right" id="storyNavRight"></div>
+        </div>
+    </div>
 
-        <div class="footer">
-            <p>Math Quest v1.0</p>
-            <p>Підготовка до НМТ</p>
+    <!-- Bottom Tab Bar - Liquid Glass -->
+    <div class="tab-bar">
+        <div class="tab-bar-inner">
+            <div class="tab-item active" data-tab="home">
+                <span class="tab-icon">🏠</span>
+                <span class="tab-label">Головна</span>
+            </div>
+            <div class="tab-item" data-tab="trainers">
+                <span class="tab-icon">📚</span>
+                <span class="tab-label">Тренажери</span>
+            </div>
+            <div class="tab-item" data-tab="materials">
+                <span class="tab-icon">📖</span>
+                <span class="tab-label">Матеріали</span>
+            </div>
+            <div class="tab-item" data-tab="courses">
+                <span class="tab-icon">🎓</span>
+                <span class="tab-label">Курси</span>
+            </div>
+            <div class="tab-item" data-tab="profile">
+                <span class="tab-icon">👤</span>
+                <span class="tab-label">Профіль</span>
+            </div>
         </div>
     </div>
 
     <script>
-        // Theme toggles
-        function initThemeToggles() {
-            // Retro mode
-            const retroToggle = document.getElementById('retroToggle');
-            const isRetro = localStorage.getItem('math_quest_retro_mode') === 'true';
+        // Tab switching
+        function initTabs() {
+            const tabItems = document.querySelectorAll('.tab-item');
+            const tabContents = document.querySelectorAll('.tab-content');
 
-            if (isRetro) {
-                document.body.classList.add('retro-mode');
-                retroToggle.classList.add('active');
-            }
+            // Restore last active tab
+            const savedTab = localStorage.getItem('math_quest_active_tab') || 'home';
+            switchTab(savedTab);
 
-            retroToggle.addEventListener('click', () => {
-                const isActive = retroToggle.classList.toggle('active');
-                document.body.classList.toggle('retro-mode', isActive);
-                localStorage.setItem('math_quest_retro_mode', isActive);
+            tabItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const tabId = item.dataset.tab;
+                    switchTab(tabId);
+                    localStorage.setItem('math_quest_active_tab', tabId);
+                });
             });
 
-            // Light mode
+            function switchTab(tabId) {
+                // Update tab items
+                tabItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.tab === tabId);
+                });
+
+                // Update tab contents
+                tabContents.forEach(content => {
+                    content.classList.toggle('active', content.id === `tab-${tabId}`);
+                });
+            }
+        }
+
+        // Theme toggle
+        function initThemeToggle() {
             const lightToggle = document.getElementById('lightToggle');
             const isLight = localStorage.getItem('math_quest_light_mode') === 'true';
 
@@ -701,7 +1223,7 @@
             });
         }
 
-        // Load stats from localStorage
+        // Load stats
         function loadStats() {
             try {
                 const stats = JSON.parse(localStorage.getItem('math_trainer_global_stats') || '{}');
@@ -710,11 +1232,9 @@
                 document.getElementById('best-streak').textContent = stats.bestStreak || 0;
                 document.getElementById('trainers-used').textContent = stats.trainersUsed || 0;
 
-                // Calculate level based on solved problems
                 const level = Math.floor(solved / 10) + 1;
                 document.getElementById('level').textContent = level;
 
-                // XP bar progress (problems to next level)
                 const xpProgress = (solved % 10) * 10;
                 document.getElementById('xp-fill').style.width = xpProgress + '%';
             } catch (e) {
@@ -722,7 +1242,7 @@
             }
         }
 
-        // Update stats (called from trainers)
+        // Global stats update function
         window.updateGlobalStats = function(solved, streak) {
             try {
                 const stats = JSON.parse(localStorage.getItem('math_trainer_global_stats') || '{}');
@@ -734,10 +1254,7 @@
             } catch (e) {}
         };
 
-        initThemeToggles();
-        loadStats();
-
-        // Update profile name when user is logged in
+        // Update profile when user logs in
         window.addEventListener('authStateChanged', (e) => {
             const user = e.detail?.user;
             const profileName = document.getElementById('profileName');
@@ -755,8 +1272,405 @@
                 }
             }
         });
+
+        // Notifications toggle
+        function initNotifications() {
+            const notificationsSetting = document.getElementById('notificationsSetting');
+            const notifyToggle = document.getElementById('notifyToggle');
+
+            // Only show notifications setting in native app
+            if (window.MathQuestNotifications?.isAvailable()) {
+                notificationsSetting.style.display = 'flex';
+
+                // Check current state
+                if (window.MathQuestNotifications.isEnabled()) {
+                    notifyToggle.classList.add('active');
+                }
+
+                notifyToggle.addEventListener('click', async () => {
+                    const isCurrentlyActive = notifyToggle.classList.contains('active');
+
+                    if (isCurrentlyActive) {
+                        // Disable notifications
+                        await window.MathQuestNotifications.disable();
+                        notifyToggle.classList.remove('active');
+                    } else {
+                        // Enable notifications
+                        const enabled = await window.MathQuestNotifications.enable();
+                        if (enabled) {
+                            notifyToggle.classList.add('active');
+                        } else {
+                            alert('Дозвольте сповіщення в налаштуваннях iOS');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        initTabs();
+        initThemeToggle();
+        loadStats();
+
+        // Init notifications after module loads
+        setTimeout(initNotifications, 1000);
+
+        // ========== STORIES ==========
+        const storiesData = [
+            {
+                id: 'pythagoras',
+                name: 'Піфагор',
+                emoji: '📐',
+                slides: [
+                    {
+                        icon: '📐',
+                        title: 'Теорема Піфагора',
+                        formula: 'a^2 + b^2 = c^2',
+                        description: 'У прямокутному трикутнику квадрат гіпотенузи дорівнює сумі квадратів катетів',
+                        animation: `<svg viewBox="0 0 200 160" fill="none">
+                            <line class="triangle-side" x1="20" y1="140" x2="180" y2="140" stroke="#EF8748" stroke-width="3"/>
+                            <line class="triangle-side" x1="180" y1="140" x2="180" y2="40" stroke="#EF8748" stroke-width="3"/>
+                            <line class="triangle-side" x1="180" y1="40" x2="20" y2="140" stroke="#34c759" stroke-width="3"/>
+                            <text x="100" y="158" fill="#6e6e73" font-size="14" text-anchor="middle">a</text>
+                            <text x="192" y="95" fill="#6e6e73" font-size="14">b</text>
+                            <text x="90" y="82" fill="#34c759" font-size="14">c</text>
+                        </svg>`
+                    },
+                    {
+                        icon: '💡',
+                        title: 'Приклад',
+                        formula: '3^2 + 4^2 = 5^2',
+                        description: 'Трійка (3, 4, 5) — найвідоміша Піфагорова трійка',
+                        example: { label: 'Перевірка', content: '9 + 16 = 25 ✓' }
+                    },
+                    {
+                        icon: '🎯',
+                        title: 'Знайти гіпотенузу',
+                        formula: 'c = \\sqrt{a^2 + b^2}',
+                        description: 'Щоб знайти гіпотенузу, витягуємо корінь із суми квадратів катетів'
+                    }
+                ]
+            },
+            {
+                id: 'sin-cos',
+                name: 'sin/cos',
+                emoji: '🔄',
+                slides: [
+                    {
+                        icon: '🔄',
+                        title: 'Основна тотожність',
+                        formula: '\\sin^2\\alpha + \\cos^2\\alpha = 1',
+                        description: 'Сума квадратів синуса і косинуса будь-якого кута дорівнює одиниці'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'Виразити sin',
+                        formula: '\\sin\\alpha = \\pm\\sqrt{1 - \\cos^2\\alpha}',
+                        description: 'Знак залежить від чверті, в якій знаходиться кут'
+                    }
+                ]
+            },
+            {
+                id: 'quadratic',
+                name: 'Дискримінант',
+                emoji: '📈',
+                slides: [
+                    {
+                        icon: '📈',
+                        title: 'Квадратне рівняння',
+                        formula: 'ax^2 + bx + c = 0',
+                        description: 'Загальний вигляд квадратного рівняння'
+                    },
+                    {
+                        icon: '🔢',
+                        title: 'Дискримінант',
+                        formula: 'D = b^2 - 4ac',
+                        description: 'Дискримінант визначає кількість коренів рівняння'
+                    },
+                    {
+                        icon: '✨',
+                        title: 'Формула коренів',
+                        formula: 'x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a}',
+                        description: 'Якщо D > 0 — два корені, D = 0 — один, D < 0 — немає'
+                    }
+                ]
+            },
+            {
+                id: 'circle',
+                name: 'Коло',
+                emoji: '⭕',
+                slides: [
+                    {
+                        icon: '⭕',
+                        title: 'Довжина кола',
+                        formula: 'C = 2\\pi r',
+                        description: 'Довжина кола через радіус',
+                        animation: `<svg viewBox="0 0 200 200" fill="none">
+                            <circle class="animated-circle" cx="100" cy="100" r="70" stroke="#EF8748" stroke-width="3" fill="none"/>
+                            <line x1="100" y1="100" x2="170" y2="100" stroke="#34c759" stroke-width="2"/>
+                            <text x="135" y="95" fill="#34c759" font-size="14">r</text>
+                            <circle cx="100" cy="100" r="4" fill="#EF8748"/>
+                        </svg>`
+                    },
+                    {
+                        icon: '🔵',
+                        title: 'Площа круга',
+                        formula: 'S = \\pi r^2',
+                        description: 'Площа круга дорівнює π помножене на квадрат радіуса'
+                    }
+                ]
+            },
+            {
+                id: 'progressions',
+                name: 'Прогресії',
+                emoji: '📶',
+                slides: [
+                    {
+                        icon: '➕',
+                        title: 'Арифметична прогресія',
+                        formula: 'a_n = a_1 + (n-1)d',
+                        description: 'Кожен наступний член більший на d'
+                    },
+                    {
+                        icon: '✖️',
+                        title: 'Геометрична прогресія',
+                        formula: 'b_n = b_1 \\cdot q^{n-1}',
+                        description: 'Кожен наступний член більший у q разів'
+                    }
+                ]
+            },
+            {
+                id: 'trig-values',
+                name: 'Значення',
+                emoji: '🎯',
+                slides: [
+                    {
+                        icon: '3️⃣',
+                        title: 'sin і cos для 30°',
+                        formula: '\\sin 30° = \\frac{1}{2}, \\quad \\cos 30° = \\frac{\\sqrt{3}}{2}',
+                        description: 'Запам\'ятай: синус зростає від 0 до 1'
+                    },
+                    {
+                        icon: '4️⃣',
+                        title: 'sin і cos для 45°',
+                        formula: '\\sin 45° = \\cos 45° = \\frac{\\sqrt{2}}{2}',
+                        description: 'На 45° синус і косинус рівні'
+                    },
+                    {
+                        icon: '6️⃣',
+                        title: 'sin і cos для 60°',
+                        formula: '\\sin 60° = \\frac{\\sqrt{3}}{2}, \\quad \\cos 60° = \\frac{1}{2}',
+                        description: 'Протилежно до 30°'
+                    }
+                ]
+            }
+        ];
+
+        let currentStoryIdx = -1;
+        let currentSlideIdx = 0;
+        let storyTimer = null;
+        let viewedStories = new Set(JSON.parse(localStorage.getItem('viewedStories') || '[]'));
+
+        function initStories() {
+            const storiesBar = document.getElementById('storiesBarHome');
+            if (!storiesBar) return;
+
+            storiesBar.innerHTML = storiesData.map((story, idx) => `
+                <div class="story-circle ${viewedStories.has(story.id) ? 'viewed' : ''}" data-story-idx="${idx}">
+                    <div class="story-avatar-wrapper">
+                        <div class="story-avatar-inner">
+                            <span class="emoji">${story.emoji}</span>
+                        </div>
+                    </div>
+                    <span class="story-circle-name">${story.name}</span>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            storiesBar.querySelectorAll('.story-circle').forEach(circle => {
+                circle.addEventListener('click', () => {
+                    openStory(parseInt(circle.dataset.storyIdx));
+                });
+            });
+
+            // Setup modal controls
+            document.getElementById('storyCloseBtn').addEventListener('click', closeStory);
+            document.getElementById('storyNavLeft').addEventListener('click', prevSlide);
+            document.getElementById('storyNavRight').addEventListener('click', nextSlide);
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (currentStoryIdx === -1) return;
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+                if (e.key === 'Escape') closeStory();
+            });
+
+            // Touch/swipe (horizontal for navigation, vertical down for exit)
+            let touchStartX = 0;
+            let touchStartY = 0;
+            const contentArea = document.getElementById('storyContentArea');
+            contentArea.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            contentArea.addEventListener('touchend', (e) => {
+                const diffX = touchStartX - e.changedTouches[0].clientX;
+                const diffY = touchStartY - e.changedTouches[0].clientY;
+
+                // If vertical swipe is stronger than horizontal
+                if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 80) {
+                    // Swipe down to close
+                    if (diffY < 0) {
+                        closeStory();
+                    }
+                } else if (Math.abs(diffX) > 50) {
+                    // Horizontal swipe for navigation
+                    if (diffX > 0) nextSlide();
+                    else prevSlide();
+                }
+            });
+        }
+
+        function openStory(idx) {
+            currentStoryIdx = idx;
+            currentSlideIdx = 0;
+
+            const story = storiesData[idx];
+
+            // Mark as viewed
+            viewedStories.add(story.id);
+            localStorage.setItem('viewedStories', JSON.stringify([...viewedStories]));
+
+            // Update circle appearance
+            const circles = document.querySelectorAll('.story-circle');
+            if (circles[idx]) circles[idx].classList.add('viewed');
+
+            // Show modal
+            document.getElementById('storyViewerModal').classList.add('active');
+
+            // Setup progress bar
+            document.getElementById('storyProgress').innerHTML = story.slides.map((_, i) => `
+                <div class="progress-segment ${i === 0 ? 'active' : ''}" data-slide="${i}">
+                    <div class="progress-fill"></div>
+                </div>
+            `).join('');
+
+            // Set header
+            document.getElementById('storyAvatarSmall').textContent = story.emoji;
+            document.getElementById('storyTitleText').textContent = story.name;
+
+            showSlide(0);
+            startTimer();
+        }
+
+        function closeStory() {
+            currentStoryIdx = -1;
+            currentSlideIdx = 0;
+            stopTimer();
+            document.getElementById('storyViewerModal').classList.remove('active');
+        }
+
+        function showSlide(idx) {
+            const story = storiesData[currentStoryIdx];
+            const slide = story.slides[idx];
+
+            let html = `<div class="story-slide">
+                <div class="slide-icon">${slide.icon}</div>
+                <h2 class="slide-title">${slide.title}</h2>`;
+
+            if (slide.animation) {
+                html += `<div class="slide-animation">${slide.animation}</div>`;
+            }
+
+            html += `<div class="slide-formula"><div class="formula-highlight" id="slideFormula"></div></div>`;
+            html += `<p class="slide-description">${slide.description}</p>`;
+
+            if (slide.example) {
+                html += `<div class="slide-example">
+                    <div class="example-label">${slide.example.label}</div>
+                    <div class="example-content">${slide.example.content}</div>
+                </div>`;
+            }
+
+            html += '</div>';
+
+            document.getElementById('storyContentArea').innerHTML = html;
+
+            // Render LaTeX
+            if (typeof katex !== 'undefined') {
+                katex.render(slide.formula, document.getElementById('slideFormula'), {
+                    throwOnError: false,
+                    displayMode: true
+                });
+            }
+
+            // Update progress segments
+            document.querySelectorAll('.progress-segment').forEach((seg, i) => {
+                seg.classList.remove('active', 'completed');
+                if (i < idx) seg.classList.add('completed');
+                if (i === idx) seg.classList.add('active');
+            });
+        }
+
+        function nextSlide() {
+            const story = storiesData[currentStoryIdx];
+            if (currentSlideIdx < story.slides.length - 1) {
+                currentSlideIdx++;
+                showSlide(currentSlideIdx);
+                resetTimer();
+            } else {
+                // Go to next story or close
+                if (currentStoryIdx < storiesData.length - 1) {
+                    openStory(currentStoryIdx + 1);
+                } else {
+                    closeStory();
+                }
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIdx > 0) {
+                currentSlideIdx--;
+                showSlide(currentSlideIdx);
+                resetTimer();
+            } else if (currentStoryIdx > 0) {
+                openStory(currentStoryIdx - 1);
+            }
+        }
+
+        function startTimer() {
+            stopTimer();
+            storyTimer = setTimeout(nextSlide, 5000);
+        }
+
+        function stopTimer() {
+            if (storyTimer) {
+                clearTimeout(storyTimer);
+                storyTimer = null;
+            }
+        }
+
+        function resetTimer() {
+            stopTimer();
+            startTimer();
+        }
+
+        // Load KaTeX and init stories
+        function loadKatexAndInitStories() {
+            if (typeof katex !== 'undefined') {
+                initStories();
+            } else {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+                script.onload = initStories;
+                document.head.appendChild(script);
+            }
+        }
+
+        loadKatexAndInitStories();
     </script>
     <script src="shared/firebase.js"></script>
-    <script src="shared/onboarding.js"></script>
+    <script src="shared/notifications.js"></script>
 </body>
 </html>

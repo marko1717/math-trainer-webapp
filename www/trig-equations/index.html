@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Тригонометричні рівняння | Math Quest</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="screen active">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <a href="../index.html" class="back-btn">← Меню</a>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Тригонометричні рівняння</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="welcome-screen">
+                <div class="welcome-icon">📐</div>
+                <h2 class="welcome-title">Тригонометричні рівняння</h2>
+                <p class="welcome-description">Розв'язування найпростіших рівнянь sin, cos, tg</p>
+
+                <div class="topic-select">
+                    <h3>Обери тип:</h3>
+
+                    <button class="btn btn-topic" data-topic="sin">
+                        <span class="topic-icon">〰️</span>
+                        <div class="topic-info">
+                            <span class="topic-name">sin x = a</span>
+                            <span class="topic-formula">x = (-1)^n arcsin a + πn</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="cos">
+                        <span class="topic-icon">🔄</span>
+                        <div class="topic-info">
+                            <span class="topic-name">cos x = a</span>
+                            <span class="topic-formula">x = ± arccos a + 2πn</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="tan">
+                        <span class="topic-icon">📈</span>
+                        <div class="topic-info">
+                            <span class="topic-name">tg x = a</span>
+                            <span class="topic-formula">x = arctg a + πn</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="special">
+                        <span class="topic-icon">⭐</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Часткові випадки</span>
+                            <span class="topic-formula">sin x = 0, cos x = 1, ...</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="roots">
+                        <span class="topic-icon">🔢</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Кількість коренів</span>
+                            <span class="topic-formula">на проміжку [0; 2π]</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic btn-mixed" data-topic="mixed">
+                        <span class="topic-icon">🎲</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Змішаний режим</span>
+                            <span class="topic-formula">Всі типи</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="questionScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="backBtn">← Назад</button>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title" id="topicTitle">Рівняння</h1>
+                </div>
+                <div class="header-right">
+                    <div class="stats-mini">
+                        <span class="stat-good">✅ <span id="correctCount">0</span></span>
+                        <span class="stat-bad">❌ <span id="wrongCount">0</span></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-number" id="questionNumber">Питання 1 / 10</div>
+
+                <div class="question-text" id="questionText">
+                    <!-- KaTeX rendered question -->
+                </div>
+
+                <div class="answers-container" id="answersContainer">
+                    <!-- Answer buttons -->
+                </div>
+
+                <div class="feedback-container" id="feedbackContainer">
+                    <div class="feedback-icon" id="feedbackIcon"></div>
+                    <div class="feedback-text" id="feedbackText"></div>
+                    <div class="feedback-explanation" id="feedbackExplanation"></div>
+                </div>
+
+                <button class="btn btn-primary btn-next hidden" id="nextBtn">Далі →</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left"></div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Результати</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="results-content">
+                <div class="results-icon" id="resultsIcon">🎉</div>
+                <h2 class="results-title" id="resultsTitle">Молодець!</h2>
+
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <span class="stat-value" id="finalCorrect">0</span>
+                        <span class="stat-label">Правильно</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="finalWrong">0</span>
+                        <span class="stat-label">Помилок</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="finalAccuracy">0%</span>
+                        <span class="stat-label">Точність</span>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary" id="restartBtn">🔄 Ще раз</button>
+                    <button class="btn btn-secondary" id="menuBtn">📚 Інші теми</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formula Reference Modal -->
+        <div class="modal hidden" id="formulaModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📖 Формули</h3>
+                    <button class="modal-close" id="closeFormulas">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="formula-section">
+                        <h4>Основні рівняння</h4>
+                        <div class="formula-item" id="sinFormula"></div>
+                        <div class="formula-item" id="cosFormula"></div>
+                        <div class="formula-item" id="tanFormula"></div>
+                    </div>
+                    <div class="formula-section">
+                        <h4>Часткові випадки</h4>
+                        <div class="formula-item" id="specialFormulas"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

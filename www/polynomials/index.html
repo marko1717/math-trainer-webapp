@@ -83,15 +83,15 @@
 
             <!-- Quiz Screen -->
             <div class="screen" id="quizScreen">
-                <div class="difficulty-indicator" id="difficultyIndicator">
-                    <span class="difficulty-dot active"></span>
-                    <span class="difficulty-dot"></span>
-                    <span class="difficulty-dot"></span>
-                </div>
-
                 <div class="question-container">
+                    <div class="difficulty-indicator" id="difficultyIndicator">
+                        <span class="difficulty-dot active"></span>
+                        <span class="difficulty-dot"></span>
+                        <span class="difficulty-dot"></span>
+                    </div>
+
                     <div class="question-card">
-                        <div class="question-number" id="questionNumber">Питання 1</div>
+                        <div class="question-number" id="questionNumber">ПИТАННЯ 1</div>
                         <div class="question-text" id="questionText">
                             Спростіть: (2x + 3) + (x - 1)
                         </div>
@@ -108,20 +108,26 @@
                         <div class="feedback-explanation" id="feedbackExplanation"></div>
                     </div>
 
-                    <button class="btn btn-primary next-btn" id="nextBtn" style="display: none;">
-                        Далі →
-                    </button>
+                    <!-- Help Panel -->
+                    <div class="help-panel" id="helpPanel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>Допомога ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Формула</span>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Help Panel -->
-                <div class="help-panel">
-                    <button class="help-btn" id="hintBtn" title="Підказка">
-                        <span>💡</span>
-                    </button>
-                    <button class="help-btn" id="formulaBtn" title="Правила">
-                        <span>📐</span>
-                    </button>
-                </div>
+                <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
+                    Далі →
+                </button>
             </div>
 
             <!-- Results Screen -->
@@ -206,20 +212,33 @@
             </div>
         </main>
 
-        <!-- AI Helper Modal -->
-        <div class="ai-helper-modal hidden" id="aiHelperModal">
-            <div class="ai-helper-content">
-                <button class="ai-close-btn" id="aiCloseBtn">×</button>
-                <div class="ai-loading" id="aiLoading">
-                    <div class="spinner"></div>
-                    <p>Думаю...</p>
+    </div>
+
+    <!-- AI Helper Modal -->
+    <div id="aiHelperModal" class="ai-modal hidden">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <div class="ai-modal-title">
+                    <span>🤖</span>
+                    <span>Допомога ШІ</span>
                 </div>
-                <div class="ai-response" id="aiResponse" style="display: none;"></div>
+                <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading" id="aiLoading">
+                    <div class="ai-loading-spinner"></div>
+                    <span>Думаю...</span>
+                </div>
+                <div class="ai-response" id="aiResponse"></div>
             </div>
         </div>
     </div>
 
+    <!-- Shared components -->
+    <script src="../shared/components/ai-helper.js"></script>
     <script src="../shared/firebase.js"></script>
+
+    <!-- Local script -->
     <script src="app.js"></script>
 </body>
 </html>

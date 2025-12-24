@@ -651,17 +651,9 @@ class GameController {
             .map(eq => `<div class="equation">${eq}</div>`)
             .join('');
 
-        // Display steps
-        this.stepsContainer.innerHTML = this.currentQuestion.steps
-            .map((step, i) => `
-                <div class="step-card" id="step${i + 1}">
-                    <div class="step-header">
-                        <span class="step-number">Крок ${i + 1}</span>
-                        <span class="step-title">${step.title}</span>
-                    </div>
-                    <div class="step-content">${step.content}</div>
-                </div>
-            `).join('');
+        // Hide steps initially - show only on incorrect answer
+        this.stepsContainer.innerHTML = '';
+        this.stepsContainer.style.display = 'none';
 
         // Generate answers
         const answers = this.shuffleAnswers([
@@ -707,14 +699,22 @@ class GameController {
         if (!isCorrect) {
             btn.classList.add('incorrect');
             btn.classList.add('animate-shake');
+
+            // Show steps only on incorrect answer
+            this.stepsContainer.style.display = 'block';
+            this.stepsContainer.innerHTML = this.currentQuestion.steps
+                .map((step, i) => `
+                    <div class="step-card completed">
+                        <div class="step-header">
+                            <span class="step-number">Крок ${i + 1}</span>
+                            <span class="step-title">${step.title}</span>
+                        </div>
+                        <div class="step-content">${step.content}</div>
+                    </div>
+                `).join('');
         } else {
             btn.classList.add('animate-pulse');
         }
-
-        // Mark steps as completed
-        this.stepsContainer.querySelectorAll('.step-card').forEach(step => {
-            step.classList.add('completed');
-        });
 
         this.ai.processAnswer(this.currentQuestion.formula, isCorrect, responseTime);
         if (isCorrect) this.correctInSession++;

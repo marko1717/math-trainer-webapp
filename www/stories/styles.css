@@ -1,0 +1,587 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #f5f5f7;
+    --card-bg: #ffffff;
+    --text: #1c1c1e;
+    --text-muted: #6e6e73;
+    --accent: #EF8748;
+    --accent-gradient: linear-gradient(135deg, #EF8748, #f5a66e, #EF8748);
+    --success: #34c759;
+    --border: #e5e5ea;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+}
+
+.app {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* Stories Bar */
+.stories-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    padding-top: calc(var(--safe-top) + 12px);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+}
+
+.stories-scroll {
+    display: flex;
+    gap: 16px;
+    padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.stories-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Story Circle */
+.story-circle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.story-avatar-wrapper {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    padding: 3px;
+    background: var(--accent-gradient);
+    transition: transform 0.2s;
+}
+
+.story-circle:active .story-avatar-wrapper {
+    transform: scale(0.95);
+}
+
+.story-circle.viewed .story-avatar-wrapper {
+    background: var(--border);
+}
+
+.story-avatar-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--card-bg);
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.story-avatar-inner .emoji {
+    font-size: 2rem;
+}
+
+.story-circle-name {
+    font-size: 0.7rem;
+    color: var(--text);
+    max-width: 70px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Story Viewer (Fullscreen) */
+.story-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.story-viewer.hidden {
+    display: none;
+}
+
+/* Progress bar */
+.story-progress {
+    display: flex;
+    gap: 4px;
+    padding: 12px 12px 8px;
+    padding-top: calc(var(--safe-top) + 12px);
+}
+
+.progress-segment {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: white;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.progress-segment.completed .progress-fill {
+    width: 100%;
+}
+
+.progress-segment.active .progress-fill {
+    animation: progressFill 5s linear forwards;
+}
+
+@keyframes progressFill {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* Story Header */
+.story-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+}
+
+.story-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.story-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.story-title {
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.story-close {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Story Content */
+.story-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+.story-slide {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 30px 24px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.slide-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.slide-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+}
+
+.slide-formula {
+    background: var(--bg);
+    padding: 20px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+}
+
+.slide-formula .katex {
+    font-size: 1.4rem;
+}
+
+.slide-description {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* Animated formula highlight */
+.formula-highlight {
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Example box */
+.slide-example {
+    background: rgba(239, 135, 72, 0.1);
+    border: 1px solid rgba(239, 135, 72, 0.2);
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 16px;
+    text-align: left;
+}
+
+.example-label {
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.example-content {
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+/* Story Navigation */
+.story-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    pointer-events: none;
+}
+
+.story-nav-left,
+.story-nav-right {
+    flex: 1;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* Main Content */
+.main-content {
+    padding-top: calc(var(--safe-top) + 100px);
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: calc(var(--safe-bottom) + 20px);
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.back-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1.3rem;
+    text-decoration: none;
+}
+
+.page-header h1 {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.page-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* Animated SVG in slides */
+.slide-animation {
+    margin: 20px 0;
+}
+
+.slide-animation svg {
+    max-width: 200px;
+    height: auto;
+}
+
+/* Triangle animation */
+.triangle-side {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: drawLine 1s ease forwards;
+}
+
+.triangle-side:nth-child(1) { animation-delay: 0s; }
+.triangle-side:nth-child(2) { animation-delay: 0.3s; }
+.triangle-side:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+}
+
+/* Circle animation */
+.animated-circle {
+    stroke-dasharray: 440;
+    stroke-dashoffset: 440;
+    animation: drawCircle 1.5s ease forwards;
+}
+
+@keyframes drawCircle {
+    to { stroke-dashoffset: 0; }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Daily Fact - Special Story Circle */
+.story-circle.daily-fact {
+    position: relative;
+}
+
+.story-circle.daily-fact .story-avatar-wrapper.rainbow {
+    background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
+    background-size: 200% 200%;
+    animation: rainbowGlow 3s ease infinite;
+}
+
+@keyframes rainbowGlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.story-circle.daily-fact .daily-fact-avatar {
+    background: linear-gradient(135deg, #fff9e6, #ffffff);
+}
+
+.story-circle.daily-fact .cooldown-timer {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.story-circle.daily-fact.new-available .story-avatar-wrapper::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 16px;
+    height: 16px;
+    background: #ff3b30;
+    border-radius: 50%;
+    border: 2px solid var(--card-bg);
+}
+
+/* Daily Fact Slide */
+.daily-fact-slide {
+    background: linear-gradient(135deg, #fff9e6, #ffffff) !important;
+    border: 2px solid rgba(239, 135, 72, 0.3);
+}
+
+.daily-fact-slide .slide-icon {
+    animation: bounce 2s ease infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.next-fact-timer {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* New fact indicator pulsing */
+.story-circle.daily-fact.new-available .story-circle-name {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Auto-generated stories */
+.story-circle.auto-story {
+    position: relative;
+}
+
+.story-circle.auto-story.new-available .story-circle-name {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.story-circle.auto-story .auto-story-avatar {
+    background: linear-gradient(135deg, #fff9e6, #ffffff);
+}
+
+/* Next story placeholder */
+.story-circle.next-story-placeholder {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.story-circle.next-story-placeholder .placeholder-wrapper {
+    background: linear-gradient(135deg, #e5e5ea, #d1d1d6);
+    border: 2px dashed #8e8e93;
+}
+
+.story-circle.next-story-placeholder .placeholder-inner {
+    background: #f5f5f7;
+}
+
+.story-circle.next-story-placeholder .countdown-name {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+}
+
+/* Auto story slide styling */
+.auto-story-slide {
+    background: linear-gradient(135deg, #fff, #f8f8f8) !important;
+}
+
+/* Animation styles for SVG elements */
+.anim-square {
+    opacity: 0;
+    animation: fadeScale 0.5s ease forwards;
+}
+
+.anim-square.delay-1 { animation-delay: 0.3s; }
+.anim-square.delay-2 { animation-delay: 0.6s; }
+
+@keyframes fadeScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Moving point animation for unit circle */
+.moving-point {
+    animation: moveOnCircle 4s linear infinite;
+    transform-origin: 100px 100px;
+}
+
+@keyframes moveOnCircle {
+    from { transform: rotate(0deg) translateX(70px); }
+    to { transform: rotate(360deg) translateX(70px); }
+}
+
+/* Draw path animation */
+.draw-path {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: drawPath 1.5s ease forwards;
+}
+
+@keyframes drawPath {
+    to { stroke-dashoffset: 0; }
+}
+
+/* Vertex point pulse */
+.vertex-point {
+    animation: vertexPulse 1s ease infinite;
+}
+
+@keyframes vertexPulse {
+    0%, 100% { r: 5; }
+    50% { r: 8; }
+}
+
+/* Tangent line slide in */
+.tangent-line {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: drawTangent 1s ease forwards 0.5s;
+}
+
+@keyframes drawTangent {
+    to { stroke-dashoffset: 0; }
+}
+
+/* Problem slide specific styles */
+.story-slide .slide-icon {
+    transition: transform 0.3s ease;
+}
+
+.story-slide:hover .slide-icon {
+    transform: scale(1.1);
+}

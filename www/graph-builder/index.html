@@ -86,6 +86,14 @@
                         </div>
                     </button>
 
+                    <button class="btn btn-topic" data-topic="intersection">
+                        <span class="topic-icon">✖️</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Перетин графіків</span>
+                            <span class="topic-formula">Розв'язок системи</span>
+                        </div>
+                    </button>
+
                     <button class="btn btn-topic btn-mixed" data-topic="mixed">
                         <span class="topic-icon">🎲</span>
                         <div class="topic-info">
@@ -121,8 +129,9 @@
             </div>
 
             <div class="task-area">
-                <p class="task-label">Побудуй графік функції:</p>
+                <p class="task-label" id="taskLabel">Побудуй графік функції:</p>
                 <div class="function-display" id="functionDisplay"></div>
+                <div class="function-display secondary" id="functionDisplay2" style="display: none;"></div>
             </div>
 
             <!-- Interactive Graph Canvas -->
@@ -133,6 +142,7 @@
                     <button class="btn-control" id="clearBtn" title="Очистити">🗑️</button>
                     <button class="btn-control active" id="pointMode" title="Точки">•</button>
                     <button class="btn-control" id="lineMode" title="Лінія">／</button>
+                    <button class="btn-control" id="intersectMode" title="Перетин" style="display: none;">✖️</button>
                 </div>
             </div>
 

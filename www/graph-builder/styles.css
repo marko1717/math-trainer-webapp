@@ -275,9 +275,21 @@ body.retro-mode .task-label {
     color: var(--accent);
 }
 
+.function-display.secondary {
+    font-size: 1.1rem;
+    color: #22d3ee;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
 body.retro-mode .function-display {
     font-size: 0.6rem;
     text-shadow: 2px 2px 0 var(--bg-dark);
+}
+
+body.retro-mode .function-display.secondary {
+    font-size: 0.5rem;
 }
 
 /* === Graph Area === */
@@ -308,24 +320,28 @@ body.retro-mode .graph-area {
 .graph-controls {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     margin-top: 12px;
+    flex-wrap: wrap;
+    padding: 0 8px;
 }
 
 .btn-control {
     font-family: inherit;
-    width: 44px;
-    height: 44px;
+    min-width: 48px;
+    height: 48px;
+    padding: 0 12px;
     border: 2px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     background: var(--card-bg);
     color: var(--text);
-    font-size: 0.8rem;
+    font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body.retro-mode .btn-control {
@@ -339,6 +355,10 @@ body.retro-mode .btn-control {
     transform: translateY(-2px);
 }
 
+.btn-control:active {
+    transform: scale(0.95);
+}
+
 body.retro-mode .btn-control:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 var(--bg-dark);
@@ -348,6 +368,18 @@ body.retro-mode .btn-control:hover {
     background: var(--accent);
     border-color: var(--accent-dark);
     color: var(--text-dark);
+}
+
+/* Intersection mode button */
+.btn-control[id="intersectMode"] {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.btn-control[id="intersectMode"].active {
+    background: #ef4444;
+    color: #fff;
 }
 
 /* === Hint Section === */

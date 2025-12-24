@@ -191,30 +191,36 @@
 
         input[type="range"] {
             width: 100%;
-            height: 8px;
-            border-radius: 4px;
+            height: 12px;
+            border-radius: 6px;
             background: var(--border);
             outline: none;
             -webkit-appearance: none;
+            cursor: pointer;
+            touch-action: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: var(--accent);
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
             transition: transform 0.2s ease;
+            border: 3px solid white;
         }
 
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-        }
-
+        input[type="range"]::-webkit-slider-thumb:hover,
         input[type="range"]::-webkit-slider-thumb:active {
-            transform: scale(1.2);
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Mobile-friendly slider touch area */
+        .slider-container {
+            padding: 8px 0;
         }
 
         /* Transformation description */
@@ -361,6 +367,169 @@
             color: var(--accent);
         }
 
+        /* Mode tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            background: var(--bg);
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-muted);
+        }
+
+        .mode-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .mode-tab:hover:not(.active) {
+            background: var(--border);
+        }
+
+        /* Intersection controls */
+        .intersection-controls {
+            display: none;
+        }
+
+        .intersection-controls.active {
+            display: block;
+        }
+
+        .function-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .function-select:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .function-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .function-color {
+            width: 16px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .function-color.f1 { background: #6366f1; }
+        .function-color.f2 { background: #10b981; }
+
+        .param-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .param-input {
+            flex: 1;
+            padding: 0.6rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .param-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .param-input-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+
+        .intersection-points {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            margin-top: 1rem;
+        }
+
+        .intersection-title {
+            font-weight: 600;
+            color: #10b981;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .intersection-list {
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .intersection-point {
+            padding: 0.5rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .intersection-point:last-child {
+            margin-bottom: 0;
+        }
+
+        .point-marker {
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .no-intersection {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Legend for intersection mode */
+        .legend-line.func1 { background: #6366f1; }
+        .legend-line.func2 { background: #10b981; }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+        }
+
         /* AI hint section */
         .ai-hint-section {
             margin-top: 1rem;
@@ -414,7 +583,7 @@
             <!-- Graph panel -->
             <div class="graph-panel">
                 <canvas id="mainCanvas"></canvas>
-                <div class="graph-legend">
+                <div class="graph-legend" id="graphLegend">
                     <div class="legend-item">
                         <div class="legend-line original"></div>
                         <span>Базова функція</span>
@@ -422,6 +591,20 @@
                     <div class="legend-item">
                         <div class="legend-line transformed"></div>
                         <span>Перетворена</span>
+                    </div>
+                </div>
+                <div class="graph-legend hidden" id="intersectionLegend">
+                    <div class="legend-item">
+                        <div class="legend-line func1"></div>
+                        <span>f(x)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line func2"></div>
+                        <span>g(x)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot"></div>
+                        <span>Перетин</span>
                     </div>
                 </div>
                 <div class="graph-info">
@@ -432,48 +615,106 @@
 
             <!-- Controls panel -->
             <div class="controls-panel">
-                <div class="formula-display" id="formulaDisplay">
-                    <!-- KaTeX formula will be rendered here -->
+                <!-- Mode tabs -->
+                <div class="mode-tabs">
+                    <button class="mode-tab active" data-mode="transform">📊 Перетворення</button>
+                    <button class="mode-tab" data-mode="intersection">✖️ Перетин</button>
                 </div>
 
-                <div class="controls-section" id="transformControls">
-                    <div class="section-title">⚙️ Параметри</div>
-                    <!-- Sliders will be generated dynamically -->
-                </div>
-
-                <div class="controls-section">
-                    <div class="section-title">🎯 Швидкі налаштування</div>
-                    <div class="quick-buttons" id="quickButtons">
-                        <button class="quick-btn" data-action="reset">Скинути</button>
-                        <button class="quick-btn" data-action="flip-x">Відобразити X</button>
-                        <button class="quick-btn" data-action="flip-y">Відобразити Y</button>
-                        <button class="quick-btn" data-action="stretch">Розтягнути</button>
-                        <button class="quick-btn" data-action="compress">Стиснути</button>
+                <!-- Transform mode controls -->
+                <div id="transformMode">
+                    <div class="formula-display" id="formulaDisplay">
+                        <!-- KaTeX formula will be rendered here -->
                     </div>
-                </div>
 
-                <div class="transform-description" id="transformDescription">
-                    <div class="transform-text">
-                        Рухай повзунки, щоб побачити, як змінюється графік функції!
+                    <div class="controls-section" id="transformControls">
+                        <div class="section-title">⚙️ Параметри</div>
+                        <!-- Sliders will be generated dynamically -->
                     </div>
-                </div>
 
-                <div class="ai-hint-section">
-                    <div class="ai-hint-header">
-                        <span>💡</span>
-                        <span>Підказка</span>
+                    <div class="controls-section">
+                        <div class="section-title">🎯 Швидкі налаштування</div>
+                        <div class="quick-buttons" id="quickButtons">
+                            <button class="quick-btn" data-action="reset">Скинути</button>
+                            <button class="quick-btn" data-action="flip-x">Відобразити X</button>
+                            <button class="quick-btn" data-action="flip-y">Відобразити Y</button>
+                            <button class="quick-btn" data-action="stretch">Розтягнути</button>
+                            <button class="quick-btn" data-action="compress">Стиснути</button>
+                        </div>
                     </div>
-                    <div class="ai-hint-text" id="aiHintText">
-                        Виберіть тип функції та експериментуйте з параметрами!
+
+                    <div class="transform-description" id="transformDescription">
+                        <div class="transform-text">
+                            Рухай повзунки, щоб побачити, як змінюється графік функції!
+                        </div>
                     </div>
+
+                    <div class="ai-hint-section">
+                        <div class="ai-hint-header">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </div>
+                        <div class="ai-hint-text" id="aiHintText">
+                            Виберіть тип функції та експериментуйте з параметрами!
+                        </div>
+                    </div>
+
+                    <div class="animation-toggle">
+                        <div class="toggle-switch" id="animToggle"></div>
+                        <span class="toggle-label">Показувати анімацію переходу</span>
+                    </div>
+
+                    <button class="reset-btn" id="resetBtn">🔄 Скинути всі параметри</button>
                 </div>
 
-                <div class="animation-toggle">
-                    <div class="toggle-switch" id="animToggle"></div>
-                    <span class="toggle-label">Показувати анімацію переходу</span>
-                </div>
+                <!-- Intersection mode controls -->
+                <div id="intersectionMode" class="intersection-controls">
+                    <div class="section-title">📈 Перша функція</div>
+                    <div class="function-label"><div class="function-color f1"></div> f(x)</div>
+                    <select class="function-select" id="func1Select">
+                        <option value="linear">y = kx + b (Лінійна)</option>
+                        <option value="parabola">y = ax² + bx + c (Парабола)</option>
+                        <option value="sqrt">y = a√x + b (Корінь)</option>
+                        <option value="abs">y = a|x| + b (Модуль)</option>
+                        <option value="hyperbola">y = a/x + b (Гіпербола)</option>
+                        <option value="sin">y = a·sin(kx) + b (Синус)</option>
+                        <option value="cos">y = a·cos(kx) + b (Косинус)</option>
+                        <option value="exp">y = aˣ + b (Показникова)</option>
+                        <option value="horizontal">y = c (Горизонтальна)</option>
+                        <option value="vertical">x = c (Вертикальна)</option>
+                    </select>
+                    <div id="func1Params" class="param-input-group"></div>
 
-                <button class="reset-btn" id="resetBtn">🔄 Скинути всі параметри</button>
+                    <div class="section-title" style="margin-top: 1rem;">📉 Друга функція</div>
+                    <div class="function-label"><div class="function-color f2"></div> g(x)</div>
+                    <select class="function-select" id="func2Select">
+                        <option value="horizontal" selected>y = c (Горизонтальна)</option>
+                        <option value="vertical">x = c (Вертикальна)</option>
+                        <option value="linear">y = kx + b (Лінійна)</option>
+                        <option value="parabola">y = ax² + bx + c (Парабола)</option>
+                        <option value="sqrt">y = a√x + b (Корінь)</option>
+                        <option value="abs">y = a|x| + b (Модуль)</option>
+                        <option value="hyperbola">y = a/x + b (Гіпербола)</option>
+                        <option value="sin">y = a·sin(kx) + b (Синус)</option>
+                        <option value="cos">y = a·cos(kx) + b (Косинус)</option>
+                        <option value="exp">y = aˣ + b (Показникова)</option>
+                    </select>
+                    <div id="func2Params" class="param-input-group"></div>
+
+                    <div class="intersection-points" id="intersectionPoints">
+                        <div class="intersection-title">
+                            <span>🎯</span>
+                            <span>Точки перетину</span>
+                        </div>
+                        <div class="intersection-list" id="intersectionList">
+                            <div class="no-intersection">Виберіть функції та натисніть "Знайти"</div>
+                        </div>
+                    </div>
+
+                    <button class="reset-btn" id="findIntersectionBtn" style="background: var(--accent); color: white; border-color: var(--accent); margin-top: 1rem;">
+                        🔍 Знайти перетин
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -896,6 +1137,70 @@
                         `Масштаб: ${(this.scale / 40).toFixed(1)}x`;
                     this.draw();
                 });
+
+                // Touch support for mobile
+                let lastTouchDistance = 0;
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let isPanning = false;
+
+                this.canvas.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 2) {
+                        // Pinch to zoom
+                        const dx = e.touches[0].clientX - e.touches[1].clientX;
+                        const dy = e.touches[0].clientY - e.touches[1].clientY;
+                        lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+                    } else if (e.touches.length === 1) {
+                        // Pan
+                        isPanning = true;
+                        touchStartX = e.touches[0].clientX;
+                        touchStartY = e.touches[0].clientY;
+                    }
+                });
+
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+
+                    if (e.touches.length === 2) {
+                        // Pinch zoom
+                        const dx = e.touches[0].clientX - e.touches[1].clientX;
+                        const dy = e.touches[0].clientY - e.touches[1].clientY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (lastTouchDistance > 0) {
+                            const delta = distance / lastTouchDistance;
+                            this.scale *= delta;
+                            this.scale = Math.max(20, Math.min(100, this.scale));
+                            document.getElementById('zoomLevel').textContent =
+                                `Масштаб: ${(this.scale / 40).toFixed(1)}x`;
+                            this.draw();
+                        }
+                        lastTouchDistance = distance;
+                    } else if (e.touches.length === 1 && isPanning) {
+                        // Pan
+                        const dx = e.touches[0].clientX - touchStartX;
+                        const dy = e.touches[0].clientY - touchStartY;
+                        this.offsetX += dx;
+                        this.offsetY += dy;
+                        this.centerX = this.width / 2 + this.offsetX;
+                        this.centerY = this.height / 2 + this.offsetY;
+                        touchStartX = e.touches[0].clientX;
+                        touchStartY = e.touches[0].clientY;
+                        this.draw();
+
+                        // Update cursor position
+                        const rect = this.canvas.getBoundingClientRect();
+                        const x = (e.touches[0].clientX - rect.left - this.centerX) / this.scale;
+                        const y = -(e.touches[0].clientY - rect.top - this.centerY) / this.scale;
+                        document.getElementById('cursorPos').textContent =
+                            `x: ${x.toFixed(2)}, y: ${y.toFixed(2)}`;
+                    }
+                }, { passive: false });
+
+                this.canvas.addEventListener('touchend', () => {
+                    lastTouchDistance = 0;
+                    isPanning = false;
+                });
             }
 
             renderControls() {
@@ -1166,6 +1471,502 @@
                 ctx.stroke();
             }
         }
+
+        // ============ INTERSECTION FUNCTIONS ============
+        const INTERSECTION_FUNCTIONS = {
+            linear: {
+                name: 'Лінійна',
+                params: [
+                    { id: 'k', name: 'k', default: 1 },
+                    { id: 'b', name: 'b', default: 0 }
+                ],
+                compute: (x, p) => p.k * x + p.b,
+                latex: (p) => `y = ${p.k === 1 ? '' : p.k}x ${p.b >= 0 ? '+' : '-'} ${Math.abs(p.b)}`,
+                isVertical: false
+            },
+            parabola: {
+                name: 'Парабола',
+                params: [
+                    { id: 'a', name: 'a', default: 1 },
+                    { id: 'bCoef', name: 'b', default: 0 },
+                    { id: 'c', name: 'c', default: 0 }
+                ],
+                compute: (x, p) => p.a * x * x + p.bCoef * x + p.c,
+                latex: (p) => `y = ${p.a}x^2 ${p.bCoef >= 0 ? '+' : '-'} ${Math.abs(p.bCoef)}x ${p.c >= 0 ? '+' : '-'} ${Math.abs(p.c)}`,
+                isVertical: false
+            },
+            sqrt: {
+                name: 'Корінь',
+                params: [
+                    { id: 'a', name: 'a', default: 1 },
+                    { id: 'b', name: 'b', default: 0 }
+                ],
+                compute: (x, p) => x >= 0 ? p.a * Math.sqrt(x) + p.b : NaN,
+                latex: (p) => `y = ${p.a}\\sqrt{x} ${p.b >= 0 ? '+' : '-'} ${Math.abs(p.b)}`,
+                isVertical: false
+            },
+            abs: {
+                name: 'Модуль',
+                params: [
+                    { id: 'a', name: 'a', default: 1 },
+                    { id: 'b', name: 'b', default: 0 }
+                ],
+                compute: (x, p) => p.a * Math.abs(x) + p.b,
+                latex: (p) => `y = ${p.a}|x| ${p.b >= 0 ? '+' : '-'} ${Math.abs(p.b)}`,
+                isVertical: false
+            },
+            hyperbola: {
+                name: 'Гіпербола',
+                params: [
+                    { id: 'a', name: 'a', default: 1 },
+                    { id: 'b', name: 'b', default: 0 }
+                ],
+                compute: (x, p) => Math.abs(x) < 0.01 ? NaN : p.a / x + p.b,
+                latex: (p) => `y = \\frac{${p.a}}{x} ${p.b >= 0 ? '+' : '-'} ${Math.abs(p.b)}`,
+                isVertical: false
+            },
+            sin: {
+                name: 'Синус',
+                params: [
+                    { id: 'a', name: 'a', default: 1 },
+                    { id: 'k', name: 'k', default: 1 },
+                    { id: 'b', name: 'b', default: 0 }
+                ],
+                compute: (x, p) => p.a * Math.sin(p.k * x) + p.b,
+                latex: (p) => `y = ${p.a}\\sin(${p.k}x) ${p.b >= 0 ? '+' : '-'} ${Math.abs(p.b)}`,
+                isVertical: false
+            },
+            cos: {
+                name: 'Косинус',
+                params: [
+                    { id: 'a', name: 'a', default: 1 },
+                    { id: 'k', name: 'k', default: 1 },
+                    { id: 'b', name: 'b', default: 0 }
+                ],
+                compute: (x, p) => p.a * Math.cos(p.k * x) + p.b,
+                latex: (p) => `y = ${p.a}\\cos(${p.k}x) ${p.b >= 0 ? '+' : '-'} ${Math.abs(p.b)}`,
+                isVertical: false
+            },
+            exp: {
+                name: 'Показникова',
+                params: [
+                    { id: 'base', name: 'a', default: 2 },
+                    { id: 'b', name: 'b', default: 0 }
+                ],
+                compute: (x, p) => Math.pow(p.base, x) + p.b,
+                latex: (p) => `y = ${p.base}^x ${p.b >= 0 ? '+' : '-'} ${Math.abs(p.b)}`,
+                isVertical: false
+            },
+            horizontal: {
+                name: 'Горизонтальна',
+                params: [
+                    { id: 'c', name: 'c', default: 0 }
+                ],
+                compute: (x, p) => p.c,
+                latex: (p) => `y = ${p.c}`,
+                isVertical: false
+            },
+            vertical: {
+                name: 'Вертикальна',
+                params: [
+                    { id: 'c', name: 'c', default: 0 }
+                ],
+                compute: (x, p) => NaN, // Special case
+                latex: (p) => `x = ${p.c}`,
+                isVertical: true
+            }
+        };
+
+        // ============ INTERSECTION CONTROLLER ============
+        class IntersectionController {
+            constructor(explorer) {
+                this.explorer = explorer;
+                this.func1Type = 'linear';
+                this.func2Type = 'horizontal';
+                this.func1Params = {};
+                this.func2Params = {};
+                this.intersectionPoints = [];
+
+                this.initParams();
+                this.setupEventListeners();
+                this.renderParams();
+            }
+
+            initParams() {
+                const f1 = INTERSECTION_FUNCTIONS[this.func1Type];
+                const f2 = INTERSECTION_FUNCTIONS[this.func2Type];
+
+                this.func1Params = {};
+                f1.params.forEach(p => this.func1Params[p.id] = p.default);
+
+                this.func2Params = {};
+                f2.params.forEach(p => this.func2Params[p.id] = p.default);
+            }
+
+            setupEventListeners() {
+                document.getElementById('func1Select').addEventListener('change', (e) => {
+                    this.func1Type = e.target.value;
+                    this.initParamsForFunc(1);
+                    this.renderParams();
+                    this.explorer.draw();
+                });
+
+                document.getElementById('func2Select').addEventListener('change', (e) => {
+                    this.func2Type = e.target.value;
+                    this.initParamsForFunc(2);
+                    this.renderParams();
+                    this.explorer.draw();
+                });
+
+                document.getElementById('findIntersectionBtn').addEventListener('click', () => {
+                    this.findIntersections();
+                    this.explorer.draw();
+                });
+            }
+
+            initParamsForFunc(funcNum) {
+                const type = funcNum === 1 ? this.func1Type : this.func2Type;
+                const f = INTERSECTION_FUNCTIONS[type];
+                const params = {};
+                f.params.forEach(p => params[p.id] = p.default);
+
+                if (funcNum === 1) {
+                    this.func1Params = params;
+                } else {
+                    this.func2Params = params;
+                }
+            }
+
+            renderParams() {
+                this.renderFuncParams(1);
+                this.renderFuncParams(2);
+            }
+
+            renderFuncParams(funcNum) {
+                const type = funcNum === 1 ? this.func1Type : this.func2Type;
+                const params = funcNum === 1 ? this.func1Params : this.func2Params;
+                const f = INTERSECTION_FUNCTIONS[type];
+                const container = document.getElementById(`func${funcNum}Params`);
+
+                let html = '';
+                f.params.forEach(p => {
+                    html += `
+                        <div style="flex: 1;">
+                            <div class="param-input-label">${p.name}</div>
+                            <input type="number" class="param-input"
+                                   id="func${funcNum}_${p.id}"
+                                   value="${params[p.id]}"
+                                   step="0.5">
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+
+                // Bind events
+                f.params.forEach(p => {
+                    const input = document.getElementById(`func${funcNum}_${p.id}`);
+                    input.addEventListener('input', (e) => {
+                        const value = parseFloat(e.target.value) || 0;
+                        if (funcNum === 1) {
+                            this.func1Params[p.id] = value;
+                        } else {
+                            this.func2Params[p.id] = value;
+                        }
+                        this.explorer.draw();
+                    });
+                });
+            }
+
+            getFunc1() {
+                const f = INTERSECTION_FUNCTIONS[this.func1Type];
+                return {
+                    compute: (x) => f.compute(x, this.func1Params),
+                    isVertical: f.isVertical,
+                    verticalX: f.isVertical ? this.func1Params.c : null
+                };
+            }
+
+            getFunc2() {
+                const f = INTERSECTION_FUNCTIONS[this.func2Type];
+                return {
+                    compute: (x) => f.compute(x, this.func2Params),
+                    isVertical: f.isVertical,
+                    verticalX: f.isVertical ? this.func2Params.c : null
+                };
+            }
+
+            findIntersections() {
+                this.intersectionPoints = [];
+                const f1 = this.getFunc1();
+                const f2 = this.getFunc2();
+
+                // Special cases for vertical lines
+                if (f1.isVertical && f2.isVertical) {
+                    // Two vertical lines - parallel or same
+                    if (f1.verticalX === f2.verticalX) {
+                        this.showIntersectionResult('Прямі співпадають');
+                    } else {
+                        this.showIntersectionResult('Прямі паралельні, перетину немає');
+                    }
+                    return;
+                }
+
+                if (f1.isVertical) {
+                    // Find y value of f2 at x = c
+                    const x = f1.verticalX;
+                    const y = f2.compute(x);
+                    if (!isNaN(y) && isFinite(y)) {
+                        this.intersectionPoints.push({ x, y });
+                    }
+                    this.showIntersectionPoints();
+                    return;
+                }
+
+                if (f2.isVertical) {
+                    // Find y value of f1 at x = c
+                    const x = f2.verticalX;
+                    const y = f1.compute(x);
+                    if (!isNaN(y) && isFinite(y)) {
+                        this.intersectionPoints.push({ x, y });
+                    }
+                    this.showIntersectionPoints();
+                    return;
+                }
+
+                // General case: find where f1(x) = f2(x)
+                // Use numerical approach - scan for sign changes
+                const xMin = -10;
+                const xMax = 10;
+                const step = 0.01;
+
+                let prevDiff = null;
+                let prevX = null;
+
+                for (let x = xMin; x <= xMax; x += step) {
+                    const y1 = f1.compute(x);
+                    const y2 = f2.compute(x);
+
+                    if (isNaN(y1) || isNaN(y2) || !isFinite(y1) || !isFinite(y2)) {
+                        prevDiff = null;
+                        prevX = null;
+                        continue;
+                    }
+
+                    const diff = y1 - y2;
+
+                    // Check for sign change (intersection)
+                    if (prevDiff !== null && prevDiff * diff < 0) {
+                        // Refine intersection point using bisection
+                        const intersectX = this.bisection(f1.compute, f2.compute, prevX, x);
+                        if (intersectX !== null) {
+                            const intersectY = f1.compute(intersectX);
+                            // Avoid duplicates
+                            const isDuplicate = this.intersectionPoints.some(p =>
+                                Math.abs(p.x - intersectX) < 0.05
+                            );
+                            if (!isDuplicate && !isNaN(intersectY) && isFinite(intersectY)) {
+                                this.intersectionPoints.push({
+                                    x: Math.round(intersectX * 100) / 100,
+                                    y: Math.round(intersectY * 100) / 100
+                                });
+                            }
+                        }
+                    }
+
+                    // Check for exact intersection (diff very close to 0)
+                    if (Math.abs(diff) < 0.001) {
+                        const isDuplicate = this.intersectionPoints.some(p =>
+                            Math.abs(p.x - x) < 0.05
+                        );
+                        if (!isDuplicate) {
+                            this.intersectionPoints.push({
+                                x: Math.round(x * 100) / 100,
+                                y: Math.round(y1 * 100) / 100
+                            });
+                        }
+                    }
+
+                    prevDiff = diff;
+                    prevX = x;
+                }
+
+                this.showIntersectionPoints();
+            }
+
+            bisection(f1, f2, a, b) {
+                const maxIter = 50;
+                const tolerance = 0.0001;
+
+                for (let i = 0; i < maxIter; i++) {
+                    const mid = (a + b) / 2;
+                    const diffMid = f1(mid) - f2(mid);
+                    const diffA = f1(a) - f2(a);
+
+                    if (Math.abs(diffMid) < tolerance || (b - a) / 2 < tolerance) {
+                        return mid;
+                    }
+
+                    if (diffA * diffMid < 0) {
+                        b = mid;
+                    } else {
+                        a = mid;
+                    }
+                }
+                return (a + b) / 2;
+            }
+
+            showIntersectionPoints() {
+                const container = document.getElementById('intersectionList');
+
+                if (this.intersectionPoints.length === 0) {
+                    container.innerHTML = '<div class="no-intersection">Перетину немає на проміжку [-10, 10]</div>';
+                    return;
+                }
+
+                let html = '';
+                this.intersectionPoints.forEach((p, i) => {
+                    html += `
+                        <div class="intersection-point">
+                            <div class="point-marker"></div>
+                            <span>P${i + 1}: (${p.x}; ${p.y})</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            showIntersectionResult(message) {
+                document.getElementById('intersectionList').innerHTML =
+                    `<div class="no-intersection">${message}</div>`;
+            }
+
+            getIntersectionPoints() {
+                return this.intersectionPoints;
+            }
+        }
+
+        // Update GraphExplorer to support intersection mode
+        const originalGraphExplorerInit = GraphExplorer.prototype.setupEventListeners;
+        GraphExplorer.prototype.setupEventListeners = function() {
+            originalGraphExplorerInit.call(this);
+
+            // Mode switching
+            this.mode = 'transform';
+            this.intersectionController = null;
+
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    this.mode = tab.dataset.mode;
+
+                    // Toggle visibility
+                    document.getElementById('transformMode').style.display =
+                        this.mode === 'transform' ? 'block' : 'none';
+                    document.getElementById('intersectionMode').classList.toggle('active',
+                        this.mode === 'intersection');
+
+                    // Toggle function tabs
+                    document.getElementById('functionTabs').style.display =
+                        this.mode === 'transform' ? 'flex' : 'none';
+
+                    // Toggle legends
+                    document.getElementById('graphLegend').classList.toggle('hidden',
+                        this.mode === 'intersection');
+                    document.getElementById('intersectionLegend').classList.toggle('hidden',
+                        this.mode === 'transform');
+
+                    // Initialize intersection controller if needed
+                    if (this.mode === 'intersection' && !this.intersectionController) {
+                        this.intersectionController = new IntersectionController(this);
+                    }
+
+                    this.draw();
+                });
+            });
+        };
+
+        // Override draw method to handle intersection mode
+        const originalDraw = GraphExplorer.prototype.draw;
+        GraphExplorer.prototype.draw = function() {
+            if (this.mode === 'intersection') {
+                this.drawIntersectionMode();
+            } else {
+                originalDraw.call(this);
+            }
+        };
+
+        GraphExplorer.prototype.drawIntersectionMode = function() {
+            const ctx = this.ctx;
+            ctx.clearRect(0, 0, this.width, this.height);
+
+            this.drawGrid();
+            this.drawAxes();
+
+            if (!this.intersectionController) return;
+
+            const f1 = this.intersectionController.getFunc1();
+            const f2 = this.intersectionController.getFunc2();
+
+            // Draw function 1 (blue)
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 3;
+            if (f1.isVertical) {
+                this.drawVerticalLine(f1.verticalX, '#6366f1');
+            } else {
+                this.plotFunction(f1.compute);
+            }
+
+            // Draw function 2 (green)
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 3;
+            if (f2.isVertical) {
+                this.drawVerticalLine(f2.verticalX, '#10b981');
+            } else {
+                this.plotFunction(f2.compute);
+            }
+
+            // Draw intersection points
+            const points = this.intersectionController.getIntersectionPoints();
+            points.forEach(p => {
+                this.drawIntersectionPoint(p.x, p.y);
+            });
+        };
+
+        GraphExplorer.prototype.drawVerticalLine = function(x, color) {
+            const ctx = this.ctx;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+
+            const canvasX = this.centerX + x * this.scale;
+            ctx.beginPath();
+            ctx.moveTo(canvasX, 0);
+            ctx.lineTo(canvasX, this.height);
+            ctx.stroke();
+        };
+
+        GraphExplorer.prototype.drawIntersectionPoint = function(x, y) {
+            const ctx = this.ctx;
+            const canvasX = this.centerX + x * this.scale;
+            const canvasY = this.centerY - y * this.scale;
+
+            // Outer circle
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(canvasX, canvasY, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Inner white circle
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(canvasX, canvasY, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Label
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 12px Inter';
+            ctx.fillText(`(${x}; ${y})`, canvasX + 12, canvasY - 8);
+        };
 
         // Initialize on DOM ready
         document.addEventListener('DOMContentLoaded', () => {

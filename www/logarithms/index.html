@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Логарифми | Math Quest</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="screen active">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <a href="../index.html" class="back-btn">← Меню</a>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Логарифми</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="welcome-screen">
+                <div class="welcome-icon">📊</div>
+                <h2 class="welcome-title">Логарифмічні вирази</h2>
+                <p class="welcome-description">Тотожності, властивості та обчислення</p>
+
+                <div class="topic-select">
+                    <h3>Обери тему:</h3>
+
+                    <button class="btn btn-topic" data-topic="definition">
+                        <span class="topic-icon">📝</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Означення</span>
+                            <span class="topic-formula">log_a b = c ⟺ a^c = b</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="basic">
+                        <span class="topic-icon">🎯</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Основна тотожність</span>
+                            <span class="topic-formula">a^(log_a b) = b</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="sum">
+                        <span class="topic-icon">➕</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Додавання</span>
+                            <span class="topic-formula">log_a(bc) = log_a b + log_a c</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="diff">
+                        <span class="topic-icon">➖</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Віднімання</span>
+                            <span class="topic-formula">log_a(b/c) = log_a b - log_a c</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="power">
+                        <span class="topic-icon">⚡</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Степінь</span>
+                            <span class="topic-formula">log_a b^n = n·log_a b</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="inverse">
+                        <span class="topic-icon">🔄</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Перевернутий</span>
+                            <span class="topic-formula">log_a b = 1/log_b a</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="decimal">
+                        <span class="topic-icon">🔟</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Десятковий (lg)</span>
+                            <span class="topic-formula">lg x = log_10 x</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="natural">
+                        <span class="topic-icon">📧</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Натуральний (ln)</span>
+                            <span class="topic-formula">ln x = log_e x</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="compute">
+                        <span class="topic-icon">🔢</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Обчислення</span>
+                            <span class="topic-formula">Знайди значення виразу</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic btn-mixed" data-topic="mixed">
+                        <span class="topic-icon">🎲</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Змішаний режим</span>
+                            <span class="topic-formula">Всі типи</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="questionScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="backBtn">← Назад</button>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title" id="topicTitle">Логарифми</h1>
+                </div>
+                <div class="header-right">
+                    <div class="stats-mini">
+                        <span class="stat-good">✅ <span id="correctCount">0</span></span>
+                        <span class="stat-bad">❌ <span id="wrongCount">0</span></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-number" id="questionNumber">Питання 1 / 10</div>
+
+                <div class="question-text" id="questionText">
+                    <!-- KaTeX rendered question -->
+                </div>
+
+                <div class="answers-container" id="answersContainer">
+                    <!-- Answer buttons -->
+                </div>
+
+                <div class="feedback-container" id="feedbackContainer">
+                    <div class="feedback-icon" id="feedbackIcon"></div>
+                    <div class="feedback-text" id="feedbackText"></div>
+                    <div class="feedback-explanation" id="feedbackExplanation"></div>
+                </div>
+
+                <button class="btn btn-primary btn-next hidden" id="nextBtn">Далі →</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left"></div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Результати</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="results-content">
+                <div class="results-icon" id="resultsIcon">🎉</div>
+                <h2 class="results-title" id="resultsTitle">Молодець!</h2>
+
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <span class="stat-value" id="finalCorrect">0</span>
+                        <span class="stat-label">Правильно</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="finalWrong">0</span>
+                        <span class="stat-label">Помилок</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="finalAccuracy">0%</span>
+                        <span class="stat-label">Точність</span>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary" id="restartBtn">🔄 Ще раз</button>
+                    <button class="btn btn-secondary" id="menuBtn">📚 Інші теми</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

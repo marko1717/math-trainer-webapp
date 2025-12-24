@@ -552,6 +552,88 @@ body.retro-mode .stat-label {
     max-width: 320px;
 }
 
+/* === Topic Select Buttons === */
+.topic-select {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.topic-select h3 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-topic {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-topic:hover, .btn-topic:active {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.topic-icon {
+    font-size: 1.8rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(239, 135, 72, 0.12);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.topic-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.topic-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.topic-formula {
+    font-size: 0.95rem;
+    color: var(--accent);
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    background: rgba(239, 135, 72, 0.08);
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.btn-mixed {
+    background: linear-gradient(135deg, rgba(239, 135, 72, 0.15), rgba(124, 157, 133, 0.15));
+    border-color: var(--accent);
+}
+
+.btn-mixed .topic-icon {
+    background: linear-gradient(135deg, var(--accent), var(--primary));
+    color: white;
+}
+
 /* === Responsive === */
 @media (max-width: 360px) {
     .header {

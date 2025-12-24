@@ -39,6 +39,9 @@
             </div>
         </div>
 
+        <!-- Name Input Screen removed - Apple App Store Guideline 4.0 compliance -->
+        <!-- We never ask users for name/email after Sign in with Apple -->
+
         <!-- Profile Screen -->
         <div id="profileScreen" class="screen">
             <a href="../index.html" class="back-link">← На головну</a>
@@ -114,6 +117,48 @@
                     <div class="achievement locked" title="10 сесій">📚</div>
                     <div class="achievement locked" title="Всі тренажери">🏅</div>
                     <div class="achievement locked" title="Рівень 10">👑</div>
+                </div>
+            </div>
+
+            <!-- Account Management -->
+            <div class="section-card danger-zone">
+                <h2>⚙️ Керування акаунтом</h2>
+                <p class="danger-warning">Видалення акаунту призведе до втрати всіх даних, включаючи прогрес, статистику та досягнення. Цю дію неможливо скасувати.</p>
+                <button id="deleteAccountBtn" class="btn-delete-account">
+                    🗑️ Видалити акаунт
+                </button>
+            </div>
+        </div>
+
+        <!-- Logout Confirmation Modal -->
+        <div id="logoutModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-icon">🚪</div>
+                <h2>Вийти з акаунту?</h2>
+                <p>Ви впевнені, що хочете вийти?</p>
+                <div class="modal-actions">
+                    <button id="cancelLogoutBtn" class="btn-cancel">Скасувати</button>
+                    <button id="confirmLogoutBtn" class="btn-confirm-logout">Так, вийти</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Account Confirmation Modal -->
+        <div id="deleteAccountModal" class="modal hidden">
+            <div class="modal-content delete-modal">
+                <div class="modal-icon">⚠️</div>
+                <h2>Видалити акаунт?</h2>
+                <p>Ви впевнені, що хочете видалити свій акаунт? Ця дія <strong>незворотна</strong>.</p>
+                <p>Буде видалено:</p>
+                <ul class="delete-list">
+                    <li>Весь прогрес по тренажерах</li>
+                    <li>Історію сесій</li>
+                    <li>Досягнення та статистику</li>
+                    <li>Обліковий запис</li>
+                </ul>
+                <div class="modal-actions">
+                    <button id="cancelDeleteBtn" class="btn-cancel">Скасувати</button>
+                    <button id="confirmDeleteBtn" class="btn-confirm-delete">Так, видалити</button>
                 </div>
             </div>
         </div>

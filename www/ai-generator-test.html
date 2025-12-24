@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Generator Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #f5f0ec;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1 { color: #EF8748; margin-bottom: 20px; text-align: center; }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        select, button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        select {
+            background: #252542;
+            color: #f5f0ec;
+            border: 2px solid #3a3a5a;
+        }
+        button {
+            background: #EF8748;
+            color: white;
+            font-weight: 600;
+        }
+        button:hover { background: #DB9063; }
+        button:disabled { background: #666; cursor: wait; }
+        .tasks-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .task-card {
+            background: #252542;
+            border: 2px solid #3a3a5a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .task-question {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        .task-answers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .answer-btn {
+            padding: 12px 16px;
+            background: #1a1a2e;
+            border: 2px solid #3a3a5a;
+            border-radius: 12px;
+            color: #f5f0ec;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .answer-btn:hover { border-color: #EF8748; }
+        .answer-btn.correct { background: #2d5a3d; border-color: #4ade80; }
+        .answer-btn.wrong { background: #5a2d2d; border-color: #f87171; }
+        .answer-btn.selected { border-color: #EF8748; background: rgba(239, 135, 72, 0.2); }
+        .explanation {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(124, 157, 133, 0.2);
+            border-radius: 8px;
+            display: none;
+        }
+        .explanation.show { display: block; }
+        .status {
+            text-align: center;
+            padding: 20px;
+            color: #a09a96;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #3a3a5a;
+            border-top-color: #EF8748;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <h1>AI Task Generator Test</h1>
+
+    <div class="controls">
+        <select id="topicSelect">
+            <option value="fsm">ФСМ</option>
+            <option value="polynomials">Многочлени</option>
+            <option value="linear">Лінійні рівняння</option>
+            <option value="systems">Системи рівнянь</option>
+            <option value="quadratic">Квадратні рівняння</option>
+        </select>
+        <select id="difficultySelect">
+            <option value="1">Рівень 1</option>
+            <option value="2">Рівень 2</option>
+            <option value="3">Рівень 3</option>
+        </select>
+        <select id="countSelect">
+            <option value="3">3 завдання</option>
+            <option value="5" selected>5 завдань</option>
+            <option value="10">10 завдань</option>
+        </select>
+        <button id="generateBtn">Згенерувати</button>
+    </div>
+
+    <div class="tasks-container" id="tasksContainer">
+        <div class="status">Натисніть "Згенерувати" для створення завдань</div>
+    </div>
+
+    <script src="shared/components/ai-generator.js"></script>
+    <script>
+        const topicSelect = document.getElementById('topicSelect');
+        const difficultySelect = document.getElementById('difficultySelect');
+        const countSelect = document.getElementById('countSelect');
+        const generateBtn = document.getElementById('generateBtn');
+        const tasksContainer = document.getElementById('tasksContainer');
+
+        generateBtn.addEventListener('click', async () => {
+            const topic = topicSelect.value;
+            const difficulty = parseInt(difficultySelect.value);
+            const count = parseInt(countSelect.value);
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Генерую...';
+            tasksContainer.innerHTML = '<div class="status"><div class="loading"></div> Генерую завдання...</div>';
+
+            try {
+                const tasks = await window.AITaskGenerator.generate(topic, difficulty, count);
+                renderTasks(tasks);
+            } catch (error) {
+                console.error('Error:', error);
+                tasksContainer.innerHTML = '<div class="status">Помилка генерації. Спробуйте ще раз.</div>';
+            }
+
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Згенерувати';
+        });
+
+        function renderTasks(tasks) {
+            if (!tasks || tasks.length === 0) {
+                tasksContainer.innerHTML = '<div class="status">Не вдалося згенерувати завдання</div>';
+                return;
+            }
+
+            tasksContainer.innerHTML = tasks.map((task, index) => {
+                // Shuffle answers
+                const allAnswers = [task.correct, ...(task.wrongAnswers || [])];
+                shuffleArray(allAnswers);
+
+                return `
+                    <div class="task-card" data-correct="${task.correct}">
+                        <div class="task-question"><strong>Завдання ${index + 1}</strong><br>${task.question}</div>
+                        <div class="task-answers">
+                            ${allAnswers.map((ans, i) => `
+                                <button class="answer-btn" data-answer="${ans}">
+                                    ${String.fromCharCode(65 + i)}) ${ans}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="explanation">${task.explanation || 'Пояснення відсутнє'}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const card = btn.closest('.task-card');
+                    const correct = card.dataset.correct;
+                    const selected = btn.dataset.answer;
+
+                    // Disable all buttons in this card
+                    card.querySelectorAll('.answer-btn').forEach(b => {
+                        b.disabled = true;
+                        if (b.dataset.answer === correct) {
+                            b.classList.add('correct');
+                        } else if (b === btn && selected !== correct) {
+                            b.classList.add('wrong');
+                        }
+                    });
+
+                    // Show explanation
+                    card.querySelector('.explanation').classList.add('show');
+                });
+            });
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>

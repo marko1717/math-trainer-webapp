@@ -340,14 +340,14 @@ body.retro-mode .btn-large {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
 }
 
 .question-card {
     background: var(--card-bg);
     border: 2px solid var(--border);
     border-radius: 12px;
-    padding: 20px;
+    padding: 14px;
     text-align: center;
 }
 
@@ -383,8 +383,8 @@ body.retro-mode .question-text {
     background: var(--bg-dark);
     border: 2px solid var(--border);
     border-radius: 12px;
-    padding: 16px;
-    margin: 16px 0;
+    padding: 12px;
+    margin: 8px 0;
 }
 
 body.retro-mode .graph-container {
@@ -395,33 +395,88 @@ body.retro-mode .graph-container {
 
 .graph-container canvas {
     width: 100%;
-    max-width: 300px;
+    max-width: 220px;
+    height: auto;
     margin: 0 auto;
     display: block;
+}
+
+/* Equation display - compact horizontal */
+.equation-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+.equation-original {
+    color: var(--graph-original);
+    font-weight: 600;
+}
+
+.equation-arrow {
+    color: var(--text-muted);
+}
+
+.equation-transformed {
+    color: var(--graph-transformed);
+    font-weight: 600;
+}
+
+/* Legend - compact horizontal */
+.graph-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+}
+
+.legend-color.original {
+    background: var(--graph-original);
+}
+
+.legend-color.transformed {
+    background: var(--graph-transformed);
 }
 
 /* === Answers === */
 .answers-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .answer-btn {
     font-family: inherit;
     width: 100%;
-    padding: 16px 18px;
+    padding: 12px 14px;
     background: var(--card-bg);
     border: 2px solid var(--border);
-    border-radius: 12px;
+    border-radius: 10px;
     text-align: left;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
 body.retro-mode .answer-btn {

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Стандартний вигляд | Math Quest</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/styles/base.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Theme -->
+    <script src="../shared/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <a href="../index.html" class="back-btn">← Меню</a>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Стандартний вигляд</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="welcome-screen">
+                <div class="welcome-icon">🔬</div>
+                <h2 class="welcome-title">Стандартний вигляд числа</h2>
+                <p class="welcome-description">Запис чисел у вигляді a × 10ⁿ</p>
+
+                <div class="topic-select">
+                    <h3>Обери тему:</h3>
+
+                    <button class="btn btn-topic" data-topic="basic">
+                        <span class="topic-icon">📝</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Основи</span>
+                            <span class="topic-formula">a × 10ⁿ, де 1 ≤ a < 10</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="large">
+                        <span class="topic-icon">🌍</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Великі числа</span>
+                            <span class="topic-formula">мільйони, мільярди...</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="small">
+                        <span class="topic-icon">🔬</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Малі числа</span>
+                            <span class="topic-formula">мілі-, мікро-, нано-</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic" data-topic="units">
+                        <span class="topic-icon">⚖️</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Одиниці виміру</span>
+                            <span class="topic-formula">г → кг, см → м</span>
+                        </div>
+                    </button>
+
+                    <button class="btn btn-topic btn-mixed" data-topic="mixed">
+                        <span class="topic-icon">🎲</span>
+                        <div class="topic-info">
+                            <span class="topic-name">Змішаний режим</span>
+                            <span class="topic-formula">Всі типи задач</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="backBtn">← Назад</button>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title" id="topicTitle">Стандартний вигляд</h1>
+                </div>
+                <div class="header-right">
+                    <div class="stats-mini">
+                        <span class="stat-good">✅ <span id="correct">0</span></span>
+                        <span class="stat-bad">❌ <span id="wrong">0</span></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <main class="main-content">
+                <div class="question-container">
+                    <div class="topic-badge" id="questionType">Стандартний вигляд</div>
+                    <div class="question-number" id="questionNumber">Питання 1 / 10</div>
+                    <div class="question-text" id="questionText"></div>
+
+                    <div class="answers-container" id="answers"></div>
+
+                    <div class="feedback-container" id="feedback"></div>
+
+                    <!-- Help Panel -->
+                    <div class="help-panel">
+                        <button class="help-btn" id="hintBtn">
+                            <span>💡</span>
+                            <span>Підказка</span>
+                        </button>
+                        <button class="help-btn help-btn-ai" id="aiHelpBtn">
+                            <span>🤖</span>
+                            <span>ШІ</span>
+                        </button>
+                        <button class="help-btn" id="formulaBtn">
+                            <span>📐</span>
+                            <span>Правила</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-next" id="nextBtn" style="display: none;">
+                    Далі →
+                </button>
+            </main>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <header class="trainer-header">
+                <div class="header-left">
+                    <button class="back-btn" id="resultBackBtn">← Назад</button>
+                </div>
+                <div class="header-center">
+                    <h1 class="trainer-title">Результати</h1>
+                </div>
+                <div class="header-right"></div>
+            </header>
+
+            <div class="results-content">
+                <div class="results-icon" id="resultIcon">🎉</div>
+                <h2 class="results-title" id="resultTitle">Чудова робота!</h2>
+
+                <div class="results-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalCorrect">0</div>
+                        <div class="stat-label">Правильно</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalWrong">0</div>
+                        <div class="stat-label">Помилок</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="finalAccuracy">0%</div>
+                        <div class="stat-label">Точність</div>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary btn-large" id="restartBtn">🔄 Ще раз</button>
+                    <button class="btn btn-secondary" id="menuBtn">📚 Інші теми</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formula Modal -->
+        <div id="formulaModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📐 Правила</h3>
+                    <button class="modal-close" id="formulaCloseBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="formula-section">
+                        <h4>Стандартний вигляд:</h4>
+                        <div class="formula-item" id="f1"></div>
+                        <p class="formula-note">де 1 ≤ a < 10, n — ціле число</p>
+                    </div>
+                    <div class="formula-section">
+                        <h4>Одиниці виміру:</h4>
+                        <div class="units-table">
+                            <div class="unit-row">
+                                <span>1 км = 1000 м = 10³ м</span>
+                            </div>
+                            <div class="unit-row">
+                                <span>1 м = 100 см = 10² см</span>
+                            </div>
+                            <div class="unit-row">
+                                <span>1 кг = 1000 г = 10³ г</span>
+                            </div>
+                            <div class="unit-row">
+                                <span>1 г = 1000 мг = 10³ мг</span>
+                            </div>
+                            <div class="unit-row">
+                                <span>1 л = 1000 мл = 10³ мл</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="formula-section">
+                        <h4>Префікси:</h4>
+                        <div class="units-table">
+                            <div class="unit-row">
+                                <span>кіло (к) = 10³</span>
+                            </div>
+                            <div class="unit-row">
+                                <span>мілі (м) = 10⁻³</span>
+                            </div>
+                            <div class="unit-row">
+                                <span>мікро (мк) = 10⁻⁶</span>
+                            </div>
+                            <div class="unit-row">
+                                <span>нано (н) = 10⁻⁹</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Helper Modal -->
+        <div id="aiHelperModal" class="ai-modal hidden">
+            <div class="ai-modal-content">
+                <div class="ai-modal-header">
+                    <div class="ai-modal-title">
+                        <span>🤖</span>
+                        <span>Допомога ШІ</span>
+                    </div>
+                    <button class="ai-close-btn" id="aiCloseBtn">&times;</button>
+                </div>
+                <div class="ai-modal-body" id="aiModalBody">
+                    <div class="ai-loading" id="aiLoading">
+                        <div class="ai-loading-spinner"></div>
+                        <span>Думаю...</span>
+                    </div>
+                    <div class="ai-response" id="aiResponse"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

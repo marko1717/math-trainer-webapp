@@ -144,6 +144,100 @@ body.retro-mode .login-info {
     font-size: 0.35rem;
 }
 
+/* === Name Input Screen === */
+.name-input-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+    margin-top: 60px;
+}
+
+.name-input-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.name-input-card h1 {
+    font-size: 1.5rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+}
+
+.name-input-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+.name-text-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    background: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.name-text-input:focus {
+    border-color: var(--accent);
+}
+
+.name-text-input::placeholder {
+    color: var(--text-muted);
+}
+
+.btn-save-name {
+    display: block;
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--accent);
+    color: #fff;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 12px;
+}
+
+.btn-save-name:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 135, 72, 0.3);
+}
+
+.btn-save-name:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-skip-name {
+    display: block;
+    width: 100%;
+    padding: 12px 24px;
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.btn-skip-name:hover {
+    color: var(--text);
+}
+
 /* === Back Link === */
 .back-link {
     display: inline-block;
@@ -530,4 +624,213 @@ body.retro-mode .loading-message {
 
 body.retro-mode .empty-message {
     font-size: 0.4rem;
+}
+
+/* === Danger Zone (Delete Account) === */
+.danger-zone {
+    border-color: var(--error);
+    background: rgba(220, 53, 69, 0.05);
+}
+
+.danger-zone h2 {
+    color: var(--text);
+}
+
+.danger-warning {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+body.retro-mode .danger-warning {
+    font-size: 0.35rem;
+}
+
+.btn-delete-account {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 24px;
+    background: transparent;
+    color: var(--error);
+    border: 2px solid var(--error);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .btn-delete-account {
+    font-size: 0.4rem;
+    border-radius: 0;
+}
+
+.btn-delete-account:hover {
+    background: var(--error);
+    color: #fff;
+}
+
+/* === Delete Account Modal === */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+body.retro-mode .modal-content {
+    border-radius: 0;
+    border-width: 4px;
+    box-shadow: 4px 4px 0 var(--bg-dark);
+}
+
+.delete-modal {
+    border-color: var(--error);
+}
+
+.modal-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.modal-content h2 {
+    font-size: 1.3rem;
+    color: var(--error);
+    margin-bottom: 12px;
+}
+
+body.retro-mode .modal-content h2 {
+    font-size: 0.6rem;
+}
+
+.modal-content p {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+body.retro-mode .modal-content p {
+    font-size: 0.4rem;
+}
+
+.delete-list {
+    text-align: left;
+    margin: 16px 0;
+    padding-left: 24px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+body.retro-mode .delete-list {
+    font-size: 0.35rem;
+}
+
+.delete-list li {
+    margin-bottom: 6px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--bg-dark);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .btn-cancel {
+    font-size: 0.4rem;
+    border-radius: 0;
+}
+
+.btn-cancel:hover {
+    background: var(--border);
+}
+
+.btn-confirm-delete {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--error);
+    color: #fff;
+    border: 2px solid var(--error);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .btn-confirm-delete {
+    font-size: 0.4rem;
+    border-radius: 0;
+}
+
+.btn-confirm-delete:hover {
+    background: #c82333;
+    border-color: #c82333;
+}
+
+.btn-confirm-delete:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-confirm-logout {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--primary);
+    color: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.retro-mode .btn-confirm-logout {
+    font-size: 0.4rem;
+    border-radius: 0;
+}
+
+.btn-confirm-logout:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
 }

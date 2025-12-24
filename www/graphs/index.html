@@ -103,21 +103,16 @@
                     <!-- Graph Display -->
                     <div class="graph-container">
                         <div class="graph-wrapper">
-                            <canvas id="graphCanvas" width="300" height="300"></canvas>
-                            <div class="equation-display" id="equationDisplay">
-                                <div class="equation-original" id="originalEquation">f(x) = x²</div>
-                                <div class="equation-transformed" id="transformedEquation">g(x) = ?</div>
-                            </div>
+                            <canvas id="graphCanvas" width="240" height="240"></canvas>
+                        </div>
+                        <div class="equation-display" id="equationDisplay">
+                            <span class="equation-original" id="originalEquation">f(x) = x²</span>
+                            <span class="equation-arrow">→</span>
+                            <span class="equation-transformed" id="transformedEquation">g(x) = ?</span>
                         </div>
                         <div class="graph-legend">
-                            <div class="legend-item">
-                                <span class="legend-color original"></span>
-                                <span>f(x) - оригінал</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color transformed"></span>
-                                <span>g(x) - трансформація</span>
-                            </div>
+                            <span class="legend-item"><span class="legend-color original"></span>f(x)</span>
+                            <span class="legend-item"><span class="legend-color transformed"></span>g(x)</span>
                         </div>
                     </div>
 

@@ -168,6 +168,8 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
+    position: relative;
+    z-index: 1001; /* Above story-nav */
 }
 
 .story-info {
@@ -205,6 +207,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    z-index: 1001; /* Above story-nav-right */
 }
 
 /* Story Content */

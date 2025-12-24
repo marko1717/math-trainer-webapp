@@ -39,10 +39,6 @@ let mode = 'exam'; // 'exam' or 'training'
 let selectedTopic = 'all';
 let hintCache = {}; // Cache for AI hints
 let draggedOption = null;
-let isPaused = false;
-
-// Saved progress key
-const SAVED_TEST_KEY = 'nmt_saved_test';
 
 // ========== DOM ELEMENTS ==========
 
@@ -74,16 +70,35 @@ const nextBtn = document.getElementById('nextBtn');
 
 // ========== INITIALIZATION ==========
 
+let classtimeData = null;
+let dataSource = 'nmt'; // 'nmt' or 'classtime'
+
 async function init() {
     try {
+        // Load main NMT data
         const response = await fetch('nmt_data.json');
         nmtData = await response.json();
+
+        // Try to load Classtime data
+        try {
+            const ctResponse = await fetch('classtime_data.json');
+            classtimeData = await ctResponse.json();
+            console.log(`Loaded ${classtimeData.test_sets?.length || 0} Classtime sets`);
+        } catch (e) {
+            console.log('Classtime data not available');
+        }
+
         renderTestList();
         setupEventListeners();
     } catch (error) {
         console.error('Error loading NMT data:', error);
         testList.innerHTML = '<p style="color: var(--text-secondary);">Помилка завантаження даних</p>';
     }
+}
+
+function switchDataSource(source) {
+    dataSource = source;
+    renderTestList();
 }
 
 function setupEventListeners() {
@@ -138,12 +153,13 @@ function setupEventListeners() {
         showTask();
     });
 
-    // Pause and navigation buttons
-    document.getElementById('backToListBtn').addEventListener('click', showPauseModal);
-    document.getElementById('pauseBtn').addEventListener('click', showPauseModal);
-    document.getElementById('resumeBtn').addEventListener('click', hidePauseModal);
-    document.getElementById('saveExitBtn').addEventListener('click', saveAndExit);
-    document.getElementById('quitTestBtn').addEventListener('click', quitTest);
+    // Exit test button - back to test list
+    document.getElementById('exitTestBtn').addEventListener('click', () => {
+        if (confirm('Ви впевнені, що хочете вийти з тесту? Прогрес буде втрачено.')) {
+            clearInterval(timerInterval);
+            showScreen('select');
+        }
+    });
 }
 
 function setupMatchingDragDrop() {
@@ -253,26 +269,24 @@ function placeAnswer(zone, value) {
 function renderTestList() {
     testList.innerHTML = '';
 
-    // Check for saved test
-    const savedTest = loadSavedTest();
-    if (savedTest) {
-        const continueCard = document.createElement('div');
-        continueCard.className = 'test-card continue-card';
-        continueCard.style.cssText = 'border-color: var(--success); background: rgba(52, 199, 89, 0.1);';
-
-        const answeredCount = savedTest.userAnswers.filter(a => a !== null).length;
-        const totalCount = savedTest.userAnswers.length;
-        const minutes = Math.floor(savedTest.elapsedSeconds / 60);
-
-        continueCard.innerHTML = `
-            <div class="test-card-info">
-                <h3>▶️ Продовжити: ${savedTest.testData.name}</h3>
-                <p>${answeredCount}/${totalCount} завдань • ${minutes} хв</p>
-            </div>
-            <span class="test-card-arrow" style="color: var(--success);">→</span>
+    // Add data source toggle if Classtime data available
+    if (classtimeData) {
+        const sourceToggle = document.createElement('div');
+        sourceToggle.className = 'source-toggle';
+        sourceToggle.innerHTML = `
+            <button class="source-btn ${dataSource === 'nmt' ? 'active' : ''}" onclick="switchDataSource('nmt')">
+                📚 НМТ тести
+            </button>
+            <button class="source-btn ${dataSource === 'classtime' ? 'active' : ''}" onclick="switchDataSource('classtime')">
+                🎓 Classtime (${classtimeData.stats?.total_questions || 0} завдань)
+            </button>
         `;
-        continueCard.addEventListener('click', () => continueSavedTest(savedTest));
-        testList.appendChild(continueCard);
+        testList.appendChild(sourceToggle);
+    }
+
+    if (dataSource === 'classtime' && classtimeData) {
+        renderClasstimeList();
+        return;
     }
 
     // Sort tests by name
@@ -296,132 +310,56 @@ function renderTestList() {
         testList.appendChild(card);
     });
 
-    // Add quizzes section with categories
+    // Add quizzes section if available
     if (nmtData.quizzes && nmtData.quizzes.length > 0) {
-        // Group quizzes by tag
-        const quizzesByTag = {};
-        nmtData.quizzes.forEach(q => {
-            const tag = q.tag || 'інше';
-            if (!quizzesByTag[tag]) {
-                quizzesByTag[tag] = [];
-            }
-            quizzesByTag[tag].push(q);
-        });
-
-        // Sort tags by count
-        const sortedTags = Object.entries(quizzesByTag)
-            .sort((a, b) => b[1].length - a[1].length);
-
-        // Add header for quizzes
-        const quizzesHeader = document.createElement('div');
-        quizzesHeader.className = 'test-section-header';
-        quizzesHeader.innerHTML = `<h3>📝 Окремі завдання (${nmtData.quizzes.length})</h3>`;
-        quizzesHeader.style.cssText = 'margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--text-muted); font-size: 0.9rem;';
-        testList.appendChild(quizzesHeader);
-
-        // Add "All quizzes" option
-        const allCard = document.createElement('div');
-        allCard.className = 'test-card';
-        allCard.innerHTML = `
+        const quizzesCard = document.createElement('div');
+        quizzesCard.className = 'test-card';
+        quizzesCard.innerHTML = `
             <div class="test-card-info">
-                <h3>🎯 Всі завдання</h3>
-                <p>${nmtData.quizzes.length} завдань (випадкові 15)</p>
+                <h3>📝 Окремі завдання</h3>
+                <p>${nmtData.quizzes.length} завдань з різних тем</p>
             </div>
             <span class="test-card-arrow">→</span>
         `;
-        allCard.addEventListener('click', () => startQuizzesRandom(15));
-        testList.appendChild(allCard);
-
-        // Add category cards
-        sortedTags.forEach(([tag, quizzes]) => {
-            const card = document.createElement('div');
-            card.className = 'test-card quiz-category';
-            const tagName = tag.replace('#', '').replace(/_/g, ' ');
-            card.innerHTML = `
-                <div class="test-card-info">
-                    <h3>${getTagEmoji(tag)} ${capitalizeFirst(tagName)}</h3>
-                    <p>${quizzes.length} завдань</p>
-                </div>
-                <span class="test-card-arrow">→</span>
-            `;
-            card.addEventListener('click', () => startQuizzesByTag(tag, quizzes));
-            testList.appendChild(card);
-        });
+        quizzesCard.addEventListener('click', () => startQuizzes());
+        testList.appendChild(quizzesCard);
     }
 }
 
-// Get emoji for tag
-function getTagEmoji(tag) {
-    const tagLower = tag.toLowerCase();
-    if (tagLower.includes('відсот')) return '💯';
-    if (tagLower.includes('систем')) return '🔗';
-    if (tagLower.includes('тригонометр')) return '📐';
-    if (tagLower.includes('похідн')) return '📈';
-    if (tagLower.includes('первісн')) return '∫';
-    if (tagLower.includes('логарифм')) return '📊';
-    if (tagLower.includes('показник')) return 'ⁿ';
-    if (tagLower.includes('функц')) return '📉';
-    if (tagLower.includes('геометр') || tagLower.includes('планіметр')) return '🔺';
-    if (tagLower.includes('стерео')) return '🧊';
-    if (tagLower.includes('нерівн')) return '⚖️';
-    if (tagLower.includes('комбінатор')) return '🎲';
-    if (tagLower.includes('ймовірн')) return '🎯';
-    if (tagLower.includes('прогрес') || tagLower.includes('послідовн')) return '📋';
-    if (tagLower.includes('алгебра')) return '🔢';
-    if (tagLower.includes('пропорц')) return '⚖️';
-    return '📝';
-}
+function renderClasstimeList() {
+    // Group by folder
+    const folders = {};
+    classtimeData.test_sets.forEach(set => {
+        const folder = set.folder || 'Інше';
+        if (!folders[folder]) folders[folder] = [];
+        folders[folder].push(set);
+    });
 
-function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
+    // Render folders
+    Object.entries(folders).sort().forEach(([folderName, sets]) => {
+        const folderHeader = document.createElement('div');
+        folderHeader.className = 'folder-header';
+        folderHeader.innerHTML = `
+            <h3>📁 ${folderName}</h3>
+            <span class="folder-count">${sets.length} сетів</span>
+        `;
+        testList.appendChild(folderHeader);
 
-// Check if answer is numerical (requires keyboard input)
-function isNumericalAnswer(answer) {
-    if (!answer) return false;
-    // Letters А-Д are multiple choice
-    if (/^[АБВГД]$/.test(answer)) return false;
-    // Space-separated letters are matching
-    if (/^[АБВГД](\s+[АБВГД])+$/.test(answer)) return false;
-    // Everything else (numbers, decimals, fractions) is numerical
-    return true;
-}
-
-// Start random quizzes
-function startQuizzesRandom(count) {
-    const shuffled = [...nmtData.quizzes].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, count);
-
-    const quizTest = {
-        id: 'quizzes_random',
-        name: `Випадкові ${count} завдань`,
-        tasks: selected.map((q, i) => ({
-            task_num: i + 1,
-            type: isNumericalAnswer(q.correct) ? 'short' : 'quiz',
-            photo: q.photo,
-            correct: q.correct,
-            solution_photo: q.solution_photo || null,
-            tag: q.tag || ''
-        }))
-    };
-    startTest(quizTest);
-}
-
-// Start quizzes by tag
-function startQuizzesByTag(tag, quizzes) {
-    const quizTest = {
-        id: `quizzes_${tag}`,
-        name: tag.replace('#', '').replace(/_/g, ' '),
-        tasks: quizzes.map((q, i) => ({
-            task_num: i + 1,
-            type: isNumericalAnswer(q.correct) ? 'short' : 'quiz',
-            photo: q.photo,
-            correct: q.correct,
-            solution_photo: q.solution_photo || null,
-            tag: q.tag || ''
-        }))
-    };
-    startTest(quizTest);
+        sets.forEach(test => {
+            const tasksWithAnswers = test.tasks.filter(t => t.correct).length;
+            const card = document.createElement('div');
+            card.className = 'test-card';
+            card.innerHTML = `
+                <div class="test-card-info">
+                    <h3>${test.name}</h3>
+                    <p>${test.tasks.length} завдань • ${tasksWithAnswers} з відповідями</p>
+                </div>
+                <span class="test-card-arrow">→</span>
+            `;
+            card.addEventListener('click', () => startTest(test));
+            testList.appendChild(card);
+        });
+    });
 }
 
 // ========== TEST FLOW ==========
@@ -438,6 +376,23 @@ function startTest(test) {
     renderTaskNav();
     startTimer();
     showTask();
+}
+
+function startQuizzes() {
+    // Create a virtual test from quizzes
+    const quizTest = {
+        id: 'quizzes',
+        name: 'Окремі завдання',
+        tasks: nmtData.quizzes.map((q, i) => ({
+            task_num: i + 1,
+            type: q.type === 'short' ? 'short' : 'quiz',
+            photo: q.photo,
+            correct: q.correct,
+            solution_photo: null,
+            hashtag: q.hashtag || ''
+        }))
+    };
+    startTest(quizTest);
 }
 
 function showScreen(screen) {
@@ -477,80 +432,6 @@ function stopTimer() {
         clearInterval(timerInterval);
         timerInterval = null;
     }
-}
-
-// ========== PAUSE & SAVE ==========
-
-function showPauseModal() {
-    isPaused = true;
-    stopTimer();
-    document.getElementById('pauseModal').classList.remove('hidden');
-}
-
-function hidePauseModal() {
-    isPaused = false;
-    document.getElementById('pauseModal').classList.add('hidden');
-    startTimer();
-}
-
-function saveAndExit() {
-    // Save current test progress
-    const saveData = {
-        testId: currentTest.id || currentTest.name,
-        testData: currentTest,
-        currentTaskIndex,
-        totalScore,
-        userAnswers,
-        elapsedSeconds,
-        mode,
-        savedAt: Date.now()
-    };
-
-    localStorage.setItem(SAVED_TEST_KEY, JSON.stringify(saveData));
-
-    // Return to list
-    hidePauseModal();
-    stopTimer();
-    showScreen('select');
-    renderTestList(); // Update list to show continue option
-}
-
-function quitTest() {
-    // Clear any saved progress for this test
-    localStorage.removeItem(SAVED_TEST_KEY);
-
-    hidePauseModal();
-    stopTimer();
-    showScreen('select');
-}
-
-function loadSavedTest() {
-    try {
-        const saved = JSON.parse(localStorage.getItem(SAVED_TEST_KEY));
-        if (saved && saved.testData) {
-            return saved;
-        }
-    } catch (e) {
-        console.error('Error loading saved test:', e);
-    }
-    return null;
-}
-
-function continueSavedTest(savedData) {
-    currentTest = savedData.testData;
-    currentTaskIndex = savedData.currentTaskIndex;
-    totalScore = savedData.totalScore;
-    userAnswers = savedData.userAnswers;
-    elapsedSeconds = savedData.elapsedSeconds;
-    mode = savedData.mode;
-
-    // Clear saved data
-    localStorage.removeItem(SAVED_TEST_KEY);
-
-    showScreen('task');
-    renderTaskNav();
-    startTimer();
-    showTask();
 }
 
 function updateTimerDisplay() {
@@ -601,24 +482,9 @@ function renderTaskNav() {
 function updateTaskNav() {
     const buttons = taskNav.querySelectorAll('.task-nav-btn');
     buttons.forEach((btn, index) => {
-        // Reset classes
-        btn.classList.remove('current', 'answered', 'wrong', 'partial');
-
-        // Current task
+        btn.classList.remove('current');
         if (index === currentTaskIndex) {
             btn.classList.add('current');
-        }
-
-        // Answer status colors
-        if (userAnswers[index] !== null) {
-            const answer = userAnswers[index];
-            if (answer.isCorrect) {
-                btn.classList.add('answered'); // green
-            } else if (answer.partialScore > 0) {
-                btn.classList.add('partial'); // yellow
-            } else {
-                btn.classList.add('wrong'); // red
-            }
         }
     });
 }
@@ -646,8 +512,11 @@ function showTask() {
     updateTaskTypeBadge(taskType);
     updateTopicBadge(taskNum);
 
-    // Load image
-    if (task.photo) {
+    // Load image (support both local files and URLs)
+    if (task.photo_url) {
+        taskImage.src = task.photo_url;
+        taskImage.parentElement.style.display = 'block';
+    } else if (task.photo) {
         taskImage.src = `images/${task.photo}`;
         taskImage.parentElement.style.display = 'block';
     } else {
@@ -680,9 +549,8 @@ function showTask() {
         }
     }
 
-    // Show/hide hint button (training mode or quizzes section)
-    const isQuizzesSection = currentTest && currentTest.id === 'quizzes';
-    if ((mode === 'training' || isQuizzesSection) && !answered) {
+    // Show/hide hint button (training mode only)
+    if (mode === 'training' && !answered) {
         hintBtn.classList.remove('hidden');
     } else {
         hintBtn.classList.add('hidden');
@@ -821,8 +689,8 @@ function checkAnswer() {
             return;
         }
         isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(task.correct);
-        partialScore = isCorrect ? 2 : 0; // Short answer tasks worth 2 points
-        maxScore = 2;
+        partialScore = isCorrect ? 1 : 0;
+        maxScore = 1;
     } else {
         const selected = document.querySelector('.answer-btn.selected');
         if (!selected) {
@@ -1070,80 +938,18 @@ async function showHint() {
     // Show loading
     hintBtn.classList.add('hidden');
     hintContainer.classList.remove('hidden');
-    hintText.innerHTML = '<div class="hint-loading"><div class="spinner"></div>🤖 Генерую підказку...</div>';
+    hintText.innerHTML = '<div class="hint-loading"><div class="spinner"></div>Генерую підказку...</div>';
 
-    try {
-        // Try to get AI hint from API
-        const hint = await getAIHint(task);
+    // Generate hint (mock for now - can be replaced with actual AI call)
+    const hint = generateMockHint(task);
 
-        // Cache it
-        hintCache[cacheKey] = hint;
+    // Cache it
+    hintCache[cacheKey] = hint;
+
+    // Display after small delay for UX
+    setTimeout(() => {
         displayHint(hint);
-    } catch (error) {
-        console.error('AI hint error:', error);
-        // Fallback to mock hint
-        const fallbackHint = generateMockHint(task);
-        hintCache[cacheKey] = fallbackHint;
-        displayHint(fallbackHint);
-    }
-}
-
-// Get hint from AI API
-async function getAIHint(task) {
-    const API_URL = 'https://marko17.pythonanywhere.com/api/hint';
-
-    // Build context from task
-    const tag = task.tag || task.hashtag || '';
-    const taskNum = task.task_num || currentTaskIndex + 1;
-
-    // Determine topic from tag or task number
-    let topic = 'math';
-    if (tag.includes('відсотк')) topic = 'percent';
-    else if (tag.includes('систем')) topic = 'systems';
-    else if (tag.includes('квадрат')) topic = 'quadratic';
-    else if (tag.includes('тригонометр')) topic = 'trigonometry';
-    else if (tag.includes('логарифм')) topic = 'logarithm';
-    else if (tag.includes('похідн')) topic = 'derivative';
-    else if (tag.includes('первісн')) topic = 'integral';
-    else if (tag.includes('геометр') || tag.includes('планіметр')) topic = 'geometry';
-    else if (tag.includes('стерео')) topic = 'stereometry';
-    else if (tag.includes('функц')) topic = 'functions';
-    else if (tag.includes('нерівн')) topic = 'inequalities';
-    else if (tag.includes('ймовірн')) topic = 'probability';
-    else if (tag.includes('комбінатор')) topic = 'combinatorics';
-    else if (tag.includes('прогрес') || tag.includes('послідовн')) topic = 'sequences';
-    else if (taskNum >= 1 && taskNum <= 4) topic = 'algebra';
-    else if (taskNum >= 5 && taskNum <= 8) topic = 'planimetry';
-    else if (taskNum >= 9 && taskNum <= 12) topic = 'functions';
-    else if (taskNum >= 13 && taskNum <= 16) topic = 'trigonometry';
-    else if (taskNum >= 17 && taskNum <= 19) topic = 'calculus';
-    else if (taskNum >= 20 && taskNum <= 22) topic = 'stereometry';
-
-    // Build question description
-    const question = `НМТ завдання ${taskNum}. Тема: ${tag || topic}. Тип: ${task.type || 'quiz'}`;
-
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            topic,
-            question,
-            level: 2,
-            context: {
-                taskNum,
-                tag,
-                type: task.type,
-                isNMT: true
-            }
-        })
-    });
-
-    if (!response.ok) {
-        throw new Error('API error');
-    }
-
-    const data = await response.json();
-    return data.hint || generateMockHint(task);
+    }, 500);
 }
 
 function displayHint(hint) {
@@ -1212,91 +1018,6 @@ function generateMockHint(task) {
 
     return numHints[taskNum] || 'Уважно прочитай умову та визнач тип задачі. Запиши, що дано і що потрібно знайти.';
 }
-
-// ========== ZOOM FUNCTIONALITY ==========
-
-const zoomModal = document.getElementById('zoomModal');
-const zoomImage = document.getElementById('zoomImage');
-const zoomClose = document.getElementById('zoomClose');
-
-// Open zoom modal when clicking on task image
-document.querySelector('.task-image-container').addEventListener('click', () => {
-    const taskImg = document.getElementById('taskImage');
-    if (taskImg.src && !taskImg.src.endsWith('/')) {
-        zoomImage.src = taskImg.src;
-        zoomModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-});
-
-// Close zoom modal
-function closeZoom() {
-    zoomModal.classList.remove('active');
-    zoomImage.classList.remove('zoomed');
-    document.body.style.overflow = '';
-}
-
-zoomClose.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeZoom();
-});
-
-zoomModal.addEventListener('click', (e) => {
-    if (e.target === zoomModal || e.target === zoomImage) {
-        // Toggle zoom on image click, close on background click
-        if (e.target === zoomImage && !zoomImage.classList.contains('zoomed')) {
-            zoomImage.classList.add('zoomed');
-        } else {
-            closeZoom();
-        }
-    }
-});
-
-// Close on Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && zoomModal.classList.contains('active')) {
-        closeZoom();
-    }
-});
-
-// Pinch zoom support for mobile
-let initialDistance = 0;
-let currentScale = 1;
-
-zoomImage.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-        initialDistance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY
-        );
-    }
-}, { passive: true });
-
-zoomImage.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2) {
-        const distance = Math.hypot(
-            e.touches[0].pageX - e.touches[1].pageX,
-            e.touches[0].pageY - e.touches[1].pageY
-        );
-
-        if (initialDistance > 0) {
-            const scale = distance / initialDistance;
-            currentScale = Math.min(Math.max(1, scale), 3);
-            zoomImage.style.transform = `scale(${currentScale})`;
-        }
-    }
-}, { passive: true });
-
-zoomImage.addEventListener('touchend', () => {
-    if (currentScale <= 1.2) {
-        currentScale = 1;
-        zoomImage.style.transform = '';
-        zoomImage.classList.remove('zoomed');
-    } else if (currentScale > 1.5) {
-        zoomImage.classList.add('zoomed');
-    }
-    initialDistance = 0;
-}, { passive: true });
 
 // ========== INIT ==========
 

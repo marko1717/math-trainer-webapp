@@ -159,6 +159,58 @@
             color: var(--text-secondary);
         }
 
+        /* Source toggle for NMT/Classtime */
+        .source-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .source-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .source-btn.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Folder headers for Classtime */
+        .folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .folder-header h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .folder-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
         /* Mode toggle */
         .mode-toggle {
             display: flex;
@@ -194,6 +246,11 @@
             background: var(--bg-secondary);
             border-radius: 12px;
             margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .timer-bar .back-btn {
+            flex-shrink: 0;
         }
 
         .timer {
@@ -726,189 +783,6 @@
         .hidden {
             display: none !important;
         }
-
-        /* Zoom Modal for task images */
-        .zoom-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .zoom-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .zoom-modal-content {
-            max-width: 100%;
-            max-height: 90vh;
-            position: relative;
-        }
-
-        .zoom-image {
-            max-width: 100%;
-            max-height: 85vh;
-            border-radius: 12px;
-            background: #fff;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .zoom-modal.active .zoom-image {
-            transform: scale(1);
-        }
-
-        .zoom-close {
-            position: absolute;
-            top: -50px;
-            right: 0;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .zoom-hint {
-            position: absolute;
-            bottom: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-
-        /* Make task image clickable */
-        .task-image-container {
-            cursor: zoom-in;
-            position: relative;
-        }
-
-        .task-image-container::after {
-            content: '🔍';
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-
-        /* Pinch zoom support */
-        .zoom-image.zoomed {
-            cursor: move;
-            transform: scale(2) !important;
-        }
-
-        /* Timer bar buttons */
-        .timer-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--bg-tertiary);
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-        }
-
-        .timer-btn:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .timer-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        /* Pause Modal */
-        .pause-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 500;
-            padding: 20px;
-        }
-
-        .pause-modal.hidden {
-            display: none;
-        }
-
-        .pause-modal-content {
-            background: var(--bg-primary);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 320px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .pause-modal-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-        }
-
-        .pause-modal-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .pause-modal-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-
-        .pause-modal-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .pause-modal-buttons .btn-primary {
-            background: var(--success);
-        }
-
-        .pause-modal-buttons .btn-danger {
-            background: var(--error);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -945,10 +819,9 @@
         <!-- Task Screen -->
         <div class="task-screen" id="taskScreen">
             <div class="timer-bar">
-                <button class="timer-btn" id="backToListBtn" title="До списку">←</button>
+                <button class="back-btn" id="exitTestBtn" title="Вийти з тесту">←</button>
                 <span class="timer" id="timer">00:00</span>
                 <span class="progress-text" id="progressText">1 / 22</span>
-                <button class="timer-btn" id="pauseBtn" title="Пауза">⏸</button>
             </div>
 
             <div class="task-nav" id="taskNav">
@@ -1085,29 +958,6 @@
                 <button class="btn-secondary" id="backToTestsBtn" style="width: 100%;">
                     ← До списку тестів
                 </button>
-            </div>
-        </div>
-
-        <!-- Zoom Modal -->
-        <div class="zoom-modal" id="zoomModal">
-            <div class="zoom-modal-content">
-                <button class="zoom-close" id="zoomClose">×</button>
-                <img class="zoom-image" id="zoomImage" src="" alt="Збільшене зображення">
-                <div class="zoom-hint">Натисніть для закриття</div>
-            </div>
-        </div>
-
-        <!-- Pause Modal -->
-        <div class="pause-modal hidden" id="pauseModal">
-            <div class="pause-modal-content">
-                <div class="pause-modal-icon">⏸️</div>
-                <div class="pause-modal-title">Тест на паузі</div>
-                <div class="pause-modal-subtitle">Прогрес збережено. Можете продовжити пізніше.</div>
-                <div class="pause-modal-buttons">
-                    <button class="btn-primary" id="resumeBtn">▶️ Продовжити</button>
-                    <button class="btn-secondary" id="saveExitBtn">💾 Зберегти і вийти</button>
-                    <button class="btn-danger" id="quitTestBtn">🚪 Завершити тест</button>
-                </div>
             </div>
         </div>
     </div>

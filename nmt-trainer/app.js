@@ -70,16 +70,35 @@ const nextBtn = document.getElementById('nextBtn');
 
 // ========== INITIALIZATION ==========
 
+let classtimeData = null;
+let dataSource = 'nmt'; // 'nmt' or 'classtime'
+
 async function init() {
     try {
+        // Load main NMT data
         const response = await fetch('nmt_data.json');
         nmtData = await response.json();
+
+        // Try to load Classtime data
+        try {
+            const ctResponse = await fetch('classtime_data.json');
+            classtimeData = await ctResponse.json();
+            console.log(`Loaded ${classtimeData.test_sets?.length || 0} Classtime sets`);
+        } catch (e) {
+            console.log('Classtime data not available');
+        }
+
         renderTestList();
         setupEventListeners();
     } catch (error) {
         console.error('Error loading NMT data:', error);
         testList.innerHTML = '<p style="color: var(--text-secondary);">Помилка завантаження даних</p>';
     }
+}
+
+function switchDataSource(source) {
+    dataSource = source;
+    renderTestList();
 }
 
 function setupEventListeners() {
@@ -132,6 +151,14 @@ function setupEventListeners() {
         currentTaskIndex = 0;
         showScreen('task');
         showTask();
+    });
+
+    // Exit test button - back to test list
+    document.getElementById('exitTestBtn').addEventListener('click', () => {
+        if (confirm('Ви впевнені, що хочете вийти з тесту? Прогрес буде втрачено.')) {
+            clearInterval(timerInterval);
+            showScreen('select');
+        }
     });
 }
 
@@ -242,6 +269,26 @@ function placeAnswer(zone, value) {
 function renderTestList() {
     testList.innerHTML = '';
 
+    // Add data source toggle if Classtime data available
+    if (classtimeData) {
+        const sourceToggle = document.createElement('div');
+        sourceToggle.className = 'source-toggle';
+        sourceToggle.innerHTML = `
+            <button class="source-btn ${dataSource === 'nmt' ? 'active' : ''}" onclick="switchDataSource('nmt')">
+                📚 НМТ тести
+            </button>
+            <button class="source-btn ${dataSource === 'classtime' ? 'active' : ''}" onclick="switchDataSource('classtime')">
+                🎓 Classtime (${classtimeData.stats?.total_questions || 0} завдань)
+            </button>
+        `;
+        testList.appendChild(sourceToggle);
+    }
+
+    if (dataSource === 'classtime' && classtimeData) {
+        renderClasstimeList();
+        return;
+    }
+
     // Sort tests by name
     const sortedTests = [...nmtData.test_sets].sort((a, b) => {
         const numA = parseInt(a.name.match(/\d+/)?.[0] || 0);
@@ -277,6 +324,42 @@ function renderTestList() {
         quizzesCard.addEventListener('click', () => startQuizzes());
         testList.appendChild(quizzesCard);
     }
+}
+
+function renderClasstimeList() {
+    // Group by folder
+    const folders = {};
+    classtimeData.test_sets.forEach(set => {
+        const folder = set.folder || 'Інше';
+        if (!folders[folder]) folders[folder] = [];
+        folders[folder].push(set);
+    });
+
+    // Render folders
+    Object.entries(folders).sort().forEach(([folderName, sets]) => {
+        const folderHeader = document.createElement('div');
+        folderHeader.className = 'folder-header';
+        folderHeader.innerHTML = `
+            <h3>📁 ${folderName}</h3>
+            <span class="folder-count">${sets.length} сетів</span>
+        `;
+        testList.appendChild(folderHeader);
+
+        sets.forEach(test => {
+            const tasksWithAnswers = test.tasks.filter(t => t.correct).length;
+            const card = document.createElement('div');
+            card.className = 'test-card';
+            card.innerHTML = `
+                <div class="test-card-info">
+                    <h3>${test.name}</h3>
+                    <p>${test.tasks.length} завдань • ${tasksWithAnswers} з відповідями</p>
+                </div>
+                <span class="test-card-arrow">→</span>
+            `;
+            card.addEventListener('click', () => startTest(test));
+            testList.appendChild(card);
+        });
+    });
 }
 
 // ========== TEST FLOW ==========
@@ -429,8 +512,11 @@ function showTask() {
     updateTaskTypeBadge(taskType);
     updateTopicBadge(taskNum);
 
-    // Load image
-    if (task.photo) {
+    // Load image (support both local files and URLs)
+    if (task.photo_url) {
+        taskImage.src = task.photo_url;
+        taskImage.parentElement.style.display = 'block';
+    } else if (task.photo) {
         taskImage.src = `images/${task.photo}`;
         taskImage.parentElement.style.display = 'block';
     } else {
@@ -872,10 +958,40 @@ function displayHint(hint) {
 }
 
 function generateMockHint(task) {
-    // Generate helpful hints based on task type
+    // Generate helpful hints based on task tag or task number
     const taskNum = task.task_num || currentTaskIndex + 1;
+    const tag = (task.tag || '').toLowerCase();
 
-    const hints = {
+    // Hints by tag (for quizzes)
+    const tagHints = {
+        'відсотки': 'Щоб знайти відсоток від числа: число × відсоток / 100. Щоб знайти на скільки % змінилось: (нове - старе) / старе × 100%.',
+        'пропорція': 'Використай властивість пропорції: a/b = c/d ⟹ a·d = b·c. Також перевір одиниці вимірювання.',
+        'системи': 'Методи: підстановки (вирази одну змінну через іншу) або додавання (помнож рівняння щоб скоротити змінну).',
+        'алгебра': 'Спробуй розкласти на множники або застосувати формули скороченого множення.',
+        'первісна': 'Первісна F(x): F\'(x) = f(x). Не забудь константу C. ∫xⁿdx = xⁿ⁺¹/(n+1) + C.',
+        'похідна': 'Основні правила: (xⁿ)\' = n·xⁿ⁻¹, (sin x)\' = cos x, (eˣ)\' = eˣ. Не забудь правило ланцюжка.',
+        'тригонометр': 'sin²x + cos²x = 1. Формули зведення: sin(π-x) = sin x, cos(π-x) = -cos x.',
+        'логарифм': 'log_a(bc) = log_a(b) + log_a(c), log_a(b/c) = log_a(b) - log_a(c), log_a(bⁿ) = n·log_a(b).',
+        'показник': 'aᵐ·aⁿ = aᵐ⁺ⁿ, aᵐ/aⁿ = aᵐ⁻ⁿ, (aᵐ)ⁿ = aᵐⁿ. Приведи до однієї основи.',
+        'геометр': 'Перевір теореми: Піфагора, синусів, косинусів. Властивості подібних фігур.',
+        'планіметр': 'Площа трикутника: S = ½ah = ½ab·sin(C). Теорема Піфагора: a² + b² = c².',
+        'стерео': 'Об\'єм призми: V = S_осн·h. Об\'єм піраміди: V = ⅓S_осн·h. Об\'єм кулі: V = 4/3πR³.',
+        'функц': 'Область визначення - де функція існує. Область значень - всі можливі y. Нулі - де f(x) = 0.',
+        'нерівн': 'Метод інтервалів: знайди нулі, розбий на проміжки, визнач знак на кожному.',
+        'комбінатор': 'Перестановки Pₙ = n! (порядок важливий). Комбінації Cₙᵏ = n!/(k!(n-k)!) (порядок не важливий).',
+        'ймовірн': 'P = m/n (сприятливі / всі). P(A∪B) = P(A) + P(B) - P(A∩B).',
+        'послідовн': 'Арифметична: aₙ = a₁ + (n-1)d, Sₙ = n(a₁+aₙ)/2. Геометрична: bₙ = b₁·qⁿ⁻¹.',
+    };
+
+    // Check tag first
+    for (const [key, hint] of Object.entries(tagHints)) {
+        if (tag.includes(key)) {
+            return hint;
+        }
+    }
+
+    // Fallback to task number hints (for NMT tests)
+    const numHints = {
         1: 'Спробуй спростити вираз, застосувавши формули скороченого множення.',
         2: 'Уважно прочитай умову та визнач, які величини дані і що потрібно знайти.',
         3: 'Перевір, чи можна розкласти вираз на множники.',
@@ -892,7 +1008,7 @@ function generateMockHint(task) {
         14: 'Зведи до одного аргументу, використовуючи формули зведення.',
         15: 'Для показникових: приведи до однієї основи.',
         16: 'Для логарифмів: використай властивості log(ab) = log(a) + log(b).',
-        17: 'Похідна показує швидкість зміни функції. f\'(x) = 0 в точках екстремуму.',
+        17: 'Похідна показує швидкість зміни функції. f\'(x) = 0 в точках екстремуну.',
         18: 'Первісна - це функція F, така що F\'(x) = f(x).',
         19: 'Для комбінаторики: визнач, чи важливий порядок (перестановки vs комбінації).',
         20: 'Для многогранників: V = ⅓·S_осн·h (піраміда), V = S_осн·h (призма).',
@@ -900,7 +1016,7 @@ function generateMockHint(task) {
         22: 'Для кулі: V = 4/3·πR³, S = 4πR².'
     };
 
-    return hints[taskNum] || 'Уважно прочитай умову та визнач тип задачі. Запиши, що дано і що потрібно знайти.';
+    return numHints[taskNum] || 'Уважно прочитай умову та визнач тип задачі. Запиши, що дано і що потрібно знайти.';
 }
 
 // ========== INIT ==========

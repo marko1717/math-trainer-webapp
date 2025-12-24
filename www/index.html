@@ -587,6 +587,66 @@
             background: var(--border);
         }
 
+        /* Auto-generated stories rainbow border */
+        .story-circle.auto-story .story-avatar-wrapper.rainbow {
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b);
+            background-size: 200% 200%;
+            animation: rainbowGlow 3s ease infinite;
+        }
+
+        @keyframes rainbowGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .story-circle.auto-story.new-available .story-circle-name {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Next story placeholder */
+        .story-circle.next-story-placeholder {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .story-circle.next-story-placeholder .placeholder-wrapper {
+            background: linear-gradient(135deg, #e5e5ea, #d1d1d6);
+            border: 2px dashed #8e8e93;
+        }
+
+        .story-circle.next-story-placeholder .countdown-name {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        /* Animation styles for SVG elements in stories */
+        .anim-square {
+            opacity: 0;
+            animation: fadeScale 0.5s ease forwards;
+        }
+        .anim-square.delay-1 { animation-delay: 0.3s; }
+        .anim-square.delay-2 { animation-delay: 0.6s; }
+        @keyframes fadeScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .draw-path {
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: drawPath 1.5s ease forwards;
+        }
+        @keyframes drawPath {
+            to { stroke-dashoffset: 0; }
+        }
+        .vertex-point {
+            animation: vertexPulse 1s ease infinite;
+        }
+        @keyframes vertexPulse {
+            0%, 100% { r: 5; }
+            50% { r: 8; }
+        }
+
         .story-avatar-inner {
             width: 100%;
             height: 100%;
@@ -1315,7 +1375,241 @@
         // Init notifications after module loads
         setTimeout(initNotifications, 1000);
 
-        // ========== STORIES ==========
+        // ========== AUTO-GENERATED STORIES ==========
+        const AUTO_STORIES_KEY = 'autoStoriesData';
+        const STORY_GENERATION_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+        // Problem templates for auto-generated stories
+        const problemTemplates = [
+            {
+                topic: 'Квадратне рівняння',
+                emoji: '🧮',
+                slides: [
+                    { icon: '❓', title: 'Задача', formula: 'x^2 - 5x + 6 = 0', description: 'Знайди корені рівняння' },
+                    { icon: '💡', title: 'Розв\'язок', formula: 'D = 25 - 24 = 1', description: 'Дискримінант додатний — два корені' },
+                    { icon: '✅', title: 'Відповідь', formula: 'x_1 = 2, \\quad x_2 = 3', description: 'Перевірка: 2 + 3 = 5, 2 × 3 = 6 ✓' }
+                ]
+            },
+            {
+                topic: 'Система рівнянь',
+                emoji: '⚖️',
+                slides: [
+                    { icon: '❓', title: 'Задача', formula: '\\begin{cases} x + y = 7 \\\\ x - y = 3 \\end{cases}', description: 'Розв\'яжи систему' },
+                    { icon: '💡', title: 'Додамо рівняння', formula: '2x = 10 \\Rightarrow x = 5', description: 'Складаємо перше і друге рівняння' },
+                    { icon: '✅', title: 'Відповідь', formula: 'x = 5, \\quad y = 2', description: 'Підставляємо: 5 + 2 = 7, 5 - 2 = 3 ✓' }
+                ]
+            },
+            {
+                topic: 'Логарифм',
+                emoji: '📊',
+                slides: [
+                    { icon: '❓', title: 'Задача', formula: '\\log_2 8 + \\log_2 4 = ?', description: 'Обчисли суму логарифмів' },
+                    { icon: '💡', title: 'Властивість', formula: '\\log_a b + \\log_a c = \\log_a (bc)', description: 'Використаємо властивість суми' },
+                    { icon: '✅', title: 'Відповідь', formula: '\\log_2 32 = 5', description: 'Бо 2⁵ = 32' }
+                ]
+            },
+            {
+                topic: 'Тригонометрія',
+                emoji: '🔄',
+                slides: [
+                    { icon: '❓', title: 'Задача', formula: '\\sin 30° + \\cos 60° = ?', description: 'Обчисли вираз' },
+                    { icon: '💡', title: 'Табличні значення', formula: '\\sin 30° = \\frac{1}{2}, \\quad \\cos 60° = \\frac{1}{2}', description: 'Згадаємо таблицю' },
+                    { icon: '✅', title: 'Відповідь', formula: '\\frac{1}{2} + \\frac{1}{2} = 1', description: 'Ці кути — доповняльні!' }
+                ]
+            },
+            {
+                topic: 'Прогресії',
+                emoji: '📶',
+                slides: [
+                    { icon: '❓', title: 'Задача', formula: 'a_1 = 3, d = 2, n = 10', description: 'Знайди 10-й член АП' },
+                    { icon: '💡', title: 'Формула', formula: 'a_n = a_1 + (n-1)d', description: 'Формула n-го члена АП' },
+                    { icon: '✅', title: 'Відповідь', formula: 'a_{10} = 3 + 9 \\cdot 2 = 21', description: 'Підставляємо значення' }
+                ]
+            }
+        ];
+
+        // Math tips for auto stories
+        const mathTips = [
+            {
+                topic: 'Множення на 11',
+                emoji: '✨',
+                slides: [
+                    { icon: '✨', title: 'Множення на 11', formula: '23 \\times 11 = 253', description: 'Розсунь цифри і встав їх суму!' },
+                    { icon: '🔢', title: 'Як це працює', formula: '2 \\underline{\\quad} 3 \\to 2 \\underline{5} 3', description: '2 + 3 = 5, вставляємо між цифрами' },
+                    { icon: '💡', title: 'Ще приклад', formula: '45 \\times 11 = 495', description: '4 + 5 = 9. Якщо сума > 9, переносимо!' }
+                ]
+            },
+            {
+                topic: 'Квадрати на 5',
+                emoji: '🎯',
+                slides: [
+                    { icon: '🎯', title: 'Квадрат числа на 5', formula: '25^2 = 625', description: 'Числа, що закінчуються на 5, легко підносити до квадрату' },
+                    { icon: '🔢', title: 'Правило', formula: 'n5^2 = n(n+1) | 25', description: 'Множимо першу цифру на наступну, дописуємо 25' },
+                    { icon: '✅', title: 'Приклади', formula: '35^2 = 1225, \\quad 85^2 = 7225', description: '3×4=12, дописуємо 25. 8×9=72, дописуємо 25' }
+                ]
+            },
+            {
+                topic: 'sin і cos',
+                emoji: '🧠',
+                slides: [
+                    { icon: '🧠', title: 'Мнемоніка', formula: '\\sin \\to \\text{протилежний}', description: 'Синус — Солдат дивиться Прямо (протилежний катет)' },
+                    { icon: '📐', title: 'Косинус', formula: '\\cos \\to \\text{прилеглий}', description: 'Косинус — Козак дивиться вбік (прилеглий катет)' },
+                    { icon: '💡', title: 'Тангенс', formula: '\\tan = \\frac{\\sin}{\\cos}', description: 'Тангенс — синус поділити на косинус' }
+                ]
+            }
+        ];
+
+        // Animated story templates
+        const animatedStoryTemplates = [
+            {
+                topic: 'Теорема Піфагора',
+                emoji: '📐',
+                slides: [
+                    {
+                        icon: '📐',
+                        title: 'Теорема Піфагора',
+                        formula: 'a^2 + b^2 = c^2',
+                        description: 'Дивись, як квадрати катетів складаються у квадрат гіпотенузи!',
+                        animation: `<svg viewBox="0 0 240 200" fill="none">
+                            <rect class="anim-square" x="20" y="100" width="60" height="60" fill="rgba(239,135,72,0.3)" stroke="#EF8748" stroke-width="2"/>
+                            <rect class="anim-square delay-1" x="90" y="100" width="80" height="80" fill="rgba(52,199,89,0.3)" stroke="#34c759" stroke-width="2" transform="rotate(-90, 130, 140)"/>
+                            <rect class="anim-square delay-2" x="100" y="20" width="100" height="100" fill="rgba(0,122,255,0.3)" stroke="#007AFF" stroke-width="2" transform="rotate(37, 150, 70)"/>
+                            <text x="50" y="135" fill="#EF8748" font-size="12" text-anchor="middle">a²</text>
+                            <text x="130" y="95" fill="#34c759" font-size="12" text-anchor="middle">b²</text>
+                            <text x="180" y="70" fill="#007AFF" font-size="14" text-anchor="middle">c²</text>
+                        </svg>`
+                    }
+                ]
+            },
+            {
+                topic: 'Графік параболи',
+                emoji: '📈',
+                slides: [
+                    {
+                        icon: '📈',
+                        title: 'Графік параболи',
+                        formula: 'y = ax^2 + bx + c',
+                        description: 'Знак "a" визначає напрямок вітей: a > 0 — вгору, a < 0 — вниз',
+                        animation: `<svg viewBox="0 0 200 150" fill="none">
+                            <line x1="10" y1="120" x2="190" y2="120" stroke="#e5e5ea" stroke-width="1"/>
+                            <line x1="100" y1="10" x2="100" y2="140" stroke="#e5e5ea" stroke-width="1"/>
+                            <path class="draw-path" d="M 20 20 Q 100 140 180 20" stroke="#EF8748" stroke-width="3" fill="none"/>
+                            <circle class="vertex-point" cx="100" cy="120" r="5" fill="#34c759"/>
+                            <text x="108" y="135" fill="#34c759" font-size="10">вершина</text>
+                        </svg>`
+                    }
+                ]
+            }
+        ];
+
+        function getAutoStoriesData() {
+            try {
+                return JSON.parse(localStorage.getItem(AUTO_STORIES_KEY) || '{}');
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveAutoStoriesData(data) {
+            localStorage.setItem(AUTO_STORIES_KEY, JSON.stringify(data));
+        }
+
+        function getCurrentSlotIndex() {
+            const now = new Date();
+            const hours = now.getHours();
+            return Math.floor(hours / 6); // 0-5: slot 0, 6-11: slot 1, 12-17: slot 2, 18-23: slot 3
+        }
+
+        function getTodayString() {
+            return new Date().toDateString();
+        }
+
+        function shouldGenerateNewStories() {
+            const data = getAutoStoriesData();
+            const currentSlot = getCurrentSlotIndex();
+            const today = getTodayString();
+            if (data.date !== today) return true;
+            if (!data.slots || !data.slots[currentSlot]) return true;
+            return false;
+        }
+
+        function getTimeUntilNextSlot() {
+            const now = new Date();
+            const currentSlot = getCurrentSlotIndex();
+            const nextSlotHour = (currentSlot + 1) * 6;
+            if (nextSlotHour >= 24) {
+                const hoursRemaining = 24 - now.getHours();
+                const minutesRemaining = 60 - now.getMinutes();
+                return { hours: hoursRemaining, minutes: minutesRemaining % 60 };
+            }
+            const hoursRemaining = nextSlotHour - now.getHours() - 1;
+            const minutesRemaining = 60 - now.getMinutes();
+            return {
+                hours: hoursRemaining + (minutesRemaining === 60 ? 1 : 0),
+                minutes: minutesRemaining % 60
+            };
+        }
+
+        function generateStoriesForCurrentSlot() {
+            const data = getAutoStoriesData();
+            const currentSlot = getCurrentSlotIndex();
+            const today = getTodayString();
+
+            if (data.date !== today) {
+                data.date = today;
+                data.slots = {};
+                data.usedIndices = {};
+            }
+
+            const storyTypes = ['fact', 'animation', 'problem', 'tip'];
+            const storyType = storyTypes[currentSlot % storyTypes.length];
+
+            let story;
+            switch (storyType) {
+                case 'animation':
+                    story = animatedStoryTemplates[Math.floor(Math.random() * animatedStoryTemplates.length)];
+                    break;
+                case 'problem':
+                    story = problemTemplates[Math.floor(Math.random() * problemTemplates.length)];
+                    break;
+                case 'tip':
+                    story = mathTips[Math.floor(Math.random() * mathTips.length)];
+                    break;
+                default:
+                    story = { topic: 'Факт дня', emoji: '💡', slides: [{ icon: '💡', title: 'Цікавий факт', formula: 'a^2 - b^2 = (a-b)(a+b)', description: 'Різниця квадратів — одна з найважливіших формул!' }] };
+            }
+
+            data.slots = data.slots || {};
+            data.slots[currentSlot] = { story: { ...story }, type: storyType, generatedAt: Date.now() };
+            saveAutoStoriesData(data);
+            return story;
+        }
+
+        function getActiveAutoStories() {
+            const data = getAutoStoriesData();
+            const today = getTodayString();
+            const currentSlot = getCurrentSlotIndex();
+
+            if (shouldGenerateNewStories()) {
+                generateStoriesForCurrentSlot();
+            }
+
+            const updatedData = getAutoStoriesData();
+            const activeStories = [];
+            for (let slot = 0; slot <= currentSlot; slot++) {
+                if (updatedData.slots && updatedData.slots[slot]) {
+                    activeStories.push({
+                        ...updatedData.slots[slot].story,
+                        slotIndex: slot,
+                        type: updatedData.slots[slot].type,
+                        isAuto: true
+                    });
+                }
+            }
+            return activeStories;
+        }
+
+        // ========== STATIC STORIES ==========
         const storiesData = [
             {
                 id: 'pythagoras',
@@ -1470,12 +1764,49 @@
         let currentSlideIdx = 0;
         let storyTimer = null;
         let viewedStories = new Set(JSON.parse(localStorage.getItem('viewedStories') || '[]'));
+        let currentAutoStory = null;
+        let currentAutoSlot = -1;
 
         function initStories() {
             const storiesBar = document.getElementById('storiesBarHome');
             if (!storiesBar) return;
 
-            storiesBar.innerHTML = storiesData.map((story, idx) => `
+            const today = getTodayString();
+            const timeUntilNext = getTimeUntilNextSlot();
+            const autoStories = getActiveAutoStories();
+
+            // Build auto-generated story circles
+            const autoStoriesHTML = autoStories.map((story, index) => {
+                const isViewed = viewedStories.has(`auto-${today}-${story.slotIndex}`);
+                const icon = story.emoji || '💡';
+                const name = story.topic || 'Нове';
+
+                return `
+                    <div class="story-circle auto-story ${isViewed ? 'viewed' : 'new-available'}" data-type="auto" data-slot="${story.slotIndex}">
+                        <div class="story-avatar-wrapper ${!isViewed ? 'rainbow' : ''}">
+                            <div class="story-avatar-inner">
+                                <span class="emoji">${icon}</span>
+                            </div>
+                        </div>
+                        <span class="story-circle-name">${name.substring(0, 10)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Next story placeholder with countdown
+            const nextStoryHTML = `
+                <div class="story-circle next-story-placeholder" title="Наступна сторі через ${timeUntilNext.hours}г ${timeUntilNext.minutes}хв">
+                    <div class="story-avatar-wrapper placeholder-wrapper">
+                        <div class="story-avatar-inner">
+                            <span class="emoji">⏳</span>
+                        </div>
+                    </div>
+                    <span class="story-circle-name countdown-name">${timeUntilNext.hours}г ${timeUntilNext.minutes}хв</span>
+                </div>
+            `;
+
+            // Regular stories
+            const regularStoriesHTML = storiesData.map((story, idx) => `
                 <div class="story-circle ${viewedStories.has(story.id) ? 'viewed' : ''}" data-story-idx="${idx}">
                     <div class="story-avatar-wrapper">
                         <div class="story-avatar-inner">
@@ -1486,11 +1817,23 @@
                 </div>
             `).join('');
 
-            // Add click handlers
-            storiesBar.querySelectorAll('.story-circle').forEach(circle => {
+            storiesBar.innerHTML = autoStoriesHTML + nextStoryHTML + regularStoriesHTML;
+
+            // Add click handlers for auto stories
+            storiesBar.querySelectorAll('.story-circle.auto-story').forEach(circle => {
                 circle.addEventListener('click', () => {
-                    openStory(parseInt(circle.dataset.storyIdx));
+                    const slot = parseInt(circle.dataset.slot);
+                    openAutoStory(slot);
                 });
+            });
+
+            // Add click handlers for regular stories
+            storiesBar.querySelectorAll('.story-circle:not(.auto-story):not(.next-story-placeholder)').forEach(circle => {
+                if (circle.dataset.storyIdx !== undefined) {
+                    circle.addEventListener('click', () => {
+                        openStory(parseInt(circle.dataset.storyIdx));
+                    });
+                }
             });
 
             // Setup modal controls
@@ -1532,7 +1875,106 @@
             });
         }
 
+        // Open auto-generated story by slot index
+        function openAutoStory(slotIndex) {
+            const data = getAutoStoriesData();
+            const today = getTodayString();
+
+            if (!data.slots || !data.slots[slotIndex]) return;
+
+            const storyData = data.slots[slotIndex];
+            const story = storyData.story;
+
+            // Mark as viewed
+            viewedStories.add(`auto-${today}-${slotIndex}`);
+            localStorage.setItem('viewedStories', JSON.stringify([...viewedStories]));
+
+            // Update UI
+            const circle = document.querySelector(`.story-circle.auto-story[data-slot="${slotIndex}"]`);
+            if (circle) {
+                circle.classList.add('viewed');
+                circle.classList.remove('new-available');
+                const wrapper = circle.querySelector('.story-avatar-wrapper');
+                if (wrapper) wrapper.classList.remove('rainbow');
+            }
+
+            // Store current auto story for navigation
+            currentAutoStory = story;
+            currentAutoSlot = slotIndex;
+            currentStoryIdx = -3; // Special index for auto stories
+            currentSlideIdx = 0;
+
+            // Show modal
+            document.getElementById('storyViewerModal').classList.add('active');
+
+            // Setup progress bar based on slides
+            const slides = story.slides || [];
+            document.getElementById('storyProgress').innerHTML = slides.map((_, i) => `
+                <div class="progress-segment ${i === 0 ? 'active' : ''}" data-slide="${i}">
+                    <div class="progress-fill"></div>
+                </div>
+            `).join('');
+
+            // Set header
+            document.getElementById('storyAvatarSmall').textContent = story.emoji || '💡';
+            document.getElementById('storyTitleText').textContent = story.topic || 'Математика';
+
+            showAutoSlide(0);
+            startTimer();
+        }
+
+        // Show auto story slide
+        function showAutoSlide(idx) {
+            if (!currentAutoStory || !currentAutoStory.slides) return;
+
+            const slide = currentAutoStory.slides[idx];
+            if (!slide) return;
+
+            let html = `<div class="story-slide">
+                <div class="slide-icon">${slide.icon}</div>
+                <h2 class="slide-title">${slide.title}</h2>`;
+
+            if (slide.animation) {
+                html += `<div class="slide-animation">${slide.animation}</div>`;
+            }
+
+            html += `<div class="slide-formula"><div class="formula-highlight" id="slideFormula"></div></div>`;
+            html += `<p class="slide-description">${slide.description}</p>`;
+
+            if (slide.example) {
+                html += `<div class="slide-example">
+                    <div class="example-label">${slide.example.label}</div>
+                    <div class="example-content">${slide.example.content}</div>
+                </div>`;
+            }
+
+            html += '</div>';
+
+            document.getElementById('storyContentArea').innerHTML = html;
+
+            // Render LaTeX
+            if (typeof katex !== 'undefined' && slide.formula) {
+                try {
+                    katex.render(slide.formula, document.getElementById('slideFormula'), {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                } catch (e) {
+                    document.getElementById('slideFormula').textContent = slide.formula;
+                }
+            }
+
+            // Update progress segments
+            document.querySelectorAll('.progress-segment').forEach((seg, i) => {
+                seg.classList.remove('active', 'completed');
+                if (i < idx) seg.classList.add('completed');
+                if (i === idx) seg.classList.add('active');
+            });
+        }
+
         function openStory(idx) {
+            currentAutoStory = null;
+            currentAutoSlot = -1;
             currentStoryIdx = idx;
             currentSlideIdx = 0;
 
@@ -1567,6 +2009,8 @@
         function closeStory() {
             currentStoryIdx = -1;
             currentSlideIdx = 0;
+            currentAutoStory = null;
+            currentAutoSlot = -1;
             stopTimer();
             document.getElementById('storyViewerModal').classList.remove('active');
         }
@@ -1614,6 +2058,31 @@
         }
 
         function nextSlide() {
+            // Handle auto stories
+            if (currentStoryIdx === -3 && currentAutoStory) {
+                if (currentSlideIdx < currentAutoStory.slides.length - 1) {
+                    currentSlideIdx++;
+                    showAutoSlide(currentSlideIdx);
+                    resetTimer();
+                } else {
+                    // Try to go to next auto story or close
+                    const data = getAutoStoriesData();
+                    const nextSlot = currentAutoSlot + 1;
+                    if (data.slots && data.slots[nextSlot]) {
+                        openAutoStory(nextSlot);
+                    } else {
+                        closeStory();
+                    }
+                }
+                return;
+            }
+
+            // Handle regular stories
+            if (currentStoryIdx < 0) {
+                closeStory();
+                return;
+            }
+
             const story = storiesData[currentStoryIdx];
             if (currentSlideIdx < story.slides.length - 1) {
                 currentSlideIdx++;
@@ -1630,6 +2099,19 @@
         }
 
         function prevSlide() {
+            // Handle auto stories
+            if (currentStoryIdx === -3 && currentAutoStory) {
+                if (currentSlideIdx > 0) {
+                    currentSlideIdx--;
+                    showAutoSlide(currentSlideIdx);
+                    resetTimer();
+                } else if (currentAutoSlot > 0) {
+                    openAutoStory(currentAutoSlot - 1);
+                }
+                return;
+            }
+
+            // Handle regular stories
             if (currentSlideIdx > 0) {
                 currentSlideIdx--;
                 showSlide(currentSlideIdx);

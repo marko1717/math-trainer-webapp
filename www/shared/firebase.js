@@ -314,62 +314,45 @@ async function signInWithApple() {
 
                 console.log('🍎 Apple provided data - email:', appleEmail, 'name:', appleDisplayName);
 
-                // Use Firebase REST API instead of JS SDK (which hangs in Capacitor WebView)
-                console.log('🍎 Using Firebase REST API for authentication...');
+                // Use Firebase JS SDK with OAuthCredential
+                // This properly handles the iOS bundle ID as audience
+                console.log('🍎 Using Firebase SDK with OAuthCredential...');
 
-                const apiKey = firebaseConfig.apiKey;
-                const restUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${apiKey}`;
-
-                // Build the postBody for Apple OAuth
-                const postBody = `id_token=${encodeURIComponent(result.response.identityToken)}&nonce=${encodeURIComponent(rawNonce)}&providerId=apple.com`;
-
-                console.log('🍎 Calling Firebase REST API...');
-                const response = await fetch(restUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        postBody: postBody,
-                        requestUri: 'https://nmt-trainer.firebaseapp.com/__/auth/handler',
-                        returnIdpCredential: true,
-                        returnSecureToken: true
+                // Create OAuthCredential for Apple
+                const credential = OAuthProvider.credentialWithPopupRedirectResolver
+                    ? OAuthProvider.credential({
+                        idToken: result.response.identityToken,
+                        rawNonce: rawNonce
                     })
-                });
+                    : OAuthProvider.credential('apple.com', {
+                        idToken: result.response.identityToken,
+                        rawNonce: rawNonce
+                    });
 
-                const data = await response.json();
-                console.log('🍎 Firebase REST API response status:', response.status);
+                console.log('🍎 Signing in with Firebase credential...');
+                const userCredential = await signInWithCredential(auth, credential);
+                const firebaseUser = userCredential.user;
 
-                if (!response.ok) {
-                    console.error('🍎 Firebase REST API error:', data);
-                    throw new Error(data.error?.message || 'Firebase authentication failed');
-                }
-
-                console.log('🍎 Firebase REST API success! User:', data.email || data.localId);
-
-                // Now sign in to Firebase JS SDK using the custom token or update auth state
-                // We have: localId, email, idToken, refreshToken from REST API
-                // Use signInWithCustomToken or update the auth state manually
+                console.log('🍎 Firebase sign in successful! User:', firebaseUser.email || firebaseUser.uid);
 
                 // IMPORTANT: Prioritize Apple-provided data over Firebase data
                 // Apple only sends fullName and email on FIRST authorization, so we must use them
-                // Firebase may not have these values or may have incomplete data
-                const finalEmail = appleEmail || data.email || null;
-                const finalDisplayName = appleDisplayName || data.displayName || data.fullName || null;
+                const finalEmail = appleEmail || firebaseUser.email || null;
+                const finalDisplayName = appleDisplayName || firebaseUser.displayName || null;
 
                 console.log('🍎 Final user data - email:', finalEmail, 'displayName:', finalDisplayName);
 
-                // Create a minimal user object for our app
+                // Create user object with Apple data
                 const user = {
-                    uid: data.localId,
+                    uid: firebaseUser.uid,
                     email: finalEmail,
                     displayName: finalDisplayName,
-                    photoURL: data.photoUrl || null,
-                    emailVerified: data.emailVerified || false,
-                    // Store tokens for later use
+                    photoURL: firebaseUser.photoURL || null,
+                    emailVerified: firebaseUser.emailVerified || false,
+                    // Get tokens from Firebase user
                     stsTokenManager: {
-                        accessToken: data.idToken,
-                        refreshToken: data.refreshToken
+                        accessToken: await firebaseUser.getIdToken(),
+                        refreshToken: firebaseUser.refreshToken
                     }
                 };
 
@@ -379,8 +362,19 @@ async function signInWithApple() {
                 // Save user to localStorage for persistence
                 saveUserToStorage(user);
 
-                // Save to Firestore via REST API - pass Apple data explicitly
-                await createOrUpdateUserProfileREST(user, data.idToken, appleDisplayName, appleEmail);
+                // Save to Firestore - pass Apple data explicitly
+                await createOrUpdateUserProfile(firebaseUser);
+
+                // Also update with Apple-provided name if we have it
+                if (appleDisplayName || appleEmail) {
+                    const { doc, setDoc } = window.firebaseDb;
+                    const userRef = doc(db, 'users', user.uid);
+                    const updateData = {};
+                    if (appleDisplayName) updateData.displayName = appleDisplayName;
+                    if (appleEmail) updateData.email = appleEmail;
+                    await setDoc(userRef, updateData, { merge: true });
+                    console.log('🍎 Updated Firestore with Apple-provided data');
+                }
 
                 console.log('✅ Apple Sign-in successful:', user.displayName || user.email || user.uid);
 

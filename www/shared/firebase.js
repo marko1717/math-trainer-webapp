@@ -314,41 +314,68 @@ async function signInWithApple() {
 
                 console.log('🍎 Apple provided data - email:', appleEmail, 'name:', appleDisplayName);
 
-                // Use Firebase JS SDK with OAuthCredential
-                // This properly handles the iOS bundle ID as audience
-                console.log('🍎 Using Firebase SDK with OAuthCredential...');
+                // For native iOS, we need to use authorizationCode to get a token with web Services ID as audience
+                // This is because Firebase expects audience = Services ID (com.mathtrainer.nmt.web)
+                // but native iOS gives us audience = Bundle ID (com.mathtrainer.nmt)
 
-                // Create OAuthCredential for Apple using provider instance
-                const appleProvider = new OAuthProvider('apple.com');
-                const credential = appleProvider.credential({
-                    idToken: result.response.identityToken,
-                    rawNonce: rawNonce
+                const authorizationCode = result.response.authorizationCode;
+                console.log('🍎 Authorization code received:', authorizationCode ? 'yes' : 'no');
+
+                if (!authorizationCode) {
+                    throw new Error('No authorization code received from Apple');
+                }
+
+                // Exchange authorizationCode for tokens via Apple Token Endpoint
+                // We need to do this through Firebase REST API with the code
+                console.log('🍎 Exchanging authorization code via Firebase...');
+
+                const apiKey = firebaseConfig.apiKey;
+                const restUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${apiKey}`;
+
+                // Use authorization code flow - Firebase will exchange it with Apple
+                const postBody = `code=${encodeURIComponent(authorizationCode)}&providerId=apple.com`;
+
+                const response = await fetch(restUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        postBody: postBody,
+                        requestUri: 'https://nmt-trainer.firebaseapp.com/__/auth/handler',
+                        returnIdpCredential: true,
+                        returnSecureToken: true
+                    })
                 });
 
-                console.log('🍎 Signing in with Firebase credential...');
-                const userCredential = await signInWithCredential(auth, credential);
-                const firebaseUser = userCredential.user;
+                const data = await response.json();
+                console.log('🍎 Firebase REST API response status:', response.status);
 
-                console.log('🍎 Firebase sign in successful! User:', firebaseUser.email || firebaseUser.uid);
+                if (!response.ok) {
+                    console.error('🍎 Firebase REST API error:', JSON.stringify(data));
+                    throw new Error(data.error?.message || 'Firebase authentication failed');
+                }
+
+                console.log('🍎 Firebase REST API success! User:', data.email || data.localId);
 
                 // IMPORTANT: Prioritize Apple-provided data over Firebase data
                 // Apple only sends fullName and email on FIRST authorization, so we must use them
-                const finalEmail = appleEmail || firebaseUser.email || null;
-                const finalDisplayName = appleDisplayName || firebaseUser.displayName || null;
+                const finalEmail = appleEmail || data.email || null;
+                const finalDisplayName = appleDisplayName || data.displayName || data.fullName || null;
 
                 console.log('🍎 Final user data - email:', finalEmail, 'displayName:', finalDisplayName);
 
-                // Create user object with Apple data
+                // Create user object from REST API response
                 const user = {
-                    uid: firebaseUser.uid,
+                    uid: data.localId,
                     email: finalEmail,
                     displayName: finalDisplayName,
-                    photoURL: firebaseUser.photoURL || null,
-                    emailVerified: firebaseUser.emailVerified || false,
-                    // Get tokens from Firebase user
+                    photoURL: data.photoUrl || null,
+                    emailVerified: data.emailVerified || false,
+                    // Store tokens for later use
                     stsTokenManager: {
-                        accessToken: await firebaseUser.getIdToken(),
-                        refreshToken: firebaseUser.refreshToken
+                        accessToken: data.idToken,
+                        refreshToken: data.refreshToken
                     }
                 };
 
@@ -358,19 +385,8 @@ async function signInWithApple() {
                 // Save user to localStorage for persistence
                 saveUserToStorage(user);
 
-                // Save to Firestore - pass Apple data explicitly
-                await createOrUpdateUserProfile(firebaseUser);
-
-                // Also update with Apple-provided name if we have it
-                if (appleDisplayName || appleEmail) {
-                    const { doc, setDoc } = window.firebaseDb;
-                    const userRef = doc(db, 'users', user.uid);
-                    const updateData = {};
-                    if (appleDisplayName) updateData.displayName = appleDisplayName;
-                    if (appleEmail) updateData.email = appleEmail;
-                    await setDoc(userRef, updateData, { merge: true });
-                    console.log('🍎 Updated Firestore with Apple-provided data');
-                }
+                // Save to Firestore via REST API - pass Apple data explicitly
+                await createOrUpdateUserProfileREST(user, data.idToken, appleDisplayName, appleEmail);
 
                 console.log('✅ Apple Sign-in successful:', user.displayName || user.email || user.uid);
 

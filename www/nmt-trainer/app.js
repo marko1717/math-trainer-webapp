@@ -1131,7 +1131,10 @@ function showSolution() {
 
     const container = document.getElementById('solutionImageContainer');
     const img = document.getElementById('solutionImage');
+    const latexContainer = document.getElementById('solutionLatexContainer');
+    const generateBtn = document.getElementById('generateSolutionBtn');
 
+    // Show solution image if available
     if (task.solution_photo) {
         img.src = `images/${task.solution_photo}`;
         container.style.display = 'block';
@@ -1139,7 +1142,226 @@ function showSolution() {
         container.style.display = 'none';
     }
 
+    // Show LaTeX solution if available
+    if (task.solution_latex && latexContainer) {
+        const stepsHtml = formatLatexSolutionForDisplay(task.solution_latex);
+        latexContainer.innerHTML = stepsHtml;
+        latexContainer.style.display = 'block';
+
+        // Render KaTeX if available
+        if (window.katex && window.renderMathInElement) {
+            renderMathInElement(latexContainer, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        }
+
+        if (generateBtn) generateBtn.style.display = 'none';
+    } else {
+        if (latexContainer) {
+            latexContainer.style.display = 'none';
+            latexContainer.innerHTML = '';
+        }
+
+        // Show generate button if task has image but no solution
+        if (generateBtn) {
+            generateBtn.style.display = (task.photo || task.photo_url) ? 'block' : 'none';
+        }
+    }
+
     showScreen('solution');
+}
+
+// Format LaTeX solution for display in app
+function formatLatexSolutionForDisplay(latex) {
+    if (!latex) return '';
+
+    const rows = latex.split('\\hline').map(r => r.trim()).filter(r => r);
+    let html = '<div class="solution-steps">';
+
+    rows.forEach((row, i) => {
+        const parts = row.replace(/\\\\$/g, '').split('&');
+        if (parts.length >= 2) {
+            const step = parts[0].trim();
+            const comment = parts[1].trim();
+
+            html += `<div class="solution-step">
+                <div class="step-number">${i + 1}</div>
+                <div class="step-content">
+                    <div class="step-math">${step}</div>
+                    <div class="step-comment">${comment}</div>
+                </div>
+            </div>`;
+        }
+    });
+
+    html += '</div>';
+    return html;
+}
+
+// Generate solution using AI (Claude API)
+async function generateSolutionForTask() {
+    const task = currentTest.tasks[currentTaskIndex];
+    const generateBtn = document.getElementById('generateSolutionBtn');
+    const latexContainer = document.getElementById('solutionLatexContainer');
+
+    if (!task.photo && !task.photo_url) {
+        alert('Немає зображення завдання для генерації розв\'язку');
+        return;
+    }
+
+    // Check for API key
+    const apiKey = localStorage.getItem('anthropic_api_key');
+    if (!apiKey) {
+        const key = prompt('Введіть API ключ Anthropic (зберігається локально):');
+        if (key) {
+            localStorage.setItem('anthropic_api_key', key);
+        } else {
+            return;
+        }
+    }
+
+    // Show loading
+    if (generateBtn) {
+        generateBtn.innerHTML = '<div class="spinner-small"></div> Генерація...';
+        generateBtn.disabled = true;
+    }
+
+    try {
+        const imgSrc = task.photo_url || `images/${task.photo}`;
+
+        // Fetch image and convert to base64
+        const imgResp = await fetch(imgSrc);
+        const imgBlob = await imgResp.blob();
+        const imgBase64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(imgBlob);
+        });
+
+        // Call Claude API
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': localStorage.getItem('anthropic_api_key'),
+                'anthropic-version': '2023-06-01',
+                'anthropic-dangerous-direct-browser-access': 'true'
+            },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 2000,
+                messages: [{
+                    role: 'user',
+                    content: [
+                        {
+                            type: 'image',
+                            source: {
+                                type: 'base64',
+                                media_type: imgBlob.type || 'image/jpeg',
+                                data: imgBase64.split(',')[1]
+                            }
+                        },
+                        {
+                            type: 'text',
+                            text: getSolutionPrompt(task.correct)
+                        }
+                    ]
+                }]
+            })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error?.message || 'API Error');
+        }
+
+        const data = await response.json();
+        const latexCode = data.content[0].text;
+
+        // Save solution to task
+        task.solution_latex = latexCode;
+
+        // Display the solution
+        if (latexContainer) {
+            const stepsHtml = formatLatexSolutionForDisplay(latexCode);
+            latexContainer.innerHTML = stepsHtml;
+            latexContainer.style.display = 'block';
+
+            if (window.katex && window.renderMathInElement) {
+                renderMathInElement(latexContainer, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }
+        }
+
+        if (generateBtn) {
+            generateBtn.style.display = 'none';
+        }
+
+        // Cache the solution in localStorage
+        cacheSolution(currentTest.id, currentTaskIndex, latexCode);
+
+    } catch (e) {
+        console.error('Solution generation error:', e);
+        alert('Помилка генерації: ' + e.message);
+
+        if (generateBtn) {
+            generateBtn.innerHTML = '🤖 Згенерувати розв\'язок';
+            generateBtn.disabled = false;
+        }
+    }
+}
+
+function getSolutionPrompt(correct) {
+    return `Ти - досвідчений репетитор з математики для підготовки до НМТ.
+Проаналізуй це математичне завдання та створи детальний покроковий розв'язок.
+
+Правильна відповідь: ${correct || 'невідома'}
+
+Формат відповіді - ТІЛЬКИ рядки LaTeX таблиці:
+Крок розв'язку & Коментар \\\\
+\\hline
+
+Приклад:
+$|1 - \\sqrt{3}| = -(1 - \\sqrt{3}) = \\sqrt{3} - 1$ & Застосовуємо означення модуля \\\\
+\\hline
+
+Використовуй українську мову. Математичні формули в $...$. Максимум 5-6 кроків.`;
+}
+
+// Cache generated solutions
+function cacheSolution(testId, taskIndex, latex) {
+    try {
+        const cacheKey = 'solution_cache';
+        const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+        const key = `${testId}_${taskIndex}`;
+        cache[key] = {
+            latex: latex,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(cache));
+    } catch (e) {
+        console.warn('Failed to cache solution:', e);
+    }
+}
+
+// Load cached solution
+function loadCachedSolution(testId, taskIndex) {
+    try {
+        const cacheKey = 'solution_cache';
+        const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+        const key = `${testId}_${taskIndex}`;
+        return cache[key]?.latex;
+    } catch (e) {
+        return null;
+    }
 }
 
 // ========== AI HINTS ==========

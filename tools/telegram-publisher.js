@@ -462,6 +462,101 @@ async function postQuiz() {
   }
 }
 
+// Post quiz with image + explanation (solution)
+async function postImageQuizWithExplanation() {
+  let classtimeData = null;
+  if (fs.existsSync(CONFIG.classtimeDataPath)) {
+    classtimeData = JSON.parse(fs.readFileSync(CONFIG.classtimeDataPath, 'utf8'));
+  }
+
+  if (!classtimeData || !classtimeData.test_sets) {
+    console.log('No Classtime data, falling back to simple quiz');
+    return postQuiz();
+  }
+
+  // Find a task with solution
+  let attempts = 0;
+  let test, task;
+
+  while (attempts < 30) {
+    test = classtimeData.test_sets[Math.floor(Math.random() * classtimeData.test_sets.length)];
+    task = test.tasks[Math.floor(Math.random() * test.tasks.length)];
+
+    if (task.photo_url && task.correct && task.solution_latex) break;
+    attempts++;
+  }
+
+  // If no solution, try without it
+  if (!task || !task.photo_url) {
+    return postImageQuiz();
+  }
+
+  const caption = task.solution_latex ?
+    `📊 <b>Завдання з поясненням!</b>
+
+📁 ${test.folder || ''}
+📚 ${test.name}
+📌 Завдання #${task.task_num}
+
+✅ <b>Відповідь:</b> ${task.correct}
+
+📝 <b>Розв'язок:</b>
+${formatSolutionForTelegram(task.solution_latex)}
+
+#НМТ #математика #розвязок` :
+    `📊 <b>Завдання дня!</b>
+
+📁 ${test.folder || ''}
+📚 ${test.name}
+📌 Завдання #${task.task_num}
+
+<tg-spoiler>✅ Відповідь: ${task.correct}</tg-spoiler>
+
+#НМТ #математика`;
+
+  try {
+    await sendPhoto(task.photo_url, caption);
+    console.log(`✓ Posted quiz with explanation: ${test.name} #${task.task_num}`);
+    return true;
+  } catch (e) {
+    console.error('✗ Failed to post quiz with explanation:', e.message);
+    return false;
+  }
+}
+
+// Format LaTeX solution for Telegram (simplified)
+function formatSolutionForTelegram(latex) {
+  if (!latex) return '';
+
+  // Parse table rows and convert to readable format
+  const rows = latex.split('\\hline').map(r => r.trim()).filter(r => r);
+  const steps = [];
+
+  rows.forEach((row, i) => {
+    const parts = row.replace(/\\\\$/g, '').split('&');
+    if (parts.length >= 2) {
+      // Clean up LaTeX for Telegram
+      let step = parts[0].trim()
+        .replace(/\$/g, '')
+        .replace(/\\cdot/g, '·')
+        .replace(/\\times/g, '×')
+        .replace(/\\div/g, '÷')
+        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
+        .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+        .replace(/\\sqrt/g, '√')
+        .replace(/\^2/g, '²')
+        .replace(/\^3/g, '³')
+        .replace(/_(\d)/g, '₀₁₂₃₄₅₆₇₈₉'.charAt);
+
+      let comment = parts[1].trim();
+
+      steps.push(`${i + 1}. ${step}`);
+    }
+  });
+
+  return steps.slice(0, 5).join('\n'); // Limit to 5 steps for Telegram
+}
+
 // Post quiz with image (from NMT data)
 async function postImageQuiz() {
   let nmtData = null;
@@ -641,7 +736,9 @@ async function main() {
   --classtime       Завдання з Classtime (з URL картинки)
   --quiz            Текстове опитування
   --image-quiz      Опитування з картинкою завдання
+  --explained       Завдання з картинкою + розв'язок
   --daily           Щоденне привітання + челендж
+  --auto            Автоматичний пост (залежно від часу)
   --all             Всі типи постів (для тесту)
   --schedule        Показати інструкцію автопостінгу
   --test            Тестовий режим (без надсилання)
@@ -701,6 +798,42 @@ async function main() {
   if (args.includes('--daily')) {
     total++;
     if (await postDaily()) success++;
+  }
+
+  if (args.includes('--explained')) {
+    total++;
+    if (await postImageQuizWithExplanation()) success++;
+  }
+
+  if (args.includes('--auto')) {
+    // Auto-select content based on current hour
+    const hour = new Date().getHours();
+    total++;
+
+    if (hour >= 7 && hour < 9) {
+      // Morning: daily greeting + theory
+      if (await postDaily()) success++;
+      total++;
+      await new Promise(r => setTimeout(r, 2000)); // Small delay
+      if (await postTheory()) success++;
+    } else if (hour >= 9 && hour < 12) {
+      // Morning practice: theory
+      if (await postTheory()) success++;
+    } else if (hour >= 12 && hour < 15) {
+      // Afternoon: quiz with explanation
+      if (await postImageQuizWithExplanation()) success++;
+    } else if (hour >= 15 && hour < 18) {
+      // Afternoon practice
+      if (await postClasstimePractice()) success++;
+    } else if (hour >= 18 && hour < 21) {
+      // Evening: image quiz
+      if (await postImageQuiz()) success++;
+    } else {
+      // Night: simple quiz
+      if (await postQuiz()) success++;
+    }
+
+    console.log(`\n⏰ Автопост о ${hour}:00`);
   }
 
   if (args.includes('--all')) {

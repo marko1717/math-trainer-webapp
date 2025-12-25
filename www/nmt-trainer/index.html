@@ -804,6 +804,94 @@
             display: block;
         }
 
+        /* Solution steps */
+        .solution-latex-container {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .solution-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .solution-step {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-math {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .step-comment {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-generate-solution {
+            width: 100%;
+            margin-top: 16px;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 2px dashed var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-generate-solution:hover {
+            background: var(--accent);
+            color: white;
+            border-style: solid;
+        }
+
+        .btn-generate-solution:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner-small {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
         /* Resume card for paused tests */
         .test-card.resume-card {
             background: linear-gradient(135deg, var(--accent) 0%, #5856d6 100%);
@@ -963,6 +1051,14 @@
                 <div class="solution-image-container" id="solutionImageContainer">
                     <img class="solution-image" id="solutionImage" src="" alt="Розв'язок">
                 </div>
+
+                <!-- LaTeX solution container -->
+                <div class="solution-latex-container" id="solutionLatexContainer" style="display: none;"></div>
+
+                <!-- Generate solution button -->
+                <button class="btn-generate-solution" id="generateSolutionBtn" onclick="generateSolutionForTask()" style="display: none;">
+                    🤖 Згенерувати розв'язок
+                </button>
             </div>
         </div>
 
@@ -1009,6 +1105,10 @@
         </div>
     </div>
 
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -172,6 +172,24 @@
         }
         .task-preview img { max-width: 100%; border-radius: 8px; margin-bottom: 12px; }
         .answer { padding: 6px 12px; background: var(--success); color: white; border-radius: 6px; display: inline-block; }
+        .task-edit-row { display: flex; gap: 12px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+        .task-edit-row label { font-size: 0.85rem; color: var(--text-secondary); }
+        .task-edit-row input, .task-edit-row select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        .task-edit-row input { flex: 1; min-width: 150px; }
+        .task-edit-row select { min-width: 120px; }
+        .options-container { margin-top: 10px; padding: 10px; background: var(--bg-primary); border-radius: 8px; }
+        .option-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .option-row input[type="text"] { flex: 1; padding: 6px 10px; }
+        .option-row input[type="radio"], .option-row input[type="checkbox"] { width: 18px; height: 18px; }
+        .option-row .option-label { font-size: 0.85rem; min-width: 25px; }
+        .add-option-btn { padding: 6px 12px; font-size: 0.8rem; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .remove-option-btn { padding: 4px 8px; font-size: 0.8rem; background: var(--error); color: white; border: none; border-radius: 4px; cursor: pointer; }
         .bulk-actions {
             display: none;
             gap: 12px;
@@ -388,16 +406,119 @@
             document.getElementById('editFolder').innerHTML = folders.map(f =>
                 '<option value="' + f + '" ' + (f === editingTest.folder ? 'selected' : '') + '>' + f + '</option>'
             ).join('');
-            document.getElementById('taskList').innerHTML = editingTest.tasks.map((task, i) =>
-                '<div class="task-preview">' +
-                (task.photo_url ? '<img src="' + task.photo_url + '" alt="Task">' : '<p style="color: var(--text-secondary);">Без зображення</p>') +
-                '<div style="display: flex; gap: 12px; align-items: center;">' +
-                '<span>Завдання ' + (i+1) + '</span>' +
-                '<span class="badge badge-' + task.type + '">' + task.type + '</span>' +
-                (task.correct ? '<span class="answer">Відповідь: ' + task.correct + '</span>' : '<span style="color: var(--error);">Без відповіді</span>') +
-                '</div></div>'
-            ).join('');
+            renderTasksForEdit();
             document.getElementById('editModal').classList.add('active');
+        }
+
+        function renderTasksForEdit() {
+            document.getElementById('taskList').innerHTML = editingTest.tasks.map((task, i) => {
+                const optionsHtml = renderOptionsEditor(task, i);
+                return '<div class="task-preview" data-task-index="' + i + '">' +
+                    (task.photo_url ? '<img src="' + task.photo_url + '" alt="Task">' : '<p style="color: var(--text-secondary);">Без зображення</p>') +
+                    '<div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">' +
+                    '<span><strong>Завдання ' + (i+1) + '</strong></span>' +
+                    '</div>' +
+                    '<div class="task-edit-row">' +
+                    '<label>Тип:</label>' +
+                    '<select onchange="updateTaskType(' + i + ', this.value)">' +
+                    '<option value="quiz"' + (task.type === 'quiz' ? ' selected' : '') + '>Тест (quiz)</option>' +
+                    '<option value="short"' + (task.type === 'short' ? ' selected' : '') + '>Коротка відповідь (short)</option>' +
+                    '<option value="match"' + (task.type === 'match' ? ' selected' : '') + '>Відповідність (match)</option>' +
+                    '</select>' +
+                    '<label>Відповідь:</label>' +
+                    '<input type="text" value="' + (task.correct || '').replace(/"/g, '&quot;') + '" onchange="updateTaskAnswer(' + i + ', this.value)" placeholder="Правильна відповідь">' +
+                    '</div>' +
+                    optionsHtml +
+                    '</div>';
+            }).join('');
+        }
+
+        function renderOptionsEditor(task, taskIndex) {
+            if (task.type !== 'quiz' || !task.options) return '';
+
+            const correctAnswers = task.correct ? task.correct.split(',').map(a => a.trim()) : [];
+            const isMultiple = correctAnswers.length > 1;
+
+            let html = '<div class="options-container">' +
+                '<div style="margin-bottom: 8px; font-size: 0.85rem; color: var(--text-secondary);">Варіанти відповідей:</div>';
+
+            task.options.forEach((opt, optIdx) => {
+                const letter = String.fromCharCode(65 + optIdx); // A, B, C, D...
+                const isCorrect = correctAnswers.includes(letter);
+                html += '<div class="option-row">' +
+                    '<span class="option-label">' + letter + ')</span>' +
+                    '<input type="' + (isMultiple ? 'checkbox' : 'radio') + '" name="correct_' + taskIndex + '"' +
+                    (isCorrect ? ' checked' : '') +
+                    ' onchange="updateCorrectOption(' + taskIndex + ', \'' + letter + '\', this.checked)">' +
+                    '<input type="text" value="' + (opt || '').replace(/"/g, '&quot;') + '" onchange="updateOptionText(' + taskIndex + ', ' + optIdx + ', this.value)">' +
+                    '<button class="remove-option-btn" onclick="removeOption(' + taskIndex + ', ' + optIdx + ')">×</button>' +
+                    '</div>';
+            });
+
+            html += '<button class="add-option-btn" onclick="addOption(' + taskIndex + ')">+ Додати варіант</button></div>';
+            return html;
+        }
+
+        function updateTaskType(taskIndex, newType) {
+            const task = editingTest.tasks[taskIndex];
+            const oldType = task.type;
+            task.type = newType;
+
+            // Initialize options array for quiz type
+            if (newType === 'quiz' && !task.options) {
+                task.options = ['', '', '', ''];
+                task.correct = 'А';
+            }
+
+            // Re-render if type changed to/from quiz
+            if ((oldType === 'quiz') !== (newType === 'quiz')) {
+                renderTasksForEdit();
+            }
+        }
+
+        function updateTaskAnswer(taskIndex, newAnswer) {
+            editingTest.tasks[taskIndex].correct = newAnswer;
+        }
+
+        function updateCorrectOption(taskIndex, letter, isChecked) {
+            const task = editingTest.tasks[taskIndex];
+            let correctAnswers = task.correct ? task.correct.split(',').map(a => a.trim()) : [];
+
+            if (isChecked) {
+                if (!correctAnswers.includes(letter)) {
+                    correctAnswers.push(letter);
+                }
+            } else {
+                correctAnswers = correctAnswers.filter(a => a !== letter);
+            }
+
+            // Sort alphabetically
+            correctAnswers.sort();
+            task.correct = correctAnswers.join(', ');
+
+            // Update answer input
+            const taskPreview = document.querySelector('[data-task-index="' + taskIndex + '"]');
+            const answerInput = taskPreview.querySelector('input[type="text"]');
+            if (answerInput) {
+                answerInput.value = task.correct;
+            }
+        }
+
+        function updateOptionText(taskIndex, optionIndex, newText) {
+            editingTest.tasks[taskIndex].options[optionIndex] = newText;
+        }
+
+        function addOption(taskIndex) {
+            const task = editingTest.tasks[taskIndex];
+            if (!task.options) task.options = [];
+            task.options.push('');
+            renderTasksForEdit();
+        }
+
+        function removeOption(taskIndex, optionIndex) {
+            const task = editingTest.tasks[taskIndex];
+            task.options.splice(optionIndex, 1);
+            renderTasksForEdit();
         }
 
         function closeModal() {

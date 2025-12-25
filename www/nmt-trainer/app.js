@@ -1165,11 +1165,10 @@ function showSolution() {
             latexContainer.innerHTML = '';
         }
 
-        // Show generate button - always show it, will check for image when clicked
+        // Hide generate button for regular users (only admins use admin panel to generate)
+        // Students see pre-generated solutions stored in task.solution_latex
         if (generateBtn) {
-            generateBtn.style.display = 'block';
-            generateBtn.innerHTML = '🤖 Згенерувати розв\'язок';
-            generateBtn.disabled = false;
+            generateBtn.style.display = 'none';
         }
     }
 

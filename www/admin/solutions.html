@@ -356,12 +356,15 @@
                         <p style="color: #888; text-align: center;">Попередній перегляд з'явиться тут</p>
                     </div>
 
-                    <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <div style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
                         <button class="btn btn-success" onclick="saveSolution()" id="saveBtn" disabled>
-                            Зберегти
+                            💾 Зберегти
                         </button>
                         <button class="btn btn-warning" onclick="exportLaTeX()">
-                            Експортувати .tex
+                            📄 .tex
+                        </button>
+                        <button class="btn btn-primary" onclick="exportAllData()">
+                            📦 Експорт JSON
                         </button>
                     </div>
                 </div>
@@ -758,6 +761,31 @@ $|1 - \\sqrt{3}| = -(1 - \\sqrt{3}) = -1 + \\sqrt{3} = \\sqrt{3} - 1$ & Заст
             a.href = URL.createObjectURL(blob);
             a.download = `solution_task${currentTask.task_num}.tex`;
             a.click();
+        }
+
+        // Export all data with solutions to JSON
+        function exportAllData() {
+            const dataToExport = classtimeData || nmtData;
+            if (!dataToExport) {
+                alert('Немає даних для експорту');
+                return;
+            }
+
+            // Count solutions
+            let solutionCount = 0;
+            dataToExport.test_sets.forEach(test => {
+                test.tasks.forEach(task => {
+                    if (task.solution_latex) solutionCount++;
+                });
+            });
+
+            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'classtime_data_with_solutions.json';
+            a.click();
+
+            alert(`Експортовано!\n\n${dataToExport.test_sets.length} тестів\n${solutionCount} розв'язків\n\nЗамініть файл classtime_data.json на сервері.`);
         }
 
         function generateFullLatex(solutionSteps) {

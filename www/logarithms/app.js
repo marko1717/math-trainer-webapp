@@ -678,6 +678,7 @@ function generateNatural() {
 }
 
 // Compute complex expressions
+function generateCompute() {
     const problems = [
         {
             question: '\\log_2 4 + \\log_2 8 - \\log_2 2 = ?',

@@ -25,6 +25,46 @@ const TOPIC_RANGES = {
 const SHORT_ANSWER_TASKS = [19, 20, 21, 22]; // Last 4 tasks
 const NUMBER_TYPES = ['short', 'number']; // Types that use number input
 
+// Motivational phrases (inspired by Холостяк show)
+const CORRECT_PHRASES = [
+    "Правильно! Ти просто вогонь!",
+    "Так тримати! Ти неймовірна!",
+    "Бомба! Ти справжня королева математики!",
+    "Вау! Це було круто!",
+    "Ти мене вразила! Чудово!",
+    "Фантастика! Ти геній!",
+    "Браво! Так і продовжуй!",
+    "Ти просто космос!",
+    "Розумниця! Я в захваті!",
+    "Це перемога! Ти найкраща!",
+    "Бездоганно! Ти на висоті!",
+    "Супер! Ти робиш це як профі!",
+    "Шикарно! Математика - це твоє!",
+    "Ти мене приголомшила! Правильно!",
+    "Неймовірно! Так тримати, красуне!"
+];
+
+const WRONG_PHRASES = [
+    "Не здавайся! Ти все одно чудова!",
+    "Наступного разу точно вийде!",
+    "Помилки - це шлях до успіху!",
+    "Нічого страшного, спробуємо ще раз!",
+    "Ти сильна, рухаємось далі!",
+    "Це лише крок до перемоги!",
+    "Не сумуй, ти все одно молодець!",
+    "Кожна спроба робить тебе кращою!",
+    "Вірю в тебе! Далі буде краще!",
+    "Тренування робить майстра!"
+];
+
+const PARTIAL_PHRASES = [
+    "Майже! Ти на правильному шляху!",
+    "Непогано! Ще трішки і буде ідеально!",
+    "Хороша спроба! Ти рухаєшся вперед!",
+    "Частково правильно - це теж результат!",
+    "Ти близько до правильної відповіді!"
+];
+
 // ========== STATE ==========
 
 let nmtData = null;
@@ -759,19 +799,23 @@ function normalizeAnswer(answer) {
     return answer.toString().trim().toLowerCase().replace(',', '.').replace(/\s/g, '');
 }
 
+function getRandomPhrase(phrases) {
+    return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
 function showAnswerFeedback(taskType, correct, userAnswer, isCorrect, partialScore, maxScore) {
     // Show feedback message
     feedbackMessage.classList.remove('hidden', 'correct', 'wrong', 'partial');
 
     if (isCorrect) {
         feedbackMessage.classList.add('correct');
-        feedbackMessage.textContent = '✓ Правильно!';
+        feedbackMessage.textContent = `✓ ${getRandomPhrase(CORRECT_PHRASES)}`;
     } else if (partialScore > 0 && partialScore < maxScore) {
         feedbackMessage.classList.add('partial');
-        feedbackMessage.textContent = `◐ Частково правильно (${partialScore}/${maxScore}). Відповідь: ${correct}`;
+        feedbackMessage.textContent = `◐ ${getRandomPhrase(PARTIAL_PHRASES)} (${partialScore}/${maxScore}). Відповідь: ${correct}`;
     } else {
         feedbackMessage.classList.add('wrong');
-        feedbackMessage.textContent = `✗ Неправильно. Відповідь: ${correct}`;
+        feedbackMessage.textContent = `✗ ${getRandomPhrase(WRONG_PHRASES)} Відповідь: ${correct}`;
     }
 
     // Visual feedback on inputs
@@ -804,13 +848,13 @@ function showFeedbackMessage(answer) {
 
     if (answer.isCorrect) {
         feedbackMessage.classList.add('correct');
-        feedbackMessage.textContent = '✓ Правильно!';
+        feedbackMessage.textContent = `✓ ${getRandomPhrase(CORRECT_PHRASES)}`;
     } else if (answer.partialScore > 0 && answer.partialScore < answer.maxScore) {
         feedbackMessage.classList.add('partial');
-        feedbackMessage.textContent = `◐ Частково правильно (${answer.partialScore}/${answer.maxScore}). Відповідь: ${answer.correct}`;
+        feedbackMessage.textContent = `◐ ${getRandomPhrase(PARTIAL_PHRASES)} (${answer.partialScore}/${answer.maxScore}). Відповідь: ${answer.correct}`;
     } else {
         feedbackMessage.classList.add('wrong');
-        feedbackMessage.textContent = `✗ Неправильно. Відповідь: ${answer.correct}`;
+        feedbackMessage.textContent = `✗ ${getRandomPhrase(WRONG_PHRASES)} Відповідь: ${answer.correct}`;
     }
 }
 

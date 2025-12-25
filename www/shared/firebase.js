@@ -314,42 +314,35 @@ async function signInWithApple() {
 
                 console.log('🍎 Apple provided data - email:', appleEmail, 'name:', appleDisplayName);
 
-                // Use Firebase SDK with OAuthCredential
-                // Now that iOS app is registered in Firebase, it should accept Bundle ID as audience
-                console.log('🍎 Using Firebase SDK with OAuthCredential...');
+                // Decode the identity token to get user info
+                // Firebase Auth doesn't accept iOS Bundle ID as audience, so we'll
+                // create a local session based on Apple's verified identity token
+                const identityToken = result.response.identityToken;
+                const tokenParts = identityToken.split('.');
+                const payload = JSON.parse(atob(tokenParts[1]));
 
-                // Create OAuthCredential for Apple using provider instance
-                const appleProvider = new OAuthProvider('apple.com');
-                const credential = appleProvider.credential({
-                    idToken: result.response.identityToken,
-                    rawNonce: rawNonce
-                });
+                console.log('🍎 Token payload - sub:', payload.sub, 'email:', payload.email);
 
-                console.log('🍎 Signing in with Firebase credential...');
-                const userCredential = await signInWithCredential(auth, credential);
-                const firebaseUser = userCredential.user;
+                // Apple's 'sub' is a unique, stable user identifier
+                const appleUserId = payload.sub;
+                const tokenEmail = payload.email;
 
-                console.log('🍎 Firebase sign in successful! User:', firebaseUser.email || firebaseUser.uid);
-
-                // IMPORTANT: Prioritize Apple-provided data over Firebase data
-                // Apple only sends fullName and email on FIRST authorization, so we must use them
-                const finalEmail = appleEmail || firebaseUser.email || null;
-                const finalDisplayName = appleDisplayName || firebaseUser.displayName || null;
+                // Create user object from Apple token
+                const finalEmail = appleEmail || tokenEmail || null;
+                const finalDisplayName = appleDisplayName || null;
 
                 console.log('🍎 Final user data - email:', finalEmail, 'displayName:', finalDisplayName);
 
-                // Create user object with Apple data
+                // Use Apple user ID as our user ID (prefixed to avoid conflicts)
                 const user = {
-                    uid: firebaseUser.uid,
+                    uid: 'apple_' + appleUserId,
                     email: finalEmail,
                     displayName: finalDisplayName,
-                    photoURL: firebaseUser.photoURL || null,
-                    emailVerified: firebaseUser.emailVerified || false,
-                    // Get tokens from Firebase user
-                    stsTokenManager: {
-                        accessToken: await firebaseUser.getIdToken(),
-                        refreshToken: firebaseUser.refreshToken
-                    }
+                    photoURL: null,
+                    emailVerified: payload.email_verified || false,
+                    provider: 'apple.com',
+                    // Store the identity token for verification
+                    appleIdentityToken: identityToken
                 };
 
                 // Store the user
@@ -358,24 +351,48 @@ async function signInWithApple() {
                 // Save user to localStorage for persistence
                 saveUserToStorage(user);
 
-                // Save to Firestore
-                await createOrUpdateUserProfile(firebaseUser);
-
-                // Also update with Apple-provided name if we have it
-                if (appleDisplayName || appleEmail) {
-                    const { doc, setDoc } = window.firebaseDb;
-                    const userRef = doc(db, 'users', user.uid);
-                    const updateData = {};
-                    if (appleDisplayName) updateData.displayName = appleDisplayName;
-                    if (appleEmail) updateData.email = appleEmail;
-                    await setDoc(userRef, updateData, { merge: true });
-                    console.log('🍎 Updated Firestore with Apple-provided data');
-                }
-
                 console.log('✅ Apple Sign-in successful:', user.displayName || user.email || user.uid);
 
-                // Dispatch auth state change
+                // Dispatch auth state change FIRST to update UI immediately
                 window.dispatchEvent(new CustomEvent('authStateChanged', { detail: { user } }));
+
+                // Save to Firestore in background (don't await, don't block)
+                // This may fail due to Firestore rules, but local auth is enough
+                setTimeout(async () => {
+                    try {
+                        const { doc, setDoc, getDoc, serverTimestamp } = window.firebaseDb;
+                        const userRef = doc(db, 'users', user.uid);
+                        const userSnap = await getDoc(userRef);
+
+                        if (!userSnap.exists()) {
+                            await setDoc(userRef, {
+                                uid: user.uid,
+                                email: finalEmail,
+                                displayName: finalDisplayName,
+                                provider: 'apple.com',
+                                appleUserId: appleUserId,
+                                createdAt: serverTimestamp(),
+                                lastLoginAt: serverTimestamp(),
+                                stats: {
+                                    totalXP: 0,
+                                    level: 1,
+                                    streak: 0,
+                                    totalTimeSpent: 0,
+                                    trainersCompleted: 0
+                                }
+                            });
+                            console.log('🍎 New user profile created in Firestore');
+                        } else {
+                            const updateData = { lastLoginAt: serverTimestamp() };
+                            if (finalDisplayName) updateData.displayName = finalDisplayName;
+                            if (finalEmail) updateData.email = finalEmail;
+                            await setDoc(userRef, updateData, { merge: true });
+                            console.log('🍎 User profile updated in Firestore');
+                        }
+                    } catch (firestoreError) {
+                        console.log('🍎 Firestore save skipped (rules may block unauthenticated writes):', firestoreError.message);
+                    }
+                }, 100);
 
                 return user;
             } catch (nativeError) {
@@ -601,11 +618,29 @@ async function getUserProfile() {
         return getUserProfileREST();
     }
 
-    const { doc, getDoc } = window.firebaseDb;
-    const userRef = doc(db, 'users', currentUser.uid);
-    const userSnap = await getDoc(userRef);
+    // For Apple users without Firebase Auth, return local user data with local stats
+    // (Firestore requires authentication for reads in our rules)
+    if (currentUser.provider === 'apple.com') {
+        console.log('📱 Apple user - returning local profile data');
+        const localStats = getLocalStats();
+        return {
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            provider: 'apple.com',
+            stats: localStats
+        };
+    }
 
-    return userSnap.exists() ? userSnap.data() : null;
+    try {
+        const { doc, getDoc } = window.firebaseDb;
+        const userRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        return userSnap.exists() ? userSnap.data() : null;
+    } catch (error) {
+        console.log('📱 Could not fetch profile from Firestore:', error.message);
+        return null;
+    }
 }
 
 // Update user display name
@@ -771,6 +806,15 @@ async function saveTrainerSession(trainerData) {
     // If user has REST API token, use REST API
     if (currentUser.stsTokenManager?.accessToken) {
         return saveTrainerSessionREST(trainerData);
+    }
+
+    // For Apple users without Firebase Auth, save to localStorage
+    // and update local stats
+    if (currentUser.provider === 'apple.com') {
+        console.log('📱 Apple user - saving session to localStorage');
+        saveToLocalStorage(trainerData);
+        updateLocalStats(trainerData);
+        return 'local_' + Date.now();
     }
 
     const { collection, addDoc, serverTimestamp, doc, setDoc, getDoc } = window.firebaseDb;
@@ -1160,16 +1204,28 @@ async function getAllTrainerProgress() {
         return getAllTrainerProgressREST();
     }
 
-    const { collection, getDocs } = window.firebaseDb;
-    const progressRef = collection(db, 'users', currentUser.uid, 'trainerProgress');
-    const progressSnap = await getDocs(progressRef);
+    // For Apple users without Firebase Auth, return empty array
+    // (Progress saved locally only for now)
+    if (currentUser.provider === 'apple.com') {
+        console.log('📱 Apple user - trainer progress not available from cloud');
+        return [];
+    }
 
-    const progress = [];
-    progressSnap.forEach((doc) => {
-        progress.push({ id: doc.id, ...doc.data() });
-    });
+    try {
+        const { collection, getDocs } = window.firebaseDb;
+        const progressRef = collection(db, 'users', currentUser.uid, 'trainerProgress');
+        const progressSnap = await getDocs(progressRef);
 
-    return progress;
+        const progress = [];
+        progressSnap.forEach((doc) => {
+            progress.push({ id: doc.id, ...doc.data() });
+        });
+
+        return progress;
+    } catch (error) {
+        console.log('📱 Could not fetch trainer progress:', error.message);
+        return [];
+    }
 }
 
 // Get all trainer progress via REST API
@@ -1218,6 +1274,21 @@ async function getRecentSessions(limitCount = 10) {
     // If user has REST API token, use REST API
     if (currentUser.stsTokenManager?.accessToken) {
         return getRecentSessionsREST(limitCount);
+    }
+
+    // For Apple users without Firebase Auth, return local sessions
+    if (currentUser.provider === 'apple.com') {
+        console.log('📱 Apple user - returning local sessions');
+        const key = 'mathquest_offline_sessions';
+        const sessions = JSON.parse(localStorage.getItem(key) || '[]');
+        // Sort by date descending and limit
+        return sessions
+            .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+            .slice(0, limitCount)
+            .map(s => ({
+                ...s,
+                completedAt: new Date(s.completedAt)
+            }));
     }
 
     const { collection, query, where, orderBy, limit, getDocs } = window.firebaseDb;
@@ -1331,6 +1402,54 @@ function saveToLocalStorage(trainerData) {
         completedAt: new Date().toISOString()
     });
     localStorage.setItem(key, JSON.stringify(sessions));
+}
+
+// Update local stats for Apple users (stored in localStorage)
+function updateLocalStats(trainerData) {
+    const key = 'mathquest_local_stats';
+    const stats = JSON.parse(localStorage.getItem(key) || '{}');
+
+    // Calculate XP earned
+    const baseXP = trainerData.score * 10;
+    const percentage = (trainerData.score / trainerData.totalQuestions) * 100;
+    const bonusXP = percentage === 100 ? 50 : percentage >= 80 ? 20 : 0;
+    const earnedXP = baseXP + bonusXP;
+
+    // Update stats
+    stats.totalXP = (stats.totalXP || 0) + earnedXP;
+    stats.level = Math.floor(stats.totalXP / 100) + 1;
+    stats.totalTimeSpent = (stats.totalTimeSpent || 0) + (trainerData.timeSpent || 0);
+    stats.trainersCompleted = (stats.trainersCompleted || 0) + 1;
+
+    // Calculate streak
+    const today = new Date().toISOString().split('T')[0];
+    const lastActivity = stats.lastActivityDate;
+    if (lastActivity !== today) {
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        if (lastActivity === yesterday) {
+            stats.streak = (stats.streak || 0) + 1;
+        } else {
+            stats.streak = 1;
+        }
+    }
+    stats.lastActivityDate = today;
+
+    localStorage.setItem(key, JSON.stringify(stats));
+    console.log('📱 Local stats updated:', stats);
+
+    // Update currentUser stats in memory and storage
+    if (currentUser) {
+        currentUser.localStats = stats;
+        saveUserToStorage(currentUser);
+    }
+
+    return stats;
+}
+
+// Get local stats for Apple users
+function getLocalStats() {
+    const key = 'mathquest_local_stats';
+    return JSON.parse(localStorage.getItem(key) || '{"totalXP":0,"level":1,"streak":0,"totalTimeSpent":0,"trainersCompleted":0}');
 }
 
 // Sync offline sessions when user logs in

@@ -6,7 +6,10 @@
 const NOTIFICATION_IDS = {
     STREAK_REMINDER: 1,
     DAILY_PRACTICE: 2,
-    STREAK_DANGER: 3
+    STREAK_DANGER: 3,
+    NEW_STORY_1: 10,  // 08:00
+    NEW_STORY_2: 11,  // 16:00
+    NEW_STORY_3: 12   // 22:00
 };
 
 // Storage keys
@@ -192,6 +195,63 @@ async function scheduleStreakDanger() {
     }
 }
 
+// Schedule story notifications (3 times a day: 08:00, 16:00, 22:00)
+async function scheduleStoryNotifications() {
+    if (!isNotificationsAvailable()) return;
+
+    try {
+        const { LocalNotifications } = window.Capacitor.Plugins;
+
+        // Story notification messages
+        const storyMessages = [
+            { title: 'Ранкова порція математики ☀️', body: 'Нова історія вже чекає на тебе!' },
+            { title: 'Час для математики! 🧮', body: 'Переглянь нову історію та дізнайся щось нове' },
+            { title: 'Вечірня історія 🌙', body: 'Завершуй день з цікавим математичним фактом' }
+        ];
+
+        // Schedule times: 08:00, 16:00, 22:00
+        const scheduleTimes = [8, 16, 22];
+        const notifications = [];
+
+        for (let i = 0; i < 3; i++) {
+            const notificationTime = new Date();
+            notificationTime.setHours(scheduleTimes[i], 0, 0, 0);
+
+            // If time already passed today, schedule for tomorrow
+            if (new Date() > notificationTime) {
+                notificationTime.setDate(notificationTime.getDate() + 1);
+            }
+
+            notifications.push({
+                id: NOTIFICATION_IDS.NEW_STORY_1 + i,
+                title: storyMessages[i].title,
+                body: storyMessages[i].body,
+                schedule: {
+                    at: notificationTime,
+                    repeats: true,
+                    every: 'day'
+                },
+                sound: 'default',
+                actionTypeId: 'OPEN_APP'
+            });
+        }
+
+        // Cancel existing story notifications first
+        await LocalNotifications.cancel({
+            notifications: [
+                { id: NOTIFICATION_IDS.NEW_STORY_1 },
+                { id: NOTIFICATION_IDS.NEW_STORY_2 },
+                { id: NOTIFICATION_IDS.NEW_STORY_3 }
+            ]
+        });
+
+        await LocalNotifications.schedule({ notifications });
+        console.log('Story notifications scheduled for 08:00, 16:00, 22:00');
+    } catch (error) {
+        console.error('Error scheduling story notifications:', error);
+    }
+}
+
 // Cancel all notifications for today (call after user completes a session)
 async function cancelTodayReminders() {
     if (!isNotificationsAvailable()) return;
@@ -230,6 +290,7 @@ async function initNotifications() {
             await scheduleStreakReminder();
             await scheduleDailyPractice();
             await scheduleStreakDanger();
+            await scheduleStoryNotifications();
 
             localStorage.setItem(STORAGE_KEYS.LAST_NOTIFICATION_SETUP, new Date().toISOString());
             console.log('Notifications initialized');
@@ -259,6 +320,7 @@ async function enableNotifications() {
         await scheduleStreakReminder();
         await scheduleDailyPractice();
         await scheduleStreakDanger();
+        await scheduleStoryNotifications();
 
         console.log('Notifications enabled');
         return true;
@@ -280,7 +342,10 @@ async function disableNotifications() {
             notifications: [
                 { id: NOTIFICATION_IDS.STREAK_REMINDER },
                 { id: NOTIFICATION_IDS.DAILY_PRACTICE },
-                { id: NOTIFICATION_IDS.STREAK_DANGER }
+                { id: NOTIFICATION_IDS.STREAK_DANGER },
+                { id: NOTIFICATION_IDS.NEW_STORY_1 },
+                { id: NOTIFICATION_IDS.NEW_STORY_2 },
+                { id: NOTIFICATION_IDS.NEW_STORY_3 }
             ]
         });
 

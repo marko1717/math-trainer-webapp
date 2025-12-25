@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - NMT Тренажер</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #3d3d3d;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: #444;
+            --accent: #007aff;
+            --success: #34c759;
+            --error: #ff3b30;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        h1 { font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
+        .stats { display: flex; gap: 24px; color: var(--text-secondary); font-size: 0.9rem; }
+        .layout { display: grid; grid-template-columns: 300px 1fr; gap: 24px; }
+        .sidebar {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        .sidebar h3 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        .folder-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .folder-item:hover { background: var(--bg-tertiary); }
+        .folder-item.active { background: var(--accent); }
+        .folder-item .count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .folder-item.active .count { background: rgba(255,255,255,0.2); color: white; }
+        .main {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        .toolbar { display: flex; justify-content: space-between; margin-bottom: 16px; gap: 12px; }
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--error); color: white; }
+        .test-list { display: flex; flex-direction: column; gap: 8px; }
+        .test-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 16px;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .test-item:hover { background: #4a4a4a; }
+        .test-item.selected { border: 2px solid var(--accent); }
+        .test-item input[type="checkbox"] { width: 18px; height: 18px; }
+        .test-info h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .test-info p { font-size: 0.8rem; color: var(--text-secondary); }
+        .test-badges { display: flex; gap: 8px; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; }
+        .badge-quiz { background: rgba(0, 122, 255, 0.2); color: #5ac8fa; }
+        .badge-short { background: rgba(255, 149, 0, 0.2); color: #ffcc00; }
+        .badge-visible { background: rgba(52, 199, 89, 0.2); color: var(--success); }
+        .badge-hidden { background: rgba(255, 59, 48, 0.2); color: var(--error); }
+        .test-actions { display: flex; gap: 8px; }
+        .test-actions button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        .test-actions button:hover { background: var(--accent); }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-secondary); }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .task-preview {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .task-preview img { max-width: 100%; border-radius: 8px; margin-bottom: 12px; }
+        .answer { padding: 6px 12px; background: var(--success); color: white; border-radius: 6px; display: inline-block; }
+        .bulk-actions {
+            display: none;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .bulk-actions.show { display: flex; }
+        .loading { text-align: center; padding: 40px; color: var(--text-secondary); }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Admin - NMT Тренажер</h1>
+            <div class="stats">
+                <span>📁 <strong id="folderCount">0</strong> папок</span>
+                <span>📝 <strong id="testCount">0</strong> тестів</span>
+                <span>❓ <strong id="questionCount">0</strong> завдань</span>
+            </div>
+        </div>
+        <div class="layout">
+            <div class="sidebar">
+                <h3>Папки</h3>
+                <div id="folderList"><div class="loading"><div class="spinner"></div>Завантаження...</div></div>
+            </div>
+            <div class="main">
+                <div class="toolbar">
+                    <input type="text" class="search-box" id="searchBox" placeholder="Пошук тестів...">
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary" onclick="exportData()">📤 Експорт</button>
+                        <button class="btn btn-success" onclick="saveChanges()">💾 Зберегти</button>
+                    </div>
+                </div>
+                <div class="bulk-actions" id="bulkActions">
+                    <span><strong id="selectedCount">0</strong> вибрано</span>
+                    <button class="btn btn-primary" onclick="bulkSetVisible(true)">👁 Показати</button>
+                    <button class="btn btn-danger" onclick="bulkSetVisible(false)">🚫 Приховати</button>
+                    <button class="btn" onclick="clearSelection()">✖ Скасувати</button>
+                </div>
+                <div class="test-list" id="testList"><div class="loading">Виберіть папку...</div></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редагувати тест</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Назва тесту</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Папка</label>
+                        <select id="editFolder"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Видимість</label>
+                    <select id="editVisible">
+                        <option value="true">Видимий</option>
+                        <option value="false">Прихований</option>
+                    </select>
+                </div>
+                <h3 style="margin: 20px 0 12px;">Завдання</h3>
+                <div id="taskList"></div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success">Зберегти</button>
+                    <button type="button" class="btn" onclick="closeModal()">Скасувати</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        let classtimeData = null;
+        let selectedFolder = null;
+        let selectedTests = new Set();
+        let editingTest = null;
+
+        async function init() {
+            try {
+                const response = await fetch('../nmt-trainer/classtime_data.json');
+                classtimeData = await response.json();
+                classtimeData.test_sets.forEach(test => {
+                    if (test.visible === undefined) test.visible = true;
+                });
+                updateStats();
+                renderFolders();
+            } catch (error) {
+                document.getElementById('folderList').innerHTML = '<p style="color: var(--error);">Помилка завантаження</p>';
+            }
+        }
+
+        function updateStats() {
+            const folders = new Set(classtimeData.test_sets.map(t => t.folder));
+            const questions = classtimeData.test_sets.reduce((sum, t) => sum + t.tasks.length, 0);
+            document.getElementById('folderCount').textContent = folders.size;
+            document.getElementById('testCount').textContent = classtimeData.test_sets.length;
+            document.getElementById('questionCount').textContent = questions;
+        }
+
+        function renderFolders() {
+            const folders = {};
+            classtimeData.test_sets.forEach(test => {
+                const folder = test.folder || 'Без папки';
+                if (!folders[folder]) folders[folder] = 0;
+                folders[folder]++;
+            });
+            document.getElementById('folderList').innerHTML = Object.entries(folders).sort().map(([name, count]) =>
+                '<div class="folder-item ' + (selectedFolder === name ? 'active' : '') + '" onclick="selectFolder(\'' + name.replace(/'/g, "\\'") + '\')">' +
+                '<span>📁 ' + name + '</span><span class="count">' + count + '</span></div>'
+            ).join('');
+        }
+
+        function selectFolder(folder) {
+            selectedFolder = folder;
+            selectedTests.clear();
+            updateBulkActions();
+            renderFolders();
+            renderTests();
+        }
+
+        function renderTests() {
+            if (!selectedFolder) {
+                document.getElementById('testList').innerHTML = '<div class="loading">Виберіть папку...</div>';
+                return;
+            }
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const tests = classtimeData.test_sets.filter(t =>
+                t.folder === selectedFolder && t.name.toLowerCase().includes(searchTerm)
+            );
+            if (tests.length === 0) {
+                document.getElementById('testList').innerHTML = '<div class="loading">Тестів не знайдено</div>';
+                return;
+            }
+            document.getElementById('testList').innerHTML = tests.map(test => {
+                const quizCount = test.tasks.filter(t => t.type === 'quiz').length;
+                const shortCount = test.tasks.filter(t => t.type === 'short').length;
+                const withAnswers = test.tasks.filter(t => t.correct).length;
+                return '<div class="test-item ' + (selectedTests.has(test.id) ? 'selected' : '') + '">' +
+                    '<input type="checkbox" ' + (selectedTests.has(test.id) ? 'checked' : '') + ' onchange="toggleSelect(\'' + test.id + '\')">' +
+                    '<div class="test-info"><h4>' + test.name + '</h4><p>' + test.tasks.length + ' завдань • ' + withAnswers + ' з відповідями</p></div>' +
+                    '<div class="test-badges">' +
+                    (quizCount ? '<span class="badge badge-quiz">' + quizCount + ' quiz</span>' : '') +
+                    (shortCount ? '<span class="badge badge-short">' + shortCount + ' short</span>' : '') +
+                    '<span class="badge ' + (test.visible !== false ? 'badge-visible' : 'badge-hidden') + '">' +
+                    (test.visible !== false ? '👁 Видимий' : '🚫 Прихований') + '</span></div>' +
+                    '<div class="test-actions">' +
+                    '<button onclick="editTest(\'' + test.id + '\')">✏️</button>' +
+                    '<button onclick="toggleVisibility(\'' + test.id + '\')">' + (test.visible !== false ? '🚫' : '👁') + '</button></div></div>';
+            }).join('');
+        }
+
+        function toggleSelect(testId) {
+            if (selectedTests.has(testId)) selectedTests.delete(testId);
+            else selectedTests.add(testId);
+            updateBulkActions();
+            renderTests();
+        }
+
+        function updateBulkActions() {
+            const el = document.getElementById('bulkActions');
+            if (selectedTests.size > 0) {
+                el.classList.add('show');
+                document.getElementById('selectedCount').textContent = selectedTests.size;
+            } else {
+                el.classList.remove('show');
+            }
+        }
+
+        function clearSelection() {
+            selectedTests.clear();
+            updateBulkActions();
+            renderTests();
+        }
+
+        function bulkSetVisible(visible) {
+            classtimeData.test_sets.forEach(test => {
+                if (selectedTests.has(test.id)) test.visible = visible;
+            });
+            clearSelection();
+        }
+
+        function toggleVisibility(testId) {
+            const test = classtimeData.test_sets.find(t => t.id === testId);
+            if (test) {
+                test.visible = test.visible === false ? true : false;
+                renderTests();
+            }
+        }
+
+        function editTest(testId) {
+            editingTest = classtimeData.test_sets.find(t => t.id === testId);
+            if (!editingTest) return;
+            document.getElementById('editName').value = editingTest.name;
+            document.getElementById('editVisible').value = editingTest.visible !== false ? 'true' : 'false';
+            const folders = [...new Set(classtimeData.test_sets.map(t => t.folder))].sort();
+            document.getElementById('editFolder').innerHTML = folders.map(f =>
+                '<option value="' + f + '" ' + (f === editingTest.folder ? 'selected' : '') + '>' + f + '</option>'
+            ).join('');
+            document.getElementById('taskList').innerHTML = editingTest.tasks.map((task, i) =>
+                '<div class="task-preview">' +
+                (task.photo_url ? '<img src="' + task.photo_url + '" alt="Task">' : '<p style="color: var(--text-secondary);">Без зображення</p>') +
+                '<div style="display: flex; gap: 12px; align-items: center;">' +
+                '<span>Завдання ' + (i+1) + '</span>' +
+                '<span class="badge badge-' + task.type + '">' + task.type + '</span>' +
+                (task.correct ? '<span class="answer">Відповідь: ' + task.correct + '</span>' : '<span style="color: var(--error);">Без відповіді</span>') +
+                '</div></div>'
+            ).join('');
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingTest = null;
+        }
+
+        document.getElementById('editForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!editingTest) return;
+            editingTest.name = document.getElementById('editName').value;
+            editingTest.folder = document.getElementById('editFolder').value;
+            editingTest.visible = document.getElementById('editVisible').value === 'true';
+            closeModal();
+            renderFolders();
+            renderTests();
+        });
+
+        function saveChanges() {
+            const exportData = {
+                test_sets: classtimeData.test_sets.filter(t => t.visible !== false),
+                stats: classtimeData.stats
+            };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'classtime_data_filtered.json';
+            a.click();
+            alert('Збережено ' + exportData.test_sets.length + ' тестів (з ' + classtimeData.test_sets.length + ')');
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(classtimeData, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'classtime_data_full.json';
+            a.click();
+        }
+
+        document.getElementById('searchBox').addEventListener('input', renderTests);
+        init();
+    </script>
+</body>
+</html>

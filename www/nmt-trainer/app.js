@@ -1165,9 +1165,11 @@ function showSolution() {
             latexContainer.innerHTML = '';
         }
 
-        // Show generate button if task has image but no solution
+        // Show generate button - always show it, will check for image when clicked
         if (generateBtn) {
-            generateBtn.style.display = (task.photo || task.photo_url) ? 'block' : 'none';
+            generateBtn.style.display = 'block';
+            generateBtn.innerHTML = '🤖 Згенерувати розв\'язок';
+            generateBtn.disabled = false;
         }
     }
 

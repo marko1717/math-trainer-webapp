@@ -9,12 +9,17 @@
  *
  * Використання:
  *   node telegram-publisher.js --theory                # Випадкова теорія
- *   node telegram-publisher.js --practice              # Випадкове завдання
+ *   node telegram-publisher.js --practice              # Випадкове завдання (з картинкою)
  *   node telegram-publisher.js --quiz                  # Опитування
  *   node telegram-publisher.js --daily                 # Щоденний пост
- *   node telegram-publisher.js --schedule              # Запланувати пости
+ *   node telegram-publisher.js --schedule              # Показати інструкцію автопостінгу
+ *   node telegram-publisher.js --image-quiz           # Опитування з картинкою
+ *   node telegram-publisher.js --test                  # Тестовий режим (без надсилання)
  *
- * Вимагає: TELEGRAM_BOT_TOKEN і TELEGRAM_CHANNEL_ID в змінних середовища
+ * Налаштування:
+ *   1. Створіть канал в Telegram
+ *   2. Додайте бота @BotFather як адміністратора каналу
+ *   3. Встановіть TELEGRAM_CHANNEL_ID (наприклад @your_channel або -100xxxxxxxxx)
  */
 
 const https = require('https');
@@ -24,10 +29,11 @@ const path = require('path');
 // Configuration
 const CONFIG = {
   botToken: process.env.TELEGRAM_BOT_TOKEN || '8196154557:AAFPjzLPWN834f98lp4x7gJ59L7Azs9xknI',
-  channelId: process.env.TELEGRAM_CHANNEL_ID || '@nmt_math_trainer', // Replace with actual channel
-  nmtDataPath: path.join(__dirname, '../nmt-trainer/nmt_data.json'),
-  classtimeDataPath: path.join(__dirname, '../nmt-trainer/classtime_data.json'),
-  imagesDir: path.join(__dirname, '../nmt-trainer/images')
+  channelId: process.env.TELEGRAM_CHANNEL_ID || '@pvtr2525', // Your channel
+  nmtDataPath: path.join(__dirname, '../www/nmt-trainer/nmt_data.json'),
+  classtimeDataPath: path.join(__dirname, '../www/nmt-trainer/classtime_data.json'),
+  imagesDir: path.join(__dirname, '../www/nmt-trainer/images'),
+  testMode: false // Set via --test flag
 };
 
 // Theory content for posts
@@ -171,34 +177,81 @@ async function sendMessage(text, parseMode = 'HTML') {
   });
 }
 
-// Send photo with caption
-async function sendPhoto(photoPath, caption) {
-  const FormData = require('form-data');
-  const form = new FormData();
+// Send photo with caption (supports local file or URL)
+async function sendPhoto(photoSource, caption) {
+  if (CONFIG.testMode) {
+    console.log('[TEST] Would send photo:', photoSource);
+    console.log('[TEST] Caption:', caption.substring(0, 100) + '...');
+    return { ok: true, test: true };
+  }
 
-  form.append('chat_id', CONFIG.channelId);
-  form.append('caption', caption);
-  form.append('parse_mode', 'HTML');
-  form.append('photo', fs.createReadStream(photoPath));
+  // If it's a URL, use simpler method
+  if (photoSource.startsWith('http')) {
+    return telegramRequest('sendPhoto', {
+      chat_id: CONFIG.channelId,
+      photo: photoSource,
+      caption: caption,
+      parse_mode: 'HTML'
+    });
+  }
+
+  // For local files, use multipart form
+  const boundary = '----FormBoundary' + Math.random().toString(36).substring(2);
+
+  const photoData = fs.readFileSync(photoSource);
+  const fileName = path.basename(photoSource);
+
+  let body = '';
+  body += `--${boundary}\r\n`;
+  body += `Content-Disposition: form-data; name="chat_id"\r\n\r\n${CONFIG.channelId}\r\n`;
+  body += `--${boundary}\r\n`;
+  body += `Content-Disposition: form-data; name="caption"\r\n\r\n${caption}\r\n`;
+  body += `--${boundary}\r\n`;
+  body += `Content-Disposition: form-data; name="parse_mode"\r\n\r\nHTML\r\n`;
+
+  const headerPart = Buffer.from(body + `--${boundary}\r\nContent-Disposition: form-data; name="photo"; filename="${fileName}"\r\nContent-Type: image/jpeg\r\n\r\n`);
+  const footerPart = Buffer.from(`\r\n--${boundary}--\r\n`);
+  const fullBody = Buffer.concat([headerPart, photoData, footerPart]);
 
   return new Promise((resolve, reject) => {
-    form.submit(`https://api.telegram.org/bot${CONFIG.botToken}/sendPhoto`, (err, res) => {
-      if (err) reject(err);
-      else {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => {
+    const req = https.request({
+      hostname: 'api.telegram.org',
+      port: 443,
+      path: `/bot${CONFIG.botToken}/sendPhoto`,
+      method: 'POST',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Content-Length': fullBody.length
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
           const result = JSON.parse(data);
           if (result.ok) resolve(result.result);
           else reject(new Error(result.description));
-        });
-      }
+        } catch (e) {
+          reject(e);
+        }
+      });
     });
+
+    req.on('error', reject);
+    req.write(fullBody);
+    req.end();
   });
 }
 
 // Send poll
 async function sendPoll(question, options, correctIndex) {
+  if (CONFIG.testMode) {
+    console.log('[TEST] Would send poll:', question);
+    console.log('[TEST] Options:', options);
+    console.log('[TEST] Correct:', correctIndex);
+    return { ok: true, test: true };
+  }
+
   return telegramRequest('sendPoll', {
     chat_id: CONFIG.channelId,
     question,
@@ -207,6 +260,16 @@ async function sendPoll(question, options, correctIndex) {
     correct_option_id: correctIndex,
     is_anonymous: true
   });
+}
+
+// Send message with test mode support
+async function sendMessageSafe(text, parseMode = 'HTML') {
+  if (CONFIG.testMode) {
+    console.log('[TEST] Would send message:');
+    console.log(text);
+    return { ok: true, test: true };
+  }
+  return sendMessage(text, parseMode);
 }
 
 // Post theory content
@@ -225,16 +288,16 @@ ${topic.explanation}
 ${topic.hashtags}`;
 
   try {
-    await sendMessage(text);
-    console.log(`Posted theory: ${topic.title}`);
+    await sendMessageSafe(text);
+    console.log(`✓ Posted theory: ${topic.title}`);
     return true;
   } catch (e) {
-    console.error('Failed to post theory:', e.message);
+    console.error('✗ Failed to post theory:', e.message);
     return false;
   }
 }
 
-// Post practice task
+// Post practice task with image from NMT data
 async function postPractice() {
   // Load NMT data
   let nmtData = null;
@@ -247,83 +310,223 @@ async function postPractice() {
     return false;
   }
 
-  // Pick random test and task
-  const test = nmtData.test_sets[Math.floor(Math.random() * nmtData.test_sets.length)];
-  const task = test.tasks[Math.floor(Math.random() * test.tasks.length)];
+  // Pick random test and task with photo
+  let attempts = 0;
+  let test, task, photoPath;
 
-  if (!task.photo) {
-    console.log('Task has no photo, trying another...');
-    return postPractice(); // Try again
+  while (attempts < 20) {
+    test = nmtData.test_sets[Math.floor(Math.random() * nmtData.test_sets.length)];
+    task = test.tasks[Math.floor(Math.random() * test.tasks.length)];
+
+    if (task.photo) {
+      photoPath = path.join(CONFIG.imagesDir, task.photo);
+      if (fs.existsSync(photoPath)) break;
+    }
+    attempts++;
   }
 
-  const photoPath = path.join(CONFIG.imagesDir, task.photo);
-
-  if (!fs.existsSync(photoPath)) {
-    console.log(`Photo not found: ${photoPath}`);
+  if (!photoPath || !fs.existsSync(photoPath)) {
+    console.log('No valid photo found after 20 attempts');
     return false;
   }
 
   const caption = `📝 <b>Завдання дня!</b>
 
-Тест: ${test.name}
-Завдання #${task.task_num}
+📚 ${test.name}
+📌 Завдання #${task.task_num}
 
-Напиши свою відповідь в коментарях! 👇
+Напиши відповідь в коментарях! 👇
 
 <tg-spoiler>Правильна відповідь: ${task.correct}</tg-spoiler>
 
 #НМТ #математика #практика`;
 
   try {
-    // Note: sendPhoto requires form-data package
-    console.log(`Would post practice task: ${test.name} #${task.task_num}`);
-    console.log(`Photo: ${photoPath}`);
-    console.log(`Answer: ${task.correct}`);
+    await sendPhoto(photoPath, caption);
+    console.log(`✓ Posted practice: ${test.name} #${task.task_num}`);
     return true;
   } catch (e) {
-    console.error('Failed to post practice:', e.message);
+    console.error('✗ Failed to post practice:', e.message);
     return false;
   }
 }
 
+// Post practice task from Classtime with image URL
+async function postClasstimePractice() {
+  let classtimeData = null;
+  if (fs.existsSync(CONFIG.classtimeDataPath)) {
+    classtimeData = JSON.parse(fs.readFileSync(CONFIG.classtimeDataPath, 'utf8'));
+  }
+
+  if (!classtimeData || !classtimeData.test_sets || classtimeData.test_sets.length === 0) {
+    console.error('No Classtime data available');
+    return false;
+  }
+
+  // Pick random test and task with photo URL
+  let attempts = 0;
+  let test, task;
+
+  while (attempts < 20) {
+    test = classtimeData.test_sets[Math.floor(Math.random() * classtimeData.test_sets.length)];
+    task = test.tasks[Math.floor(Math.random() * test.tasks.length)];
+
+    if (task.photo_url) break;
+    attempts++;
+  }
+
+  if (!task || !task.photo_url) {
+    console.log('No valid Classtime task found');
+    return false;
+  }
+
+  const caption = `📝 <b>Завдання з Classtime</b>
+
+📁 ${test.folder || ''}
+📚 ${test.name}
+📌 Завдання #${task.task_num}
+
+Напиши відповідь в коментарях! 👇
+
+#НМТ #математика #classtime`;
+
+  try {
+    await sendPhoto(task.photo_url, caption);
+    console.log(`✓ Posted Classtime: ${test.name} #${task.task_num}`);
+    return true;
+  } catch (e) {
+    console.error('✗ Failed to post Classtime:', e.message);
+    return false;
+  }
+}
+
+// Extended quiz bank for Telegram polls
+const QUIZ_BANK = [
+  // Тригонометрія
+  { question: 'Чому дорівнює sin²30° + cos²30°?', options: ['0', '0.5', '1', '2'], correct: 2, topic: 'тригонометрія' },
+  { question: 'Чому дорівнює sin(90°)?', options: ['0', '0.5', '1', '-1'], correct: 2, topic: 'тригонометрія' },
+  { question: 'Чому дорівнює cos(0°)?', options: ['0', '0.5', '1', '-1'], correct: 2, topic: 'тригонометрія' },
+  { question: 'Чому дорівнює tg(45°)?', options: ['0', '0.5', '1', '√2'], correct: 2, topic: 'тригонометрія' },
+  { question: 'sin(180°) = ?', options: ['0', '1', '-1', '0.5'], correct: 0, topic: 'тригонометрія' },
+
+  // Рівняння
+  { question: 'Скільки коренів має x² + 1 = 0?', options: ['0', '1', '2', '∞'], correct: 0, topic: 'рівняння' },
+  { question: 'Розв\'яжи: x² - 4 = 0', options: ['x=2', 'x=±2', 'x=-2', 'x=4'], correct: 1, topic: 'рівняння' },
+  { question: 'Дискримінант x²-5x+6: D=?', options: ['1', '-1', '25', '11'], correct: 0, topic: 'рівняння' },
+  { question: 'Корінь рівняння 2x + 4 = 0', options: ['x=2', 'x=-2', 'x=4', 'x=-4'], correct: 1, topic: 'рівняння' },
+
+  // Логарифми
+  { question: 'log₂(8) = ?', options: ['2', '3', '4', '8'], correct: 1, topic: 'логарифми' },
+  { question: 'log₁₀(100) = ?', options: ['1', '2', '10', '100'], correct: 1, topic: 'логарифми' },
+  { question: 'log₃(27) = ?', options: ['2', '3', '9', '27'], correct: 1, topic: 'логарифми' },
+  { question: 'ln(e) = ?', options: ['0', '1', 'e', '2.71'], correct: 1, topic: 'логарифми' },
+  { question: 'log₅(1) = ?', options: ['0', '1', '5', '-1'], correct: 0, topic: 'логарифми' },
+
+  // Формули скороченого множення
+  { question: '(a + b)² = ?', options: ['a² + b²', 'a² - b²', 'a² + 2ab + b²', '2ab'], correct: 2, topic: 'формули' },
+  { question: '(a - b)² = ?', options: ['a² + b²', 'a² - 2ab + b²', 'a² + 2ab + b²', '(a-b)(a+b)'], correct: 1, topic: 'формули' },
+  { question: 'a² - b² = ?', options: ['(a-b)²', '(a+b)²', '(a-b)(a+b)', 'a²-2ab+b²'], correct: 2, topic: 'формули' },
+  { question: '(a + b)³ = ?', options: ['a³+b³', 'a³+3a²b+3ab²+b³', 'a³-b³', '3ab(a+b)'], correct: 1, topic: 'формули' },
+
+  // Похідні
+  { question: "(x³)' = ?", options: ['x²', '3x', '3x²', 'x⁴/4'], correct: 2, topic: 'похідні' },
+  { question: "(sin x)' = ?", options: ['sin x', '-sin x', 'cos x', '-cos x'], correct: 2, topic: 'похідні' },
+  { question: "(eˣ)' = ?", options: ['eˣ', 'xeˣ⁻¹', 'ln x', 'e'], correct: 0, topic: 'похідні' },
+  { question: "(ln x)' = ?", options: ['ln x', '1/x', 'x', 'eˣ'], correct: 1, topic: 'похідні' },
+  { question: "(x⁵)' = ?", options: ['5x⁴', 'x⁴', '5x⁵', 'x⁶/6'], correct: 0, topic: 'похідні' },
+
+  // Геометрія
+  { question: 'Сума кутів трикутника:', options: ['90°', '180°', '270°', '360°'], correct: 1, topic: 'геометрія' },
+  { question: 'Сума кутів чотирикутника:', options: ['180°', '270°', '360°', '540°'], correct: 2, topic: 'геометрія' },
+  { question: 'Площа кола радіуса r:', options: ['2πr', 'πr²', 'πr', '4πr²'], correct: 1, topic: 'геометрія' },
+  { question: 'Довжина кола радіуса r:', options: ['2πr', 'πr²', 'πr', '4πr²'], correct: 0, topic: 'геометрія' },
+  { question: 'Теорема Піфагора:', options: ['a+b=c', 'a²+b²=c²', 'ab=c²', 'a²-b²=c²'], correct: 1, topic: 'геометрія' },
+
+  // Прогресії
+  { question: 'Сума АП: 1+2+3+...+100=?', options: ['5000', '5050', '10100', '100'], correct: 1, topic: 'прогресії' },
+  { question: 'Який наступний член: 2,4,8,16,...', options: ['18', '24', '32', '64'], correct: 2, topic: 'прогресії' },
+  { question: 'Який наступний член: 3,6,9,12,...', options: ['14', '15', '16', '18'], correct: 1, topic: 'прогресії' }
+];
+
 // Post quiz poll
 async function postQuiz() {
-  const quizzes = [
-    {
-      question: 'Чому дорівнює sin²30° + cos²30°?',
-      options: ['0', '0.5', '1', '2'],
-      correct: 2
-    },
-    {
-      question: 'Скільки коренів має рівняння x² + 1 = 0?',
-      options: ['0', '1', '2', 'Нескінченно'],
-      correct: 0
-    },
-    {
-      question: 'Чому дорівнює log₂(8)?',
-      options: ['2', '3', '4', '8'],
-      correct: 1
-    },
-    {
-      question: '(a + b)² = ?',
-      options: ['a² + b²', 'a² - b²', 'a² + 2ab + b²', '2ab'],
-      correct: 2
-    },
-    {
-      question: 'Похідна функції f(x) = x³ дорівнює:',
-      options: ['x²', '3x', '3x²', 'x⁴/4'],
-      correct: 2
-    }
-  ];
-
-  const quiz = quizzes[Math.floor(Math.random() * quizzes.length)];
+  const quiz = QUIZ_BANK[Math.floor(Math.random() * QUIZ_BANK.length)];
 
   try {
     await sendPoll(quiz.question, quiz.options, quiz.correct);
-    console.log(`Posted quiz: ${quiz.question}`);
+    console.log(`✓ Posted quiz: ${quiz.question}`);
     return true;
   } catch (e) {
-    console.error('Failed to post quiz:', e.message);
+    console.error('✗ Failed to post quiz:', e.message);
+    return false;
+  }
+}
+
+// Post quiz with image (from NMT data)
+async function postImageQuiz() {
+  let nmtData = null;
+  if (fs.existsSync(CONFIG.nmtDataPath)) {
+    nmtData = JSON.parse(fs.readFileSync(CONFIG.nmtDataPath, 'utf8'));
+  }
+
+  if (!nmtData || !nmtData.test_sets) {
+    console.log('No NMT data, falling back to text quiz');
+    return postQuiz();
+  }
+
+  // Find a quiz-type task with photo
+  let attempts = 0;
+  let test, task, photoPath;
+
+  while (attempts < 30) {
+    test = nmtData.test_sets[Math.floor(Math.random() * nmtData.test_sets.length)];
+    task = test.tasks[Math.floor(Math.random() * test.tasks.length)];
+
+    if (task.type === 'quiz' && task.photo && task.correct) {
+      photoPath = path.join(CONFIG.imagesDir, task.photo);
+      if (fs.existsSync(photoPath)) break;
+    }
+    attempts++;
+  }
+
+  if (!photoPath || !fs.existsSync(photoPath)) {
+    console.log('No quiz with image found, falling back to text quiz');
+    return postQuiz();
+  }
+
+  // Ukrainian letter options
+  const optionLetters = ['А', 'Б', 'В', 'Г', 'Д'];
+  const correctIndex = optionLetters.indexOf(task.correct.toUpperCase());
+
+  if (correctIndex === -1) {
+    console.log('Invalid correct answer format, falling back');
+    return postQuiz();
+  }
+
+  const caption = `📊 <b>Опитування дня!</b>
+
+📚 ${test.name}
+📌 Завдання #${task.task_num}
+
+Обери правильний варіант! 👇
+
+#НМТ #опитування`;
+
+  try {
+    // First send the image
+    await sendPhoto(photoPath, caption);
+
+    // Then send the poll
+    await sendPoll(
+      `Завдання #${task.task_num} - яка правильна відповідь?`,
+      optionLetters.slice(0, 5), // А, Б, В, Г, Д
+      correctIndex
+    );
+
+    console.log(`✓ Posted image quiz: ${test.name} #${task.task_num}`);
+    return true;
+  } catch (e) {
+    console.error('✗ Failed to post image quiz:', e.message);
     return false;
   }
 }
@@ -345,67 +548,185 @@ ${challenge}
 #НМТ #математика #мотивація #челендж`;
 
   try {
-    await sendMessage(text);
-    console.log('Posted daily challenge');
+    await sendMessageSafe(text);
+    console.log('✓ Posted daily challenge');
     return true;
   } catch (e) {
-    console.error('Failed to post daily:', e.message);
+    console.error('✗ Failed to post daily:', e.message);
     return false;
   }
+}
+
+// Show schedule/cron setup instructions
+function showScheduleInstructions() {
+  console.log(`
+╔════════════════════════════════════════════════════════════╗
+║              АВТОМАТИЧНИЙ ПОСТІНГ В TELEGRAM               ║
+╠════════════════════════════════════════════════════════════╣
+
+📋 КРОК 1: Налаштування каналу
+─────────────────────────────────
+1. Створіть канал в Telegram (якщо ще немає)
+2. Перейдіть в налаштування каналу → Адміністратори
+3. Додайте бота @BotFather (токен вже налаштований)
+4. Дайте боту права на публікацію повідомлень
+
+📋 КРОК 2: Встановлення ID каналу
+─────────────────────────────────
+Відредагуйте channelId в цьому файлі:
+  tools/telegram-publisher.js
+
+Або встановіть змінну середовища:
+  export TELEGRAM_CHANNEL_ID="@your_channel_name"
+
+📋 КРОК 3: Автопостінг через cron (Linux/Mac)
+─────────────────────────────────
+Відкрийте crontab:
+  crontab -e
+
+Додайте рядки:
+  # Щоранку о 8:00 - привітання + челендж
+  0 8 * * * cd ${process.cwd()} && node tools/telegram-publisher.js --daily
+
+  # О 10:00 - теорія
+  0 10 * * * cd ${process.cwd()} && node tools/telegram-publisher.js --theory
+
+  # О 14:00 - опитування з картинкою
+  0 14 * * * cd ${process.cwd()} && node tools/telegram-publisher.js --image-quiz
+
+  # О 18:00 - практичне завдання
+  0 18 * * * cd ${process.cwd()} && node tools/telegram-publisher.js --practice
+
+  # О 20:00 - текстове опитування
+  0 20 * * * cd ${process.cwd()} && node tools/telegram-publisher.js --quiz
+
+📋 КРОК 4: Автопостінг через PythonAnywhere
+─────────────────────────────────
+Якщо сервер на PythonAnywhere:
+1. Перейдіть в Tasks → Scheduled tasks
+2. Додайте задачу: node /home/marko17/tools/telegram-publisher.js --daily
+
+📋 КРОК 5: Тестування
+─────────────────────────────────
+Спробуйте в тестовому режимі (без надсилання):
+  node telegram-publisher.js --test --all
+
+Надішліть тестовий пост:
+  node telegram-publisher.js --theory
+
+╚════════════════════════════════════════════════════════════╝
+`);
 }
 
 // Main function
 async function main() {
   const args = process.argv.slice(2);
 
-  if (args.length === 0) {
+  // Check for test mode
+  if (args.includes('--test')) {
+    CONFIG.testMode = true;
+    console.log('🔧 ТЕСТОВИЙ РЕЖИМ - пости не надсилаються\n');
+  }
+
+  if (args.length === 0 || args.includes('--help')) {
     console.log(`
-Telegram Channel Publisher
+╔════════════════════════════════════════════════════════════╗
+║              TELEGRAM CHANNEL PUBLISHER                    ║
+║              для НМТ Math Trainer                          ║
+╠════════════════════════════════════════════════════════════╣
 
-Використання:
-  node telegram-publisher.js --theory      Публікація теорії
-  node telegram-publisher.js --practice    Публікація завдання
-  node telegram-publisher.js --quiz        Публікація опитування
-  node telegram-publisher.js --daily       Щоденний пост
-  node telegram-publisher.js --all         Всі типи (для тесту)
+📚 КОМАНДИ:
+  --theory          Публікація теорії (формула + пояснення)
+  --practice        Завдання з картинкою (з NMT тренажера)
+  --classtime       Завдання з Classtime (з URL картинки)
+  --quiz            Текстове опитування
+  --image-quiz      Опитування з картинкою завдання
+  --daily           Щоденне привітання + челендж
+  --all             Всі типи постів (для тесту)
+  --schedule        Показати інструкцію автопостінгу
+  --test            Тестовий режим (без надсилання)
+  --help            Ця довідка
 
-Налаштування:
-  Встановіть змінні середовища:
-  - TELEGRAM_BOT_TOKEN (за замовчуванням використовується існуючий)
-  - TELEGRAM_CHANNEL_ID (наприклад @nmt_math_trainer)
+💡 ПРИКЛАДИ:
+  node telegram-publisher.js --theory
+  node telegram-publisher.js --test --all
+  node telegram-publisher.js --schedule
+
+⚙️ НАЛАШТУВАННЯ:
+  Поточний канал: ${CONFIG.channelId}
+  Бот: ${CONFIG.botToken.substring(0, 15)}...
+
+╚════════════════════════════════════════════════════════════╝
 `);
     return;
   }
 
-  console.log(`Bot Token: ${CONFIG.botToken.substring(0, 10)}...`);
-  console.log(`Channel: ${CONFIG.channelId}`);
+  if (args.includes('--schedule')) {
+    showScheduleInstructions();
+    return;
+  }
+
+  console.log(`📡 Канал: ${CONFIG.channelId}`);
+  console.log(`🤖 Бот: ${CONFIG.botToken.substring(0, 15)}...`);
   console.log('');
 
+  let success = 0;
+  let total = 0;
+
   if (args.includes('--theory')) {
-    await postTheory();
+    total++;
+    if (await postTheory()) success++;
   }
 
   if (args.includes('--practice')) {
-    await postPractice();
+    total++;
+    if (await postPractice()) success++;
+  }
+
+  if (args.includes('--classtime')) {
+    total++;
+    if (await postClasstimePractice()) success++;
   }
 
   if (args.includes('--quiz')) {
-    await postQuiz();
+    total++;
+    if (await postQuiz()) success++;
+  }
+
+  if (args.includes('--image-quiz')) {
+    total++;
+    if (await postImageQuiz()) success++;
   }
 
   if (args.includes('--daily')) {
-    await postDaily();
+    total++;
+    if (await postDaily()) success++;
   }
 
   if (args.includes('--all')) {
-    console.log('=== Testing all post types ===\n');
-    await postDaily();
+    console.log('═══════════════════════════════════════');
+    console.log('  ТЕСТУВАННЯ ВСІХ ТИПІВ ПОСТІВ');
+    console.log('═══════════════════════════════════════\n');
+
+    total = 6;
+    if (await postDaily()) success++;
     console.log('');
-    await postTheory();
+    if (await postTheory()) success++;
     console.log('');
-    await postQuiz();
+    if (await postQuiz()) success++;
     console.log('');
-    await postPractice();
+    if (await postImageQuiz()) success++;
+    console.log('');
+    if (await postPractice()) success++;
+    console.log('');
+    if (await postClasstimePractice()) success++;
+  }
+
+  if (total > 0) {
+    console.log('');
+    console.log(`═══════════════════════════════════════`);
+    console.log(`  Результат: ${success}/${total} постів`);
+    console.log(`═══════════════════════════════════════`);
   }
 }
 

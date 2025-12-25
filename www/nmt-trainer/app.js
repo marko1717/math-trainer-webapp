@@ -61,9 +61,11 @@ let timerInterval = null;
 let elapsedSeconds = 0;
 let answered = false;
 let mode = 'exam'; // 'exam' or 'training'
+let isPaused = false;
 let selectedTopic = 'all';
 let hintCache = {}; // Cache for AI hints
 let draggedOption = null;
+let pendingAnswers = []; // Temporary storage for selected but not submitted answers
 
 // ========== DOM ELEMENTS ==========
 
@@ -182,9 +184,97 @@ function setupEventListeners() {
     document.getElementById('exitTestBtn').addEventListener('click', () => {
         if (confirm('Ви впевнені, що хочете вийти з тесту? Прогрес буде втрачено.')) {
             clearInterval(timerInterval);
+            clearPausedTest();
             showScreen('select');
         }
     });
+
+    // Pause button
+    document.getElementById('pauseTestBtn').addEventListener('click', togglePause);
+}
+
+function togglePause() {
+    const pauseBtn = document.getElementById('pauseTestBtn');
+
+    if (isPaused) {
+        // Resume
+        isPaused = false;
+        pauseBtn.textContent = '⏸';
+        pauseBtn.classList.remove('paused');
+        pauseBtn.title = 'Пауза';
+        startTimer();
+        document.querySelector('.card').style.filter = 'none';
+    } else {
+        // Pause
+        isPaused = true;
+        pauseBtn.textContent = '▶';
+        pauseBtn.classList.add('paused');
+        pauseBtn.title = 'Продовжити';
+        clearInterval(timerInterval);
+        savePausedTest();
+        document.querySelector('.card').style.filter = 'blur(10px)';
+    }
+}
+
+function savePausedTest() {
+    const pausedState = {
+        testId: currentTest.id,
+        testName: currentTest.name,
+        currentTaskIndex,
+        totalScore,
+        userAnswers,
+        elapsedSeconds,
+        mode,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('nmt_paused_test', JSON.stringify(pausedState));
+}
+
+function clearPausedTest() {
+    localStorage.removeItem('nmt_paused_test');
+}
+
+function loadPausedTest() {
+    try {
+        const saved = localStorage.getItem('nmt_paused_test');
+        if (!saved) return null;
+
+        const pausedState = JSON.parse(saved);
+        // Expire after 24 hours
+        if (Date.now() - pausedState.timestamp > 24 * 60 * 60 * 1000) {
+            clearPausedTest();
+            return null;
+        }
+        return pausedState;
+    } catch (e) {
+        return null;
+    }
+}
+
+function resumePausedTest(pausedState) {
+    // Find the test
+    const allTests = [...(nmtData?.test_sets || []), ...(classtimeData?.test_sets || [])];
+    const test = allTests.find(t => t.id === pausedState.testId);
+
+    if (!test) {
+        alert('Тест не знайдено');
+        clearPausedTest();
+        return;
+    }
+
+    currentTest = test;
+    currentTaskIndex = pausedState.currentTaskIndex;
+    totalScore = pausedState.totalScore;
+    userAnswers = pausedState.userAnswers;
+    elapsedSeconds = pausedState.elapsedSeconds;
+    mode = pausedState.mode;
+    isPaused = false;
+
+    clearPausedTest();
+    showScreen('task');
+    renderTaskNav();
+    showTask();
+    startTimer();
 }
 
 function setupMatchingDragDrop() {
@@ -294,6 +384,22 @@ function placeAnswer(zone, value) {
 function renderTestList() {
     testList.innerHTML = '';
 
+    // Check for paused test and show resume button
+    const pausedTest = loadPausedTest();
+    if (pausedTest) {
+        const resumeCard = document.createElement('div');
+        resumeCard.className = 'test-card resume-card';
+        resumeCard.innerHTML = `
+            <div class="test-card-info">
+                <h3>▶ Продовжити: ${pausedTest.testName}</h3>
+                <p>Завдання ${pausedTest.currentTaskIndex + 1} • ${formatTime(pausedTest.elapsedSeconds)}</p>
+            </div>
+            <span class="test-card-arrow">→</span>
+        `;
+        resumeCard.addEventListener('click', () => resumePausedTest(pausedTest));
+        testList.appendChild(resumeCard);
+    }
+
     // Add data source toggle if Classtime data available
     if (classtimeData) {
         const sourceToggle = document.createElement('div');
@@ -394,6 +500,7 @@ function startTest(test) {
     currentTaskIndex = 0;
     totalScore = 0;
     userAnswers = new Array(test.tasks.length).fill(null);
+    pendingAnswers = new Array(test.tasks.length).fill(null);
     elapsedSeconds = 0;
     hintCache = {};
 
@@ -460,13 +567,17 @@ function stopTimer() {
 }
 
 function updateTimerDisplay() {
-    const minutes = Math.floor(elapsedSeconds / 60);
-    const seconds = elapsedSeconds % 60;
-    timer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    timer.textContent = formatTime(elapsedSeconds);
 
     if (elapsedSeconds > 45 * 60) {
         timer.classList.add('warning');
     }
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
 // ========== TASK NAVIGATION ==========
@@ -495,6 +606,7 @@ function renderTaskNav() {
         }
 
         btn.addEventListener('click', () => {
+            savePendingAnswer(); // Save current selection before switching
             currentTaskIndex = index;
             showTask();
             updateTaskNav();
@@ -507,11 +619,83 @@ function renderTaskNav() {
 function updateTaskNav() {
     const buttons = taskNav.querySelectorAll('.task-nav-btn');
     buttons.forEach((btn, index) => {
-        btn.classList.remove('current');
+        // Remove all state classes
+        btn.classList.remove('current', 'answered', 'wrong', 'partial', 'pending');
+
+        // Add current task indicator
         if (index === currentTaskIndex) {
             btn.classList.add('current');
         }
+
+        // Add classes for answered tasks
+        if (userAnswers[index] !== null) {
+            const answer = userAnswers[index];
+            if (answer.isCorrect) {
+                btn.classList.add('answered');
+            } else if (answer.partialScore > 0) {
+                btn.classList.add('partial');
+            } else {
+                btn.classList.add('wrong');
+            }
+        } else if (pendingAnswers && pendingAnswers[index]) {
+            // Add visual indicator for pending (selected but not submitted) answers
+            btn.classList.add('pending');
+        }
     });
+}
+
+// Save current selection before switching tasks
+function savePendingAnswer() {
+    if (answered || userAnswers[currentTaskIndex] !== null) return;
+
+    const task = currentTest.tasks[currentTaskIndex];
+    const taskNum = task.task_num || currentTaskIndex + 1;
+    let taskType = task.type || 'quiz';
+    if (SHORT_ANSWER_TASKS.includes(taskNum) || NUMBER_TYPES.includes(taskType)) {
+        taskType = 'short';
+    }
+
+    if (taskType === 'match') {
+        const answer = getMatchingAnswer();
+        if (answer.trim()) {
+            pendingAnswers[currentTaskIndex] = { type: 'match', value: answer };
+        }
+    } else if (taskType === 'short') {
+        const value = shortAnswerInput.value.trim();
+        if (value) {
+            pendingAnswers[currentTaskIndex] = { type: 'short', value };
+        }
+    } else {
+        const selected = document.querySelector('.answer-btn.selected');
+        if (selected) {
+            pendingAnswers[currentTaskIndex] = { type: 'quiz', value: selected.dataset.answer };
+        }
+    }
+}
+
+// Restore pending answer when returning to a task
+function restorePendingAnswer(taskType) {
+    const pending = pendingAnswers[currentTaskIndex];
+    if (!pending) return;
+
+    if (taskType === 'quiz' && pending.type === 'quiz') {
+        const btn = document.querySelector(`.answer-btn[data-answer="${pending.value}"]`);
+        if (btn) btn.classList.add('selected');
+    } else if (taskType === 'short' && pending.type === 'short') {
+        shortAnswerInput.value = pending.value;
+    } else if (taskType === 'match' && pending.type === 'match') {
+        // Restore matching answers
+        const parts = pending.value.split(' ');
+        document.querySelectorAll('.match-dropzone').forEach((zone, i) => {
+            if (parts[i]) {
+                zone.dataset.answer = parts[i];
+                zone.textContent = parts[i];
+                zone.classList.add('has-answer');
+                const opt = document.querySelector(`.match-option[data-value="${parts[i]}"]`);
+                if (opt) opt.classList.add('used');
+            }
+        });
+    }
 }
 
 // ========== TASK DISPLAY ==========
@@ -558,6 +742,8 @@ function showTask() {
         resetMatchingUI();
         if (previousAnswer) {
             restoreMatchingAnswer(previousAnswer);
+        } else {
+            restorePendingAnswer(taskType);
         }
     } else if (taskType === 'short') {
         shortAnswerContainer.classList.remove('hidden');
@@ -565,12 +751,16 @@ function showTask() {
         shortAnswerInput.classList.remove('correct', 'wrong');
         if (previousAnswer) {
             shortAnswerInput.classList.add(previousAnswer.isCorrect ? 'correct' : 'wrong');
+        } else {
+            restorePendingAnswer(taskType);
         }
     } else {
         quizOptions.classList.remove('hidden');
         resetQuizButtons();
         if (previousAnswer) {
             restoreQuizAnswer(previousAnswer, task.correct);
+        } else {
+            restorePendingAnswer(taskType);
         }
     }
 

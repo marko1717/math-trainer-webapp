@@ -167,5 +167,89 @@ async function generateSolutionWithClaude(task) {
 
 ---
 
+---
+
+## Підключення до PythonAnywhere
+
+### Дані для підключення:
+- **Хост:** ssh.pythonanywhere.com
+- **Користувач:** marko17
+- **Пароль:** &m+5nQDWB/:%GLb
+
+### Встановлення sshpass (для автоматичного вводу пароля):
+
+```bash
+# macOS
+brew tap esolitos/ipa
+brew install esolitos/ipa/sshpass
+```
+
+### Підключення через SSH:
+
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' ssh -o StrictHostKeyChecking=no marko17@ssh.pythonanywhere.com
+```
+
+### Виконання команди на сервері:
+
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' ssh -o StrictHostKeyChecking=no marko17@ssh.pythonanywhere.com "команда"
+```
+
+Приклад - перевірити файли:
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' ssh -o StrictHostKeyChecking=no marko17@ssh.pythonanywhere.com "ls -la ~/bot-tg/"
+```
+
+### Копіювання файлу на сервер (SCP):
+
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' scp -o StrictHostKeyChecking=no /локальний/шлях/файл.py marko17@ssh.pythonanywhere.com:/home/marko17/файл.py
+```
+
+### Перевірка синтаксису Python файлу:
+
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' ssh -o StrictHostKeyChecking=no marko17@ssh.pythonanywhere.com "python3 -m py_compile /home/marko17/bot-tg/quiz-bot-2.py && echo SYNTAX_OK"
+```
+
+### Перегляд конкретних рядків файлу:
+
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' ssh -o StrictHostKeyChecking=no marko17@ssh.pythonanywhere.com "sed -n '100,150p' /home/marko17/bot-tg/quiz-bot-2.py"
+```
+
+### Пошук в файлі:
+
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' ssh -o StrictHostKeyChecking=no marko17@ssh.pythonanywhere.com "grep -n 'пошуковий_текст' ~/bot-tg/quiz-bot-2.py | head -20"
+```
+
+### Запуск Python скрипта на сервері:
+
+```bash
+/opt/homebrew/bin/sshpass -p '&m+5nQDWB/:%GLb' ssh -o StrictHostKeyChecking=no marko17@ssh.pythonanywhere.com "python3 /home/marko17/script.py"
+```
+
+### Структура файлів на PythonAnywhere:
+
+```
+/home/marko17/
+├── bot-tg/
+│   └── quiz-bot-2.py    # Telegram бот
+├── mysite/
+│   └── ...              # Web додаток (Flask/Django)
+└── ...
+```
+
+### Перезапуск веб-додатку:
+
+Через веб-інтерфейс PythonAnywhere:
+1. Зайти на https://www.pythonanywhere.com
+2. Вкладка "Web"
+3. Натиснути "Reload"
+
+---
+
 *Створено: 26 грудня 2025*
 *Claude Code session для проекту math-trainer-webapp*
